@@ -34,53 +34,69 @@ export async function POST(request: Request) {
     }));
 
     // Create the prompt for Gemini
-    const prompt = `You are a home services trade matching expert.
+    const prompt = `You are a trade matching expert for a UK home services platform.
 
-Your task is to analyze the user's query and match it with the most relevant trades from our database.
+Your job is to analyze a homeowner's request and determine the most relevant trades from our database, based on the nature of the work, the likely cause of the issue, and typical UK trade responsibilities.
 
-Query: "${query}"
+Query:
+"${query}"
 
 Available trades data:
 ${JSON.stringify(tradesData, null, 2)}
 
-Step-by-step reasoning (do not include this in the output):
-1. Determine the **intent** of the query. Classify it as one of the following:
-   - "installation" → user wants something fitted, added, or replaced
-   - "repair" → user wants something fixed or not working
-   - "maintenance" → user wants regular servicing or inspection
-   - "upgrade" → user wants to improve or modernize something
-   - "emergency" → urgent issue, often involving leaks, loss of power, or safety concerns
+---
 
-2. Identify the **object or problem** mentioned (e.g., washing machine, boiler, lighting, roof, walls, flooring, garden).
+Your goals:
+1. Understand the intent behind the user's request (for example, repair, installation, renovation, or inspection).
+2. Identify the most suitable trade or trades from the provided data.
+3. Provide a short, clear analysis that explains the issue or intent.
+4. Recommend up to 4 trades maximum, ordered by relevance.
+5. Assign realistic match scores between 0 and 100.
+6. For each trade, estimate an average price range in GBP based on UK market data for that type of work.
+   - Use broad, honest ranges (for example, 80–200 for small jobs, 300–800 for major repairs).
+   - Express as numeric values: "low" and "high".
+   - Always include "currency": "GBP".
+   - Add a short "notes" field explaining what the estimate covers (for example, call-out, parts, labour).
+7. If no exact match exists, choose the closest relevant trade and briefly explain why.
 
-3. Match the query to the most relevant trades based on:
-   - Alignment between intent and the type of work each trade performs
-   - The specific problem or object mentioned
-   - Realistic professional responsibility (who would actually handle this job)
+---
 
-4. Penalize matches that are **technically related but contextually wrong** (e.g., a kitchen fitter should not be chosen for a washing machine repair).
-
-Respond ONLY with raw JSON in the following format:
+Output format (strict JSON, no markdown, no extra text):
 
 {
-  "intent": "repair | installation | maintenance | upgrade | emergency",
-  "overview": "Brief analysis of what the user likely needs (2-3 sentences)",
-  "recommendedTrade": "Name of the most relevant trade",
-  "recommendationReason": "Why this trade is the most suitable (1-2 sentences)",
+  "overview": "2 to 3 sentence summary explaining what the problem likely involves and what kind of trades are suitable.",
+  "recommendedTrade": "Name of the single most relevant trade",
+  "recommendationReason": "Why this trade best fits the job (1 to 2 sentences)",
+  "estimatedPrice": {
+    "low": number,
+    "high": number,
+    "currency": "GBP",
+    "notes": "short sentence describing what the estimate includes"
+  },
   "matches": [
     {
-      "tradeName": "Trade name",
-      "matchScore": number between 0-100,
-      "matchReason": "Short reason why this trade fits the query"
+      "tradeName": "Trade name from tradesData",
+      "matchScore": number between 0 and 100,
+      "matchReason": "1 sentence explaining why this trade is suitable",
+      "estimatedPrice": {
+        "low": number,
+        "high": number,
+        "currency": "GBP",
+        "notes": "short description"
+      }
     }
   ]
 }
 
-Guidelines:
-- Return 2–4 matches, ordered by match score.
-- Use realistic match scores (e.g., 90–100 = excellent, 70–89 = good, 50–69 = partial).
-- Be specific about why each trade is or isn't a good fit.
-- If the issue is about a household appliance, prefer trades like "Handyman Services" or "Electrical" rather than installation-focused ones like "Kitchen Fitting".`;
+---
+
+Important rules:
+- Use plain English in all text fields.
+- Avoid vague statements (for example, "this trade may help"); be specific about what they can do.
+- Always include an estimatedPrice for both the top-level recommendation and each match.
+- Never add commentary or markdown formatting.
+- If the problem is unclear, recommend the most versatile trade (like "Handyman Services") and explain why.
+- Make sure your JSON is valid and can be parsed directly.`;
 
     // Check for API key
     if (!process.env.GEMINI_API_KEY) {
