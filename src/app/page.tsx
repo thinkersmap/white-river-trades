@@ -28,10 +28,22 @@ export default function Home() {
     overview: string;
     recommendedTrade: string;
     recommendationReason: string;
+    estimatedPrice: {
+      low: number;
+      high: number;
+      currency: string;
+      notes: string;
+    };
     matches: Array<{
       tradeName: string;
       matchScore: number;
       matchReason: string;
+      estimatedPrice: {
+        low: number;
+        high: number;
+        currency: string;
+        notes: string;
+      };
     }>;
   } | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -203,17 +215,17 @@ export default function Home() {
                 >
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-md" aria-hidden="true" />
                   
-                  <div className="fixed inset-0 flex items-start justify-center sm:pt-10 lg:pt-20">
-                    <Dialog.Panel className="w-full h-full sm:h-auto sm:max-h-[calc(100vh-80px)] max-w-5xl bg-white sm:rounded-lg overflow-hidden">
-                      <div className="sticky top-0 z-10 bg-white flex items-center justify-between p-4 sm:p-6 border-b">
+                  <div className="fixed inset-0 flex flex-col">
+                    <Dialog.Panel className="flex flex-col w-full h-full bg-white sm:h-[calc(100vh-80px)] sm:max-w-5xl sm:mx-auto sm:my-10 sm:rounded-lg">
+                      <div className="flex items-center justify-between p-4 sm:p-6 border-b">
                         <div>
                           <h2 className="text-lg sm:text-xl font-medium text-gray-900">Find a local trade</h2>
                           <p className="text-sm text-gray-500 mt-1">Describe your project or problem, and we&apos;ll match you with the right trade.</p>
                         </div>
-                          <div className="flex items-center gap-4">
-                            <div className="hidden sm:flex gap-2">
-                              <div className={`h-1 w-8 rounded-full transition-colors ${step >= 1 ? 'bg-black' : 'bg-gray-100'}`} />
-                              <div className={`h-1 w-8 rounded-full transition-colors ${step >= 2 ? 'bg-black' : 'bg-gray-100'}`} />
+                        <div className="flex items-center gap-4">
+                          <div className="hidden sm:flex gap-2">
+                            <div className={`h-1 w-8 rounded-full transition-colors ${step >= 1 ? 'bg-black' : 'bg-gray-100'}`} />
+                            <div className={`h-1 w-8 rounded-full transition-colors ${step >= 2 ? 'bg-black' : 'bg-gray-100'}`} />
         </div>
                           <button 
                             onClick={() => setIsOpen(false)}
@@ -226,9 +238,9 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
+                      <div className="flex-1 overflow-y-auto">
                         {step === 1 ? (
-                          <div className="p-6">
+                          <div className="p-4 sm:p-6">
                             <div className="max-w-2xl mx-auto space-y-8">
                               <div className="relative">
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -350,7 +362,7 @@ export default function Home() {
                                             return (
                                               <div 
                                                 key={trade.name}
-                                                className="group hover:bg-gray-50/80 border border-gray-200 rounded-xl mx-0.5 px-4 sm:px-6 py-4 sm:py-6 transition-all hover:border-gray-300"
+                                                className="group border border-gray-200 rounded-xl overflow-hidden transition-all hover:border-gray-300 hover:shadow-sm"
                                               >
                                                 <button 
                                                   onClick={() => {
@@ -359,38 +371,52 @@ export default function Home() {
                                                   }}
                                                   className="w-full text-left"
                                                 >
-                                                  <div className="flex items-start gap-4">
-                                                    <div className="p-3 bg-gray-50 rounded-xl shrink-0 group-hover:bg-white transition-colors">
-                                                      <Icon className="w-6 h-6 text-gray-600" />
-                                                    </div>
-                                                    <div className="min-w-0 space-y-4 flex-1">
-                                                      <div>
-                                                        <div className="flex items-center justify-between gap-4 mb-2">
-                                                          <div className="text-lg font-medium text-gray-900">{trade.name}</div>
-                                                          <div className={`text-sm font-medium ${
-                                                            match.matchScore >= 80 ? 'text-green-600' :
-                                                            match.matchScore >= 50 ? 'text-yellow-600' :
-                                                            'text-gray-400'
-                                                          }`}>
-                                                            {match.matchScore}% match
-                                                          </div>
+                                                  <div className="flex flex-col">
+                                                    {/* Header */}
+                                                    <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100">
+                                                      <div className="flex items-center gap-3">
+                                                        <div className="p-2.5 bg-gray-50 rounded-lg shrink-0 group-hover:bg-white transition-colors">
+                                                          <Icon className="w-5 h-5 text-gray-600" />
                                                         </div>
-                                                        <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
+                                                        <div className="text-lg font-medium text-gray-900">{trade.name}</div>
+                                                      </div>
+                                                      <div className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                                                        match.matchScore >= 80 ? 'bg-green-50 text-green-700' :
+                                                        match.matchScore >= 50 ? 'bg-yellow-50 text-yellow-700' :
+                                                        'bg-gray-50 text-gray-500'
+                                                      }`}>
+                                                        {match.matchScore}% match
+                                                      </div>
+                                                    </div>
+
+                                                    {/* Content */}
+                                                    <div className="p-4 sm:p-5 space-y-4">
+                                                      {/* Description */}
+                                                      <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
+
+                                                      {/* Match Reason */}
+                                                      <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
+
+                                                      {/* Price Box */}
+                                                      <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                                        <div className="flex items-baseline gap-1.5">
+                                                          <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.low.toLocaleString()}</div>
+                                                          <div className="text-gray-400">-</div>
+                                                          <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.high.toLocaleString()}</div>
+                                                        </div>
+                                                        <div className="text-sm text-gray-500">{match.estimatedPrice.notes}</div>
                                                       </div>
 
-                                                      <div className="space-y-4">
-                                                        <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
-                                                        
-                                                        <div className="flex flex-wrap gap-2">
-                                                          {trade.subcategories.map(sub => (
-                                                            <span 
-                                                              key={sub.slug}
-                                                              className="inline-flex text-xs text-gray-600 bg-gray-50 px-2.5 py-1 rounded-lg group-hover:bg-gray-100 transition-colors"
-                                                            >
-                                                              {sub.name}
-                                                            </span>
-                                                          ))}
-                                                        </div>
+                                                      {/* Subcategories */}
+                                                      <div className="flex flex-wrap gap-2 pt-1">
+                                                        {trade.subcategories.map(sub => (
+                                                          <span 
+                                                            key={sub.slug}
+                                                            className="inline-flex text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg group-hover:bg-gray-50 transition-colors"
+                                                          >
+                                                            {sub.name}
+                                                          </span>
+                                                        ))}
                                                       </div>
                                                     </div>
                                                   </div>
@@ -491,21 +517,36 @@ export default function Home() {
                 >
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-md" aria-hidden="true" />
                   
-                  <div className="fixed inset-0 flex items-start justify-center sm:pt-10 lg:pt-20">
-                    <Dialog.Panel className="w-full h-full sm:h-auto sm:max-h-[calc(100vh-80px)] max-w-5xl bg-white sm:rounded-lg overflow-hidden">
-                      <div className="sticky top-0 z-10 bg-white flex items-center justify-between p-4 sm:p-6 border-b">
-                        <h2 className="text-lg sm:text-xl font-medium text-gray-900">Available trades</h2>
-                        <button 
-                          onClick={() => setShowTrades(false)}
-                          className="text-gray-400 hover:text-gray-500"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
+                  <div className="fixed inset-0 flex flex-col">
+                    <Dialog.Panel className="flex flex-col w-full h-full bg-white sm:h-[calc(100vh-80px)] sm:max-w-5xl sm:mx-auto sm:my-10 sm:rounded-lg">
+                      <div className="flex flex-col border-b">
+                        <div className="flex items-center gap-3 px-4 sm:px-6 pt-4 sm:pt-6">
+                          <button 
+                            onClick={() => {
+                              setShowTrades(false);
+                              setIsOpen(true);
+                            }}
+                            className="text-sm text-gray-500 hover:text-gray-900 -ml-1 px-1 flex items-center gap-1"
+                          >
+                            <span className="text-lg">←</span>
+                            <span>Back to search</span>
+                          </button>
+                          <div className="h-4 border-r border-gray-200"></div>
+                        </div>
+                        <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5">
+                          <h2 className="text-lg sm:text-xl font-medium text-gray-900">Available trades</h2>
+                          <button 
+                            onClick={() => setShowTrades(false)}
+                            className="text-gray-400 hover:text-gray-500"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
                       
-                      <div className="overflow-y-auto">
+                      <div className="flex-1 overflow-y-auto">
                         <div className="p-4 sm:p-6 space-y-8 sm:space-y-12">
                           {/* Group trades by category */}
                           {Array.from(new Set(trades.map(t => t.category))).map(category => (
