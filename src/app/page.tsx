@@ -491,20 +491,22 @@ export default function Home() {
                 >
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-md" aria-hidden="true" />
                   
-                  <div className="fixed inset-0 flex items-start justify-center pt-20">
-                    <Dialog.Panel className="w-full max-w-5xl bg-white rounded-lg">
-                      <div className="flex items-center justify-between p-6 border-b">
-                        <h2 className="text-xl font-medium text-gray-900">Available trades</h2>
+                  <div className="fixed inset-0 flex items-start justify-center sm:pt-10 lg:pt-20">
+                    <Dialog.Panel className="w-full h-full sm:h-auto sm:max-h-[calc(100vh-80px)] max-w-5xl bg-white sm:rounded-lg overflow-hidden">
+                      <div className="sticky top-0 z-10 bg-white flex items-center justify-between p-4 sm:p-6 border-b">
+                        <h2 className="text-lg sm:text-xl font-medium text-gray-900">Available trades</h2>
                         <button 
                           onClick={() => setShowTrades(false)}
                           className="text-gray-400 hover:text-gray-500"
                         >
-                          ✕
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         </button>
                       </div>
                       
-                      <div className="overflow-y-auto max-h-[calc(100vh-200px)]">
-                        <div className="p-6 space-y-12">
+                      <div className="overflow-y-auto">
+                        <div className="p-4 sm:p-6 space-y-8 sm:space-y-12">
                           {/* Group trades by category */}
                           {Array.from(new Set(trades.map(t => t.category))).map(category => (
                             <div key={category}>
@@ -532,9 +534,9 @@ export default function Home() {
                                             }
                                           }}
                                           className={`
-                                            w-full p-4 text-left transition-all
+                                            w-full p-3 sm:p-4 text-left transition-all
                                             ${trade.available 
-                                              ? 'hover:bg-gray-100/50' 
+                                              ? 'hover:bg-gray-100/50 active:bg-gray-100' 
                                               : 'cursor-not-allowed'
                                             }
                                           `}
@@ -543,16 +545,16 @@ export default function Home() {
                                             <div className="p-1.5 bg-gray-100 rounded-md shrink-0">
                                               <Icon className="w-4 h-4 text-gray-500" />
                                             </div>
-                                            <div className="min-w-0 space-y-2">
+                                            <div className="min-w-0 space-y-1.5 sm:space-y-2">
                                               <div className="flex items-center gap-2">
                                                 <span className="text-sm font-medium text-gray-900">{trade.name}</span>
                                                 {!trade.available && (
                                                   <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Coming Soon</span>
                                                 )}
                                               </div>
-                                              <div className="text-xs text-gray-500 line-clamp-2">{trade.description}</div>
+                                              <div className="text-xs text-gray-600 line-clamp-2">{trade.description}</div>
                                               <div className="flex gap-1.5 flex-wrap">
-                                                {trade.subcategories.slice(0, 3).map(sub => (
+                                                {trade.subcategories.slice(0, 2).map(sub => (
                                                   <span 
                                                     key={sub.slug}
                                                     className="inline-flex text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"
@@ -560,9 +562,9 @@ export default function Home() {
                                                     {sub.name}
                                                   </span>
                                                 ))}
-                                                {trade.subcategories.length > 3 && (
+                                                {trade.subcategories.length > 2 && (
                                                   <span className="inline-flex text-[10px] text-gray-400">
-                                                    +{trade.subcategories.length - 3}
+                                                    +{trade.subcategories.length - 2}
                                                   </span>
                                                 )}
                                               </div>
