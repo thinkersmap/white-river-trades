@@ -120,13 +120,13 @@ export default function Home() {
       <div className="bg-white">
         <nav className="max-w-[1400px] mx-auto px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between">
           <div className="flex items-center gap-8 lg:gap-14">
-            <div className="text-lg sm:text-xl font-semibold tracking-tight">White River</div>
+            <div className="text-lg sm:text-xl font-semibold tracking-tight text-gray-900">White River</div>
             <div className="hidden md:flex items-center gap-6 lg:gap-9">
-              <a href="#" className="text-[15px] [color:#374151] hover:[color:#111827] transition-colors">Solutions</a>
-              <a href="#" className="text-[15px] [color:#374151] hover:[color:#111827] transition-colors">Industries</a>
-              <a href="#" className="text-[15px] [color:#374151] hover:[color:#111827] transition-colors">Pricing</a>
-              <a href="#" className="text-[15px] [color:#374151] hover:[color:#111827] transition-colors">Resources</a>
-              <a href="#" className="text-[15px] [color:#374151] hover:[color:#111827] transition-colors">Company</a>
+              <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Solutions</a>
+              <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Industries</a>
+              <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Pricing</a>
+              <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Resources</a>
+              <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Company</a>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -170,10 +170,10 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <h1 className="text-4xl sm:text-5xl lg:text-[72px] leading-[1.1] font-normal tracking-[-0.02em] [color:#111827]">
+                  <h1 className="text-4xl sm:text-5xl lg:text-[72px] leading-[1.1] font-normal tracking-[-0.02em] text-gray-900">
                     Need work done? Discover local services near you.
                   </h1>
-                  <p className="mt-4 lg:mt-6 text-lg lg:text-xl [color:#4B5563] leading-relaxed max-w-[95%] lg:max-w-[90%]">
+                  <p className="mt-4 lg:mt-6 text-lg lg:text-xl text-gray-600 leading-relaxed max-w-[95%] lg:max-w-[90%]">
                     Tell us what you need done and where you are. We&apos;ll show local businesses ready to help. Use the searchbox below to get started.
                   </p>
                 </div>
@@ -189,7 +189,7 @@ export default function Home() {
                     <input
                       readOnly
                       type="text"
-                      className="w-full pl-16 pr-6 py-5 text-lg bg-gray-50 rounded-2xl border border-gray-200/60 focus:outline-none group-hover:border-gray-300 group-hover:bg-white transition-all cursor-pointer shadow-sm"
+                      className="w-full pl-16 pr-6 py-5 text-lg text-gray-900 placeholder:text-gray-500 bg-gray-50 rounded-2xl border border-gray-200/60 focus:outline-none group-hover:border-gray-300 group-hover:bg-white transition-all cursor-pointer shadow-sm"
                       placeholder={searchExamples[placeholderIndex]}
                     />
                   </div>
@@ -207,8 +207,8 @@ export default function Home() {
                     <Dialog.Panel className="w-full h-full sm:h-auto sm:max-h-[calc(100vh-80px)] max-w-5xl bg-white sm:rounded-lg overflow-hidden">
                       <div className="sticky top-0 z-10 bg-white flex items-center justify-between p-4 sm:p-6 border-b">
                         <div>
-                          <h2 className="text-lg sm:text-xl font-medium [color:#111827]">Find a local trade</h2>
-                          <p className="text-sm [color:#6B7280] mt-1">Describe your project or problem, and we&apos;ll match you with the right trade.</p>
+                          <h2 className="text-lg sm:text-xl font-medium text-gray-900">Find a local trade</h2>
+                          <p className="text-sm text-gray-500 mt-1">Describe your project or problem, and we&apos;ll match you with the right trade.</p>
                         </div>
                           <div className="flex items-center gap-4">
                             <div className="hidden sm:flex gap-2">
@@ -245,7 +245,7 @@ export default function Home() {
                                       setSearchResults(null);
                                     }
                                   }}
-                                  className="w-full pl-11 pr-[6.5rem] py-3 sm:py-4 text-base sm:text-lg bg-gray-50 rounded-xl border border-gray-200/60 focus:outline-none focus:ring-2 focus:ring-black/5"
+                                  className="w-full pl-11 pr-[6.5rem] py-3 sm:py-4 text-base sm:text-lg text-gray-900 placeholder:text-gray-500 bg-gray-50 rounded-xl border border-gray-200/60 focus:outline-none focus:ring-2 focus:ring-black/5"
                                   placeholder={searchExamples[placeholderIndex]}
                                   onKeyDown={(e) => e.key === 'Enter' && searchQuery && handleSearch()}
                                 />
@@ -330,9 +330,9 @@ export default function Home() {
                                     <>
                                       {/* Analysis Overview */}
                                       <div>
-                                        <div className="text-sm [color:#9CA3AF] font-medium mb-3">AI ANALYSIS</div>
+                                        <div className="text-sm text-gray-400 font-medium mb-3">AI ANALYSIS</div>
                                         <div className="bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] rounded-lg p-6">
-                                          <div className="text-base [color:#4B5563] leading-relaxed">
+                                          <div className="text-base text-gray-600 leading-relaxed">
                                             {searchResults.overview}
                                           </div>
                                         </div>
@@ -340,7 +340,7 @@ export default function Home() {
 
                                       {/* Matching Trades */}
                                       <div>
-                                        <div className="text-sm [color:#9CA3AF] font-medium mb-4">RECOMMENDED TRADES</div>
+                                        <div className="text-sm text-gray-400 font-medium mb-4">RECOMMENDED TRADES</div>
                                         <div className="space-y-4">
                                           {searchResults.matches.map((match) => {
                                             const trade = trades.find(t => t.name === match.tradeName);
@@ -366,26 +366,26 @@ export default function Home() {
                                                     <div className="min-w-0 space-y-4 flex-1">
                                                       <div>
                                                         <div className="flex items-center justify-between gap-4 mb-2">
-                                                          <div className="text-lg font-medium [color:#111827]">{trade.name}</div>
+                                                          <div className="text-lg font-medium text-gray-900">{trade.name}</div>
                                                           <div className={`text-sm font-medium ${
-                                                            match.matchScore >= 80 ? '[color:#059669]' :
-                                                            match.matchScore >= 50 ? '[color:#D97706]' :
-                                                            '[color:#9CA3AF]'
+                                                            match.matchScore >= 80 ? 'text-green-600' :
+                                                            match.matchScore >= 50 ? 'text-yellow-600' :
+                                                            'text-gray-400'
                                                           }`}>
                                                             {match.matchScore}% match
                                                           </div>
                                                         </div>
-                                                        <div className="text-base [color:#4B5563] leading-relaxed">{trade.description}</div>
+                                                        <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
                                                       </div>
 
                                                       <div className="space-y-4">
-                                                        <div className="text-sm [color:#4B5563] leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
+                                                        <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
                                                         
                                                         <div className="flex flex-wrap gap-2">
                                                           {trade.subcategories.map(sub => (
                                                             <span 
                                                               key={sub.slug}
-                                                              className="inline-flex text-xs [color:#4B5563] bg-[#F9FAFB] px-2.5 py-1 rounded-lg group-hover:bg-[#F3F4F6] transition-colors"
+                                                              className="inline-flex text-xs text-gray-600 bg-gray-50 px-2.5 py-1 rounded-lg group-hover:bg-gray-100 transition-colors"
                                                             >
                                                               {sub.name}
                                                             </span>
