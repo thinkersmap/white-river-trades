@@ -115,13 +115,13 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
+    <div className="min-h-screen bg-[#f5f5f7] flex flex-col">
       {/* Navigation Container */}
       <div className="bg-white">
-        <nav className="max-w-[1400px] mx-auto px-8 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-14">
-            <div className="text-xl font-semibold tracking-tight">White River</div>
-            <div className="hidden md:flex items-center gap-9">
+        <nav className="max-w-[1400px] mx-auto px-4 sm:px-8 py-4 sm:py-5 flex items-center justify-between">
+          <div className="flex items-center gap-8 lg:gap-14">
+            <div className="text-lg sm:text-xl font-semibold tracking-tight">White River</div>
+            <div className="hidden md:flex items-center gap-6 lg:gap-9">
               <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Solutions</a>
               <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Industries</a>
               <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Pricing</a>
@@ -129,27 +129,34 @@ export default function Home() {
               <a href="#" className="text-[15px] text-gray-700 hover:text-gray-900 transition-colors">Company</a>
             </div>
           </div>
-          <a
-            href="#"
-            className="hidden md:block px-7 py-2.5 bg-black text-white text-[15px] rounded-full hover:bg-gray-900 transition-all"
-          >
-            Get Started
-          </a>
+          <div className="flex items-center gap-4">
+            <button className="md:hidden text-gray-700 hover:text-gray-900">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+            <a
+              href="#"
+              className="hidden md:block px-6 lg:px-7 py-2.5 bg-black text-white text-[15px] rounded-full hover:bg-gray-900 transition-all"
+            >
+              Get Started
+            </a>
+          </div>
         </nav>
       </div>
 
       {/* Hero Section */}
-      <div className="p-4 h-[calc(100vh-76px)]">
-        <div className="grid grid-cols-2 gap-4 h-full">
+      <div className="flex-1 p-4">
+        <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left Hero Container */}
           <div className="bg-white rounded-[16px] flex items-center">
-            <div className="px-16 py-20 w-full">
-              <div className="space-y-10">
+            <div className="px-6 sm:px-8 lg:px-16 py-12 lg:py-20 w-full">
+              <div className="space-y-8 lg:space-y-10">
                 {/* Avatar Stack */}
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="w-12 h-12 rounded-full border-2 border-white ring-2 ring-gray-50 relative">
-                      <Image
+        <Image
                         src={`https://i.pravatar.cc/100?img=${i + 10}`}
                         alt={`Tradesperson ${i}`}
                         fill
@@ -163,10 +170,10 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <h1 className="text-[72px] leading-[1.1] font-normal tracking-[-0.02em] text-gray-900">
+                  <h1 className="text-4xl sm:text-5xl lg:text-[72px] leading-[1.1] font-normal tracking-[-0.02em] text-gray-900">
                     Need work done? Discover local services near you.
                   </h1>
-                  <p className="mt-6 text-xl text-gray-600 leading-relaxed max-w-[90%]">
+                  <p className="mt-4 lg:mt-6 text-lg lg:text-xl text-gray-600 leading-relaxed max-w-[95%] lg:max-w-[90%]">
                     Tell us what you need done and where you are. We&apos;ll show local businesses ready to help. Use the searchbox below to get started.
                   </p>
                 </div>
@@ -196,15 +203,15 @@ export default function Home() {
                 >
                   <div className="fixed inset-0 bg-black/50 backdrop-blur-md" aria-hidden="true" />
                   
-                  <div className="fixed inset-0 flex items-start justify-center pt-20">
-                    <Dialog.Panel className="w-full max-w-5xl bg-white rounded-lg">
-                      <div className="flex items-center justify-between p-6 border-b">
+                  <div className="fixed inset-0 flex items-start justify-center sm:pt-10 lg:pt-20">
+                    <Dialog.Panel className="w-full h-full sm:h-auto sm:max-h-[calc(100vh-80px)] max-w-5xl bg-white sm:rounded-lg overflow-hidden">
+                      <div className="sticky top-0 z-10 bg-white flex items-center justify-between p-4 sm:p-6 border-b">
                         <div>
-                          <h2 className="text-xl font-medium text-gray-900">Find a local trade</h2>
+                          <h2 className="text-lg sm:text-xl font-medium text-gray-900">Find a local trade</h2>
                           <p className="text-sm text-gray-500 mt-1">Describe your project or problem, and we&apos;ll match you with the right trade.</p>
                         </div>
                           <div className="flex items-center gap-4">
-                            <div className="flex gap-2">
+                            <div className="hidden sm:flex gap-2">
                               <div className={`h-1 w-8 rounded-full transition-colors ${step >= 1 ? 'bg-black' : 'bg-gray-100'}`} />
                               <div className={`h-1 w-8 rounded-full transition-colors ${step >= 2 ? 'bg-black' : 'bg-gray-100'}`} />
         </div>
@@ -212,7 +219,9 @@ export default function Home() {
                             onClick={() => setIsOpen(false)}
                             className="text-gray-400 hover:text-gray-500"
                           >
-                            ✕
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                           </button>
                         </div>
                       </div>
@@ -236,16 +245,16 @@ export default function Home() {
                                       setSearchResults(null);
                                     }
                                   }}
-                                  className="w-full pl-11 pr-24 py-4 text-lg bg-gray-50 rounded-xl border border-gray-200/60 focus:outline-none focus:ring-2 focus:ring-black/5"
+                                  className="w-full pl-11 pr-[6.5rem] py-3 sm:py-4 text-base sm:text-lg bg-gray-50 rounded-xl border border-gray-200/60 focus:outline-none focus:ring-2 focus:ring-black/5"
                                   placeholder={searchExamples[placeholderIndex]}
                                   onKeyDown={(e) => e.key === 'Enter' && searchQuery && handleSearch()}
                                 />
                                 <button
                                   onClick={handleSearch}
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                   disabled={!searchQuery || isSearching}
                                 >
-                                  {isSearching ? 'Finding Service...' : 'Find Service'}
+                                  {isSearching ? 'Finding...' : 'Find'}
                                 </button>
                               </div>
 
@@ -341,7 +350,7 @@ export default function Home() {
                                             return (
                                               <div 
                                                 key={trade.name}
-                                                className="group hover:bg-gray-50/80 border border-gray-200 rounded-xl mx-0.5 px-6 py-6 transition-all hover:border-gray-300"
+                                                className="group hover:bg-gray-50/80 border border-gray-200 rounded-xl mx-0.5 px-4 sm:px-6 py-4 sm:py-6 transition-all hover:border-gray-300"
                                               >
                                                 <button 
                                                   onClick={() => {
@@ -573,16 +582,16 @@ export default function Home() {
                 </Dialog>
 
                 {/* Stats */}
-                <div className="flex gap-16 pt-6">
+                <div className="flex flex-col sm:flex-row gap-8 sm:gap-16 pt-6">
                   <div>
-                    <div className="text-[48px] leading-none font-normal text-gray-900">20+</div>
-                    <div className="mt-3 text-[15px] text-gray-500 font-medium">
+                    <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">20+</div>
+                    <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
                       Trusted tradespeople<br/>registered this month
                     </div>
                   </div>
                   <div>
-                    <div className="text-[48px] leading-none font-normal text-gray-900">4K+</div>
-                    <div className="mt-3 text-[15px] text-gray-500 font-medium">
+                    <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">4K+</div>
+                    <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
                       Customer reviews<br/>from Britain
                     </div>
                   </div>
@@ -592,8 +601,8 @@ export default function Home() {
           </div>
 
           {/* Right Hero Container */}
-          <div className="bg-[#e8eaed] rounded-[16px] overflow-hidden">
-            <div className="relative w-full h-full">
+          <div className="bg-[#e8eaed] rounded-[16px] overflow-hidden min-h-[400px]">
+            <div className="relative w-full h-full min-h-[400px]">
           <Image
                 src="/images/roofer.png"
                 alt="Skilled roofer working on a roof"
