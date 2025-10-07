@@ -71,11 +71,12 @@ export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) 
                 Find local services you can trust for your home.
                 </h1>
                 <p className="mt-4 lg:mt-6 text-lg lg:text-xl text-gray-600 leading-relaxed max-w-[95%] lg:max-w-[90%]">
-                Tell us what you need fixed or improved and where you live. We&apos;ll match you with trusted local trades ready to help.
+                Tell us what you need fixed or improved and where you live. We&apos;ll match you with trusted local trades ready to help. {" "}
+                <span className="bg-[linear-gradient(90deg,#8b5cf6_0%,#3b82f6_50%,#06b6d4_100%)] bg-clip-text text-transparent font-medium">Click the searchbar to begin.</span>
                 </p>
               </div>
 
-              <div className="relative max-w-2xl cursor-pointer" onClick={onSearch}>
+              <div className="relative max-w-2xl cursor-pointer group" onClick={onSearch}>
                 {/* Animated gradient border wrapper with enhanced glow */}
                 <div
                   className="relative rounded-2xl p-[3px]"
@@ -87,22 +88,22 @@ export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) 
                   {/* Soft glow behind the border */}
                   <div
                     aria-hidden
-                    className="pointer-events-none absolute inset-0 rounded-[14px]"
+                    className="pointer-events-none absolute inset-0 rounded-[14px] opacity-30 group-hover:opacity-50 transition-opacity"
                     style={{
                       background: 'conic-gradient(from var(--angle) at 50% 50%, #8b5cf6 0%, #3b82f6 40%, #06b6d4 70%, #8b5cf6 100%)',
                       filter: 'blur(16px)',
-                      opacity: 0.35,
                       animation: 'rotate-angle 8s linear infinite',
                     }}
                   />
-                <div className="relative rounded-2xl bg-white">
+                <div className="relative rounded-2xl bg-white ring-1 ring-transparent group-hover:ring-gray-200 transition">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400">
                     <MagnifyingGlassIcon className="w-6 h-6" />
                   </div>
+                  
                   <input
                     readOnly
                     type="text"
-                    className="w-full pl-16 pr-6 py-5 text-lg text-gray-900 placeholder:text-gray-500 bg-white rounded-2xl border border-transparent focus:outline-none transition-all cursor-pointer shadow-sm"
+                    className="w-full pl-16 pr-16 py-5 text-lg text-gray-600 placeholder:text-gray-400 bg-white rounded-2xl border border-transparent focus:outline-none transition-all cursor-pointer shadow-sm group-hover:bg-gray-50"
                     value={typedText}
                     placeholder=""
                   />
