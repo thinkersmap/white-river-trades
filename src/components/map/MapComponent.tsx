@@ -46,33 +46,73 @@ export default function MapComponent({ constituency }: MapComponentProps) {
       setIsLoading(true);
       setError(null);
 
-      // Log the coordinates for debugging
-      console.log('Raw coordinates:', constituency.geometry.coordinates[0][0]);
+      const geometry = constituency.geometry as {
+        type: 'Polygon' | 'MultiPolygon';
+        coordinates: number[][][] | number[][][][];
+      };
+      const type: 'Polygon' | 'MultiPolygon' = geometry.type;
+      const coords: number[][][] | number[][][][] = geometry.coordinates;
 
-      // Convert coordinates from BNG to WGS84
-      const convertedCoordinates = constituency.geometry.coordinates[0].map(coord => {
-        try {
-          // Swap easting/northing to match BNG convention
-          const [easting, northing] = coord;
-          // Convert from BNG to WGS84
-          const [lon, lat] = proj4('EPSG:27700', 'EPSG:4326', [easting, northing]);
-          console.log('Converted:', [easting, northing], 'to', [lon, lat]);
-          // Convert to Web Mercator for OpenLayers
-          return fromLonLat([lon, lat]);
-        } catch (error) {
-          console.error('Error converting coordinates:', coord, error);
-          throw new Error('Failed to convert coordinates');
+      // Normalize to array of linear rings (each ring is array of [x,y])
+      let rings: number[][][] = [];
+      if (type === 'Polygon') {
+        const polyCoords = coords as number[][][];
+        rings = polyCoords || [];
+      } else if (type === 'MultiPolygon') {
+        const multiCoords = coords as number[][][][];
+        // Flatten one level: [[ring[]], [ring[]], ...] => [ring[], ring[], ...]
+        rings = multiCoords.flat(1);
+      } else {
+        throw new Error(`Unsupported geometry type: ${type}`);
+      }
+
+      if (!rings.length) {
+        throw new Error('No rings found in geometry');
+      }
+
+      // Helper to detect if coordinate looks like lon/lat (WGS84)
+      const isLonLat = (x: number, y: number) =>
+        Number.isFinite(x) && Number.isFinite(y) && x >= -180 && x <= 180 && y >= -90 && y <= 90;
+
+      // Convert each ring to Web Mercator
+      const features: Feature[] = [];
+      for (const ring of rings) {
+        const convertedRing = ring
+          .map((pt: number[] | null | undefined) => {
+            const [x, y] = Array.isArray(pt) ? pt : [NaN, NaN];
+            if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+            try {
+              if (isLonLat(x, y)) {
+                // Already WGS84
+                return fromLonLat([x, y]);
+              }
+              // Assume BNG (EPSG:27700) and convert to WGS84 first
+              const [lon, lat] = proj4('EPSG:27700', 'EPSG:4326', [x, y]);
+              if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
+              return fromLonLat([lon, lat]);
+            } catch (err) {
+              console.error('Error converting point:', pt, err);
+              return null;
+            }
+          })
+          .filter((p): p is [number, number] => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]));
+
+        if (convertedRing.length >= 3) {
+          features.push(
+            new Feature({
+              geometry: new Polygon([convertedRing]),
+            })
+          );
         }
-      });
+      }
 
-      // Create polygon feature
-      const polygonFeature = new Feature({
-        geometry: new Polygon([convertedCoordinates])
-      });
+      if (!features.length) {
+        throw new Error('No valid polygon rings after conversion');
+      }
 
       // Create vector source and layer
       const vectorSource = new VectorSource({
-        features: [polygonFeature]
+        features,
       });
 
       const vectorLayer = new VectorLayer({
@@ -98,8 +138,8 @@ export default function MapComponent({ constituency }: MapComponentProps) {
           vectorLayer
         ],
         view: new View({
-          center: fromLonLat([-0.28718, 51.38754]), // Use the centroid from GeoJSON properties
-          zoom: 12
+          center: fromLonLat([-0.1, 51.5]),
+          zoom: 8
         })
       });
 
