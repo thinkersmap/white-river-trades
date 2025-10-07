@@ -1,5 +1,8 @@
+"use client";
+
 import Image from 'next/image';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 interface HeroProps {
   onSearch: () => void;
@@ -8,6 +11,37 @@ interface HeroProps {
 }
 
 export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) {
+  const [typedText, setTypedText] = useState<string>("");
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const currentPhrase = useMemo(() => searchExamples[placeholderIndex] || "", [searchExamples, placeholderIndex]);
+
+  useEffect(() => {
+    // Clear any existing timer
+    if (typingTimerRef.current) {
+      clearInterval(typingTimerRef.current);
+      typingTimerRef.current = null;
+    }
+    setTypedText("");
+
+    // Typewriter animation
+    const chars = currentPhrase.split("");
+    let index = 0;
+    typingTimerRef.current = setInterval(() => {
+      index += 1;
+      setTypedText(chars.slice(0, index).join(""));
+      if (index >= chars.length && typingTimerRef.current) {
+        clearInterval(typingTimerRef.current);
+        typingTimerRef.current = null;
+      }
+    }, 30);
+
+    return () => {
+      if (typingTimerRef.current) {
+        clearInterval(typingTimerRef.current);
+        typingTimerRef.current = null;
+      }
+    };
+  }, [currentPhrase]);
   return (
     <div className="flex-1 p-4">
       <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -34,42 +68,69 @@ export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) 
 
               <div>
                 <h1 className="text-4xl sm:text-5xl lg:text-[72px] leading-[1.1] font-normal tracking-[-0.02em] text-gray-900">
-                  Need work done? Discover local services near you.
+                Find local services you can trust for your home.
                 </h1>
                 <p className="mt-4 lg:mt-6 text-lg lg:text-xl text-gray-600 leading-relaxed max-w-[95%] lg:max-w-[90%]">
-                  Tell us what you need done and where you are. We&apos;ll show local businesses ready to help. Use the searchbox below to get started.
+                Tell us what you need fixed or improved and where you live. We&apos;ll match you with trusted local trades ready to help.
                 </p>
               </div>
 
-              <div className="relative max-w-2xl">
-                <div 
-                  className="relative cursor-pointer group"
-                  onClick={onSearch}
+              <div className="relative max-w-2xl cursor-pointer" onClick={onSearch}>
+                {/* Animated gradient border wrapper with enhanced glow */}
+                <div
+                  className="relative rounded-2xl p-[3px]"
+                  style={{
+                    background: 'conic-gradient(from var(--angle) at 50% 50%, #8b5cf6 0%, #3b82f6 40%, #06b6d4 70%, #8b5cf6 100%)',
+                    animation: 'rotate-angle 4s linear infinite',
+                  }}
                 >
+                  {/* Soft glow behind the border */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 rounded-[14px]"
+                    style={{
+                      background: 'conic-gradient(from var(--angle) at 50% 50%, #8b5cf6 0%, #3b82f6 40%, #06b6d4 70%, #8b5cf6 100%)',
+                      filter: 'blur(16px)',
+                      opacity: 0.35,
+                      animation: 'rotate-angle 8s linear infinite',
+                    }}
+                  />
+                <div className="relative rounded-2xl bg-white">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400">
                     <MagnifyingGlassIcon className="w-6 h-6" />
                   </div>
                   <input
                     readOnly
                     type="text"
-                    className="w-full pl-16 pr-6 py-5 text-lg text-gray-900 placeholder:text-gray-500 bg-gray-50 rounded-2xl border border-gray-200/60 focus:outline-none group-hover:border-gray-300 group-hover:bg-white transition-all cursor-pointer shadow-sm"
-                    placeholder={searchExamples[placeholderIndex]}
+                    className="w-full pl-16 pr-6 py-5 text-lg text-gray-900 placeholder:text-gray-500 bg-white rounded-2xl border border-transparent focus:outline-none transition-all cursor-pointer shadow-sm"
+                    value={typedText}
+                    placeholder=""
                   />
+                </div>
                 </div>
               </div>
 
-              {/* Stats */}
-              <div className="flex flex-col sm:flex-row gap-8 sm:gap-16 pt-6">
-                <div>
-                  <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">20+</div>
-                  <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
-                    Trusted tradespeople<br/>registered this month
+              {/* How it works */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-4">
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">①</div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">Tell us what you need</div>
+                    <div className="mt-1 text-xs text-gray-500 leading-relaxed">Describe the job or service you&apos;re looking for.</div>
                   </div>
                 </div>
-                <div>
-                  <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">4K+</div>
-                  <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
-                    Customer reviews<br/>from Britain
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">②</div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">Share your location</div>
+                    <div className="mt-1 text-xs text-gray-500 leading-relaxed">Enter your postcode so we can find pros near you.</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">③</div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">Get matched instantly</div>
+                    <div className="mt-1 text-xs text-gray-500 leading-relaxed">We&apos;ll match you with the right local trade.</div>
                   </div>
                 </div>
               </div>
@@ -81,7 +142,7 @@ export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) 
         <div className="bg-[#e8eaed] rounded-[16px] overflow-hidden min-h-[400px]">
           <div className="relative w-full h-full min-h-[400px]">
             <Image
-              src="/images/roofer.png"
+              src="/images/hero-2.png"
               alt="Skilled roofer working on a roof"
               fill
               priority
