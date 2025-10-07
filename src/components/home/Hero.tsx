@@ -96,14 +96,14 @@ export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) 
                     }}
                   />
                 <div className="relative rounded-2xl bg-white ring-1 ring-transparent group-hover:ring-gray-200 transition">
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400">
-                    <MagnifyingGlassIcon className="w-6 h-6" />
+                  <div className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 text-gray-400">
+                    <MagnifyingGlassIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   
                   <input
                     readOnly
                     type="text"
-                    className="w-full pl-16 pr-16 py-5 text-lg text-gray-600 placeholder:text-gray-400 bg-white rounded-2xl border border-transparent focus:outline-none transition-all cursor-pointer shadow-sm group-hover:bg-gray-50"
+                    className="w-full pl-12 sm:pl-16 pr-6 sm:pr-8 py-4 sm:py-5 text-base sm:text-lg text-gray-600 placeholder:text-gray-400 bg-white rounded-2xl border border-transparent focus:outline-none transition-all cursor-pointer shadow-sm group-hover:bg-gray-50 tracking-tight"
                     value={typedText}
                     placeholder=""
                   />
