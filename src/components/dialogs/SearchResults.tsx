@@ -1,9 +1,34 @@
 import { trades } from '@/data/trades';
 
+interface TradeMatch {
+  tradeName: string;
+  matchScore: number;
+  matchReason: string;
+  estimatedPrice: {
+    low: number;
+    high: number;
+    currency: string;
+    notes: string;
+  };
+}
+
+interface SearchResult {
+  overview: string;
+  recommendedTrade: string;
+  recommendationReason: string;
+  estimatedPrice: {
+    low: number;
+    high: number;
+    currency: string;
+    notes: string;
+  };
+  matches: TradeMatch[];
+}
+
 interface SearchResultsProps {
   isSearching: boolean;
   searchError: string | null;
-  searchResults: any; // TODO: Add proper type
+  searchResults: SearchResult | null;
   setSelectedTrade: (trade: string) => void;
   setStep: (step: number) => void;
   elapsedTime: number;
@@ -28,56 +53,35 @@ export function SearchResults({
         <div>
           <div className="text-sm text-gray-400 font-medium mb-3 flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></div>
-            ANALYZING YOUR REQUEST
+            AI ANALYSIS
           </div>
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="animate-pulse space-y-3">
-              <div className="h-4 bg-gray-100 rounded-full w-3/4"></div>
-              <div className="h-4 bg-gray-100 rounded-full w-1/2"></div>
-            </div>
+          <div className="space-y-4">
+            <div className="h-4 bg-gray-100 rounded animate-pulse w-full"></div>
+            <div className="h-4 bg-gray-100 rounded animate-pulse w-11/12"></div>
+            <div className="h-4 bg-gray-100 rounded animate-pulse w-10/12"></div>
+          </div>
+          <div className="mt-4 text-sm text-gray-500 flex items-center gap-2">
+            <span>{loadingMessages[messageIndex]}</span>
+            <span className="text-gray-400">({elapsedTime}s)</span>
           </div>
         </div>
 
-        {/* Matching Loading */}
+        {/* Matching Trades Loading */}
         <div>
-          <div className="text-sm text-gray-400 font-medium mb-3 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-ping"></div>
-            FINDING RELEVANT TRADES
-          </div>
+          <div className="text-sm text-gray-400 font-medium mb-4">RECOMMENDED TRADES</div>
           <div className="space-y-4">
-            {[1, 2].map((i) => (
-              <div key={i} className="bg-gray-50/60 border border-gray-100 rounded-xl p-4">
-                <div className="animate-pulse">
-                  <div className="flex items-start gap-3">
-                    <div className="rounded-lg bg-gray-100 h-8 w-8 shrink-0"></div>
-                    <div className="space-y-3 flex-1">
-                      <div className="flex items-center justify-between">
-                        <div className="h-4 bg-gray-100 rounded-full w-1/4"></div>
-                        <div className="h-4 bg-gray-100 rounded-full w-16"></div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="h-3 bg-gray-100 rounded-full w-full"></div>
-                        <div className="h-3 bg-gray-100 rounded-full w-5/6"></div>
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="h-3 bg-gray-100 rounded-full w-20"></div>
-                        <div className="h-3 bg-gray-100 rounded-full w-24"></div>
-                        <div className="h-3 bg-gray-100 rounded-full w-16"></div>
-                      </div>
-                    </div>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="border border-gray-200 rounded-xl p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-5 bg-gray-100 rounded animate-pulse w-1/3"></div>
+                    <div className="h-4 bg-gray-100 rounded animate-pulse w-full"></div>
+                    <div className="h-4 bg-gray-100 rounded animate-pulse w-4/5"></div>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className="text-center space-y-2">
-          <div className="text-sm text-gray-500 transition-opacity duration-500">
-            {loadingMessages[messageIndex]}
-          </div>
-          <div className="text-xs text-gray-400">
-            {elapsedTime > 0 && `${elapsedTime} seconds elapsed`}
           </div>
         </div>
       </div>
@@ -86,106 +90,93 @@ export function SearchResults({
 
   if (searchError) {
     return (
-      <div className="p-4 bg-red-50 rounded-lg border border-red-100">
-        <div className="text-sm text-red-600">
-          {searchError}
-        </div>
+      <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-600">
+        {searchError}
       </div>
     );
   }
 
-  if (searchResults?.matches) {
-    return (
-      <>
-        {/* Analysis Overview */}
-        <div>
-          <div className="text-sm text-gray-400 font-medium mb-3">AI ANALYSIS</div>
-          <div className="bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] rounded-lg p-6">
-            <div className="text-base text-gray-600 leading-relaxed">
-              {searchResults.overview}
-            </div>
-          </div>
-        </div>
+  if (!searchResults) {
+    return null;
+  }
 
-        {/* Matching Trades */}
-        <div>
-          <div className="text-sm text-gray-400 font-medium mb-4">RECOMMENDED TRADES</div>
-          <div className="space-y-4">
-            {searchResults.matches.map((match: any) => { // TODO: Add proper type
-              const trade = trades.find(t => t.name === match.tradeName);
-              if (!trade) return null;
-              
-              const Icon = trade.icon;
-              return (
-                <div 
-                  key={trade.name}
-                  className="group border border-gray-200 rounded-xl overflow-hidden transition-all hover:border-gray-300 hover:shadow-sm"
-                >
+  return (
+    <div className="space-y-8">
+      {/* AI Analysis */}
+      <div>
+        <div className="text-sm text-gray-400 font-medium mb-3">AI ANALYSIS</div>
+        <div className="bg-gradient-to-br from-purple-50/50 via-blue-50/30 to-purple-50/50 border border-purple-100/50 rounded-xl p-5 text-[15px] leading-relaxed text-gray-700">
+          {searchResults.overview}
+        </div>
+      </div>
+
+      {/* Matching Trades */}
+      <div>
+        <div className="text-sm text-gray-400 font-medium mb-4">RECOMMENDED TRADES</div>
+        <div className="space-y-4">
+          {searchResults.matches.map((match: TradeMatch) => {
+            const trade = trades.find(t => t.name === match.tradeName);
+            if (!trade) return null;
+            
+            const Icon = trade.icon;
+            return (
+              <div 
+                key={trade.name}
+                className="group border border-gray-200 rounded-xl overflow-hidden transition-all hover:border-gray-300 hover:shadow-sm"
+              >
+                <div className="p-4 space-y-4">
+                  {/* Trade Header */}
+                  <div className="flex items-start gap-3">
+                    <div className="p-2.5 bg-gray-100 rounded-lg shrink-0 group-hover:bg-gray-200 transition-colors">
+                      <Icon className="w-5 h-5 text-gray-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-medium text-gray-900">{trade.name}</h3>
+                        <div className="px-2 py-0.5 bg-green-50 border border-green-200 rounded text-xs font-medium text-green-700">
+                          {match.matchScore}% match
+                        </div>
+                      </div>
+                      
+                      {/* Price Range */}
+                      {match.estimatedPrice && (
+                        <div className="mb-2">
+                          <span className="text-lg font-semibold text-gray-900">
+                            {match.estimatedPrice.currency === 'GBP' ? '£' : '$'}
+                            {match.estimatedPrice.low} - {match.estimatedPrice.currency === 'GBP' ? '£' : '$'}
+                            {match.estimatedPrice.high}
+                          </span>
+                          {match.estimatedPrice.notes && (
+                            <span className="ml-2 text-sm text-gray-500">
+                              {match.estimatedPrice.notes}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* AI Analysis for this trade */}
+                      <div className="bg-gradient-to-br from-purple-50/30 via-blue-50/20 to-purple-50/30 border border-purple-100/30 rounded-lg p-3 text-sm text-gray-600 leading-relaxed">
+                        {match.matchReason}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Select Button */}
                   <button 
                     onClick={() => {
                       setSelectedTrade(trade.name);
                       setStep(2);
                     }}
-                    className="w-full text-left"
+                    className="w-full px-4 py-3 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
                   >
-                    <div className="flex flex-col">
-                      {/* Header */}
-                      <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2.5 bg-gray-50 rounded-lg shrink-0 group-hover:bg-white transition-colors">
-                            <Icon className="w-5 h-5 text-gray-600" />
-                          </div>
-                          <div className="text-lg font-medium text-gray-900">{trade.name}</div>
-                        </div>
-                        <div className={`px-2.5 py-1 rounded-full text-sm font-medium ${
-                          match.matchScore >= 80 ? 'bg-green-50 text-green-700' :
-                          match.matchScore >= 50 ? 'bg-yellow-50 text-yellow-700' :
-                          'bg-gray-50 text-gray-500'
-                        }`}>
-                          {match.matchScore}% match
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-4 sm:p-5 space-y-4">
-                        {/* Description */}
-                        <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
-
-                        {/* Match Reason */}
-                        <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
-
-                        {/* Price Box */}
-                        <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                          <div className="flex items-baseline gap-1.5">
-                            <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.low.toLocaleString()}</div>
-                            <div className="text-gray-400">-</div>
-                            <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.high.toLocaleString()}</div>
-                          </div>
-                          <div className="text-sm text-gray-500">{match.estimatedPrice.notes}</div>
-                        </div>
-
-                        {/* Subcategories */}
-                        <div className="flex flex-wrap gap-2 pt-1">
-                          {trade.subcategories.map(sub => (
-                            <span 
-                              key={sub.slug}
-                              className="inline-flex text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg group-hover:bg-gray-50 transition-colors"
-                            >
-                              {sub.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                    Select {trade.name}
                   </button>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
-      </>
-    );
-  }
-
-  return null;
+      </div>
+    </div>
+  );
 }

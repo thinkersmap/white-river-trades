@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getConstituencyFromPostcode } from '@/lib/postcodes';
+import { trades } from '@/data/trades';
 
 interface LocationStepProps {
   selectedTrade: string;
@@ -23,8 +24,9 @@ export function LocationStep({ selectedTrade, tradeIcon: Icon }: LocationStepPro
     try {
       const constituency = await getConstituencyFromPostcode(postcode);
       
-      // Get the trade slug from the selected trade name
-      const tradeSlug = selectedTrade.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      // Look up the trade by its display name and use its canonical slug
+      const tradeSlug = trades.find(t => t.name === selectedTrade)?.slug
+        || selectedTrade.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       
       // Redirect to the trade/constituency page
       router.push(`/${tradeSlug}/${constituency.slug}`);

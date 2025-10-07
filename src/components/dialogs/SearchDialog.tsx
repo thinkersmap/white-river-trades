@@ -304,63 +304,67 @@ export function SearchDialog({
                                     key={trade.name}
                                     className="group border border-gray-200 rounded-xl overflow-hidden transition-all hover:border-gray-300 hover:shadow-sm"
                                   >
-                                    <button 
-                                      onClick={() => {
-                                        setSelectedTrade(trade.name);
-                                        setStep(2);
-                                      }}
-                                      className="w-full text-left"
-                                    >
-                                      <div className="flex flex-col">
-                                        {/* Header */}
-                                        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100">
-                                          <div className="flex items-center gap-3">
-                                            <div className="p-2.5 bg-gray-50 rounded-lg shrink-0 group-hover:bg-white transition-colors">
-                                              <Icon className="w-5 h-5 text-gray-600" />
-                                            </div>
-                                            <div className="text-lg font-medium text-gray-900">{trade.name}</div>
+                                    <div className="flex flex-col">
+                                      {/* Header */}
+                                      <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100">
+                                        <div className="flex items-center gap-3">
+                                          <div className="p-2.5 bg-gray-50 rounded-lg shrink-0 group-hover:bg-white transition-colors">
+                                            <Icon className="w-5 h-5 text-gray-600" />
                                           </div>
-                                          <div className={`px-2.5 py-1 rounded-full text-sm font-medium ${
-                                            match.matchScore >= 80 ? 'bg-green-50 text-green-700' :
-                                            match.matchScore >= 50 ? 'bg-yellow-50 text-yellow-700' :
-                                            'bg-gray-50 text-gray-500'
-                                          }`}>
-                                            {match.matchScore}% match
-                                          </div>
+                                          <div className="text-lg font-medium text-gray-900">{trade.name}</div>
                                         </div>
-
-                                        {/* Content */}
-                                        <div className="p-4 sm:p-5 space-y-4">
-                                          {/* Description */}
-                                          <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
-
-                                          {/* Match Reason */}
-                                          <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
-
-                                          {/* Price Box */}
-                                          <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                                            <div className="flex items-baseline gap-1.5">
-                                              <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.low.toLocaleString()}</div>
-                                              <div className="text-gray-400">-</div>
-                                              <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.high.toLocaleString()}</div>
-                                            </div>
-                                            <div className="text-sm text-gray-500">{match.estimatedPrice.notes}</div>
-                                          </div>
-
-                                          {/* Subcategories */}
-                                          <div className="flex flex-wrap gap-2 pt-1">
-                                            {trade.subcategories.map(sub => (
-                                              <span 
-                                                key={sub.slug}
-                                                className="inline-flex text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg group-hover:bg-gray-50 transition-colors"
-                                              >
-                                                {sub.name}
-                                              </span>
-                                            ))}
-                                          </div>
+                                        <div className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                                          match.matchScore >= 80 ? 'bg-green-50 text-green-700' :
+                                          match.matchScore >= 50 ? 'bg-yellow-50 text-yellow-700' :
+                                          'bg-gray-50 text-gray-500'
+                                        }`}>
+                                          {match.matchScore}% match
                                         </div>
                                       </div>
-                                    </button>
+
+                                      {/* Content */}
+                                      <div className="p-4 sm:p-5 space-y-4">
+                                        {/* Description */}
+                                        <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
+
+                                        {/* Match Reason */}
+                                        <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
+
+                                        {/* Price Box */}
+                                        <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                          <div className="flex items-baseline gap-1.5">
+                                            <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.low.toLocaleString()}</div>
+                                            <div className="text-gray-400">-</div>
+                                            <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.high.toLocaleString()}</div>
+                                          </div>
+                                          <div className="text-sm text-gray-500">{match.estimatedPrice.notes}</div>
+                                        </div>
+
+                                        {/* Subcategories */}
+                                        <div className="flex flex-wrap gap-2 pt-1">
+                                          {trade.subcategories.map(sub => (
+                                            <span 
+                                              key={sub.slug}
+                                              className="inline-flex text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg group-hover:bg-gray-50 transition-colors"
+                                            >
+                                              {sub.name}
+                                            </span>
+                                          ))}
+                                        </div>
+
+                                        {/* Select Button */}
+                                        <button 
+                                          onClick={() => {
+                                            setSelectedTrade(trade.name);
+                                            setStep(2);
+                                            setView('location');
+                                          }}
+                                          className="w-full px-4 py-3 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+                                        >
+                                          Select {trade.name}
+                                        </button>
+                                      </div>
+                                    </div>
                                   </div>
                                 );
                               })}
