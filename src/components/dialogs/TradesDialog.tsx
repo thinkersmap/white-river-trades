@@ -15,18 +15,6 @@ export function TradesDialog({
   onBackToSearch,
   onSelectTrade,
 }: TradesDialogProps) {
-  const BackButton = (
-    <button 
-      onClick={onBackToSearch}
-      className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-      </svg>
-      Back to search
-    </button>
-  );
-
   return (
     <Dialog
       open={isOpen}
@@ -39,7 +27,7 @@ export function TradesDialog({
         <Dialog.Panel className="flex flex-col w-full h-full bg-white sm:h-[calc(100vh-80px)] sm:max-w-5xl sm:mx-auto sm:my-10 sm:rounded-lg">
           <DialogHeader
             onClose={onClose}
-            leftElement={BackButton}
+            onBack={onBackToSearch}
           />
           
           <div className="flex-1 overflow-y-auto">
