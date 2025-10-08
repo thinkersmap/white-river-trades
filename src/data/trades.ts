@@ -71,7 +71,7 @@ export const trades: Trade[] = [
   sicName: "Other building completion and finishing",
   category: "Construction Trades",
   icon: WrenchIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Door hanging", slug: "door-hanging", description: "Precision installation and adjustment of interior and exterior doors for a perfect fit." },
     { name: "Skirting & architraves", slug: "skirting-architraves", description: "Fitting of skirting boards, architraves, and mouldings for a clean interior finish." },
@@ -89,7 +89,7 @@ export const trades: Trade[] = [
   sicName: "Joinery installation",
   category: "Construction Trades",
   icon: Cog6ToothIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Fitted wardrobes", slug: "fitted-wardrobes", description: "Custom-built wardrobes and cabinetry for efficient use of space." },
     { name: "Staircases", slug: "staircases", description: "Design, manufacture, and installation of bespoke timber staircases." },
@@ -106,7 +106,7 @@ export const trades: Trade[] = [
   sicName: "Construction of domestic buildings",
   category: "Construction Trades",
   icon: BuildingOffice2Icon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Extensions", slug: "extensions", description: "Design and construction of single and double-storey home extensions." },
     { name: "Renovations", slug: "renovations", description: "Full or partial home refurbishments with structural and aesthetic improvements." },
@@ -124,7 +124,7 @@ export const trades: Trade[] = [
   sicName: "Plastering",
   category: "Construction Trades",
   icon: SparklesIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Skimming", slug: "skimming", description: "Creating smooth surfaces over old plaster or drywall for decoration." },
     { name: "Dry lining", slug: "dry-lining", description: "Installation of plasterboard and partitions for quick wall construction." },
@@ -141,7 +141,7 @@ export const trades: Trade[] = [
   sicName: "Painting",
   category: "Construction Trades",
   icon: PaintBrushIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Interior painting", slug: "interior-painting", description: "High-quality wall and ceiling painting for a perfect finish." },
     { name: "Exterior painting", slug: "exterior-painting", description: "Weather-resistant paintwork for homes and commercial properties." },
@@ -158,7 +158,7 @@ export const trades: Trade[] = [
   sicName: "Floor and wall covering",
   category: "Construction Trades",
   icon: RectangleStackIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Wood & laminate flooring", slug: "wood-laminate-flooring", description: "Supply and fitting of hardwood, laminate, and engineered floors." },
     { name: "Tile installation", slug: "tile-installation", description: "Professional tiling for kitchens, bathrooms, and floors." },
@@ -175,7 +175,7 @@ export const trades: Trade[] = [
   sicName: "Construction of domestic buildings",
   category: "Construction Trades",
   icon: HomeIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Dormer conversions", slug: "dormer-conversions", description: "Add space and light with a dormer extension to your roof." },
     { name: "Mansard conversions", slug: "mansard-conversions", description: "Stylish loft transformations with additional headroom." },
@@ -194,7 +194,7 @@ export const trades: Trade[] = [
   sicName: "Other building completion and finishing",
   category: "Home Services",
   icon: ClipboardDocumentCheckIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Full kitchen installation", slug: "full-kitchen-installation", description: "Complete kitchen fitting including cabinets, appliances, and finishing." },
     { name: "Cabinet fitting", slug: "cabinet-fitting", description: "Installation and alignment of bespoke or flat-pack kitchen units." },
@@ -211,7 +211,7 @@ export const trades: Trade[] = [
   sicName: "Plumbing, heat and air-conditioning installation",
   category: "Home Services",
   icon: FireIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Bathroom installation", slug: "bathroom-installation", description: "Complete bathroom fitting including plumbing, tiling, and finishes." },
     { name: "Shower fitting", slug: "shower-fitting", description: "Installation and replacement of showers, trays, and enclosures." },
@@ -228,7 +228,7 @@ export const trades: Trade[] = [
   sicName: "General cleaning of buildings",
   category: "Home Services",
   icon: SparklesIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Gutter cleaning", slug: "gutter-cleaning", description: "Clearing blocked gutters to prevent overflow and damp damage." },
     { name: "Pressure washing", slug: "pressure-washing", description: "High-pressure jet washing for driveways, patios, and exterior walls." },
@@ -246,7 +246,7 @@ export const trades: Trade[] = [
   sicName: "Other building completion and finishing",
   category: "Home Services",
   icon: WrenchScrewdriverIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Furniture assembly", slug: "furniture-assembly", description: "Flat-pack furniture assembly and installation services." },
     { name: "Mounting & hanging", slug: "mounting-hanging", description: "TVs, mirrors, shelves, and picture hanging with secure fixings." },
@@ -264,7 +264,7 @@ export const trades: Trade[] = [
   sicName: "Glazing",
   category: "Home Services",
   icon: CubeTransparentIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Window replacement", slug: "window-replacement", description: "Supply and fit of double or triple-glazed windows." },
     { name: "Door fitting", slug: "door-fitting", description: "Expert installation of wooden, composite, and uPVC doors." },
@@ -282,7 +282,7 @@ export const trades: Trade[] = [
   sicName: "Security systems service activities",
   category: "Home Services",
   icon: ShieldCheckIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Alarm systems", slug: "alarm-systems", description: "Installation of wired and wireless intruder alarm systems." },
     { name: "CCTV installation", slug: "cctv-installation", description: "Security camera systems for homes, offices, and commercial properties." },
@@ -303,7 +303,7 @@ export const trades: Trade[] = [
   sicName: "Landscape service activities",
   category: "Outdoors & Landscaping",
   icon: SparklesIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Lawn care", slug: "lawn-care", description: "Mowing, feeding, and aerating lawns for healthy grass." },
     { name: "Hedge trimming", slug: "hedge-trimming", description: "Regular hedge cutting and shaping for tidy boundaries." },
@@ -323,7 +323,7 @@ export const trades: Trade[] = [
   sicName: "Other building completion and finishing",
   category: "Outdoors & Landscaping",
     icon: MinusIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Timber fencing", slug: "timber-fencing", description: "Supply and fit of closeboard, panel, or picket fencing." },
     { name: "Metal fencing", slug: "metal-fencing", description: "Installation of wrought iron and steel fencing for added security." },
@@ -340,7 +340,7 @@ export const trades: Trade[] = [
   sicName: "Other building completion and finishing",
   category: "Outdoors & Landscaping",
   icon: Squares2X2Icon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Block paving", slug: "block-paving", description: "Traditional and modern block driveways with pattern designs." },
     { name: "Resin driveways", slug: "resin-driveways", description: "Low-maintenance, attractive resin-bound surfaces." },
@@ -358,7 +358,7 @@ export const trades: Trade[] = [
   sicName: "Landscape service activities",
   category: "Outdoors & Landscaping",
   icon: GlobeEuropeAfricaIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Tree felling", slug: "tree-felling", description: "Safe and controlled removal of large or hazardous trees." },
     { name: "Pruning", slug: "pruning", description: "Crown reduction and shaping to maintain healthy tree growth." },
@@ -375,7 +375,7 @@ export const trades: Trade[] = [
   sicName: "Scaffold erection",
   category: "Outdoors & Landscaping",
   icon: BuildingOffice2Icon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Scaffolding hire", slug: "scaffolding-hire", description: "Short or long-term scaffold hire for residential and commercial projects." },
     { name: "Temporary roofing", slug: "temporary-roofing", description: "Protective coverings to shield worksites from the weather." },
@@ -394,7 +394,7 @@ export const trades: Trade[] = [
   sicName: "Construction of domestic buildings",
   category: "Structural & Specialist Trades",
   icon: HomeModernIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Extensions", slug: "extensions", description: "Single and double-storey extensions designed and built to your needs." },
     { name: "Loft conversions", slug: "loft-conversions", description: "Turn unused attic space into bedrooms or offices." },
@@ -414,7 +414,7 @@ export const trades: Trade[] = [
   sicName: "Plastering",
   category: "Structural & Specialist Trades",
   icon: PaintBrushIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Skimming & plaster repairs", slug: "skimming-plaster-repairs", description: "Smooth finishing for walls and ceilings, ideal for decorating." },
     { name: "Ceiling reboarding", slug: "ceiling-reboarding", description: "Replacing damaged or uneven ceilings with fresh plasterboard." },
@@ -432,7 +432,7 @@ export const trades: Trade[] = [
   sicName: "Other construction installation",
   category: "Structural & Specialist Trades",
   icon: FireIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Loft insulation", slug: "loft-insulation", description: "Energy-saving insulation installed in attic and roof spaces." },
     { name: "Cavity wall insulation", slug: "cavity-wall-insulation", description: "Filling wall cavities to prevent heat loss." },
@@ -449,7 +449,7 @@ export const trades: Trade[] = [
   sicName: "Other specialised construction activities n.e.c.",
   category: "Structural & Specialist Trades",
   icon: ShieldCheckIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Rising damp treatment", slug: "rising-damp-treatment", description: "Injection or membrane-based solutions for rising damp." },
     { name: "Basement waterproofing", slug: "basement-waterproofing", description: "Internal and external waterproofing for basements and cellars." },
@@ -466,7 +466,7 @@ export const trades: Trade[] = [
   sicName: "Construction of domestic buildings",
   category: "Structural & Specialist Trades",
   icon: HomeModernIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Dormer conversions", slug: "dormer-conversions", description: "Add extra headroom and space with a dormer extension." },
     { name: "Hip-to-gable", slug: "hip-to-gable", description: "Transform sloped roofs to vertical walls for larger loft areas." },
@@ -486,7 +486,7 @@ export const trades: Trade[] = [
   sicName: "Plumbing, heat and air-conditioning installation",
   category: "Energy, Mechanical & Waste",
   icon: FireIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Air conditioning installation", slug: "air-conditioning-installation", description: "Design and installation of cooling and ventilation systems." },
     { name: "Heat pumps", slug: "heat-pumps", description: "Energy-efficient air and ground source heat pump installations." },
@@ -503,7 +503,7 @@ export const trades: Trade[] = [
   sicName: "Electrical installation",
   category: "Energy, Mechanical & Waste",
   icon: BoltIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Solar panel installation", slug: "solar-panel-installation", description: "Design and installation of residential and commercial solar systems." },
     { name: "Battery storage", slug: "battery-storage", description: "Store excess energy with lithium battery systems for home and business use." },
@@ -520,7 +520,7 @@ export const trades: Trade[] = [
   sicName: "Collection of non-hazardous waste",
   category: "Energy, Mechanical & Waste",
   icon: TrashIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "Skip hire", slug: "skip-hire", description: "Various skip sizes available for domestic and commercial waste." },
     { name: "Rubbish removal", slug: "rubbish-removal", description: "On-demand waste collection and clearance services." },
@@ -537,7 +537,7 @@ export const trades: Trade[] = [
   sicName: "Removal services",
   category: "Energy, Mechanical & Waste",
   icon: TruckIcon,
-  available: false,
+  available: true,
   subcategories: [
     { name: "House removals", slug: "house-removals", description: "Full or partial home moving services with packing and transport." },
     { name: "Packing services", slug: "packing-services", description: "Careful packing and unpacking for safe transportation of goods." },
