@@ -206,7 +206,7 @@ export function SearchDialog({
                       className="absolute right-2 top-1/2 -translate-y-1/2 px-3 sm:px-4 py-1.5 sm:py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={!searchQuery || isSearching}
                     >
-                      {isSearching ? 'Finding...' : 'Find'}
+                      {isSearching ? 'Searching...' : 'Search'}
                     </button>
                   </div>
 

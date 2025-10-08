@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { TradeActions } from "@/components/trade/TradeActions";
 import MapComponent from "@/components/map/MapComponent";
+import { JobBanner } from "@/components/shared/JobBanner";
+import { ArrowRightIcon } from "@heroicons/react/20/solid";
 
 type Props = {
   params: Promise<{
@@ -27,10 +29,14 @@ export default function TradePage({ params }: Props) {
 
   const Icon = trade.icon;
 
+  // Get trade-specific override data if available
+  const tradeOverrides = constituencyData.overrides?.tradeOverrides?.[tradeSlug];
+  
   const breadcrumbItems = [
     { label: trade.name, href: `/${tradeSlug}` },
     { label: constituencyData.name },
   ];
+
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] flex flex-col">
@@ -54,34 +60,29 @@ export default function TradePage({ params }: Props) {
                 </div>
 
                 <p className="mt-4 lg:mt-6 text-lg lg:text-xl text-gray-600 leading-relaxed max-w-[95%] lg:max-w-[90%]">
-                  {constituencyData.overrides?.shortDescription ||
+                  {tradeOverrides?.intro ||
+                    constituencyData.overrides?.shortDescription ||
                     `Find trusted ${trade.name.toLowerCase()} in ${constituencyData.name}. We'll match you with experienced professionals who understand local properties and requirements.`}
                 </p>
+
+                {/* Areas Covered - Show if override data available */}
+                {tradeOverrides?.areasCovered && (
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-gray-900">Areas covered</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {tradeOverrides.areasCovered.map((area: string, index: number) => (
+                        <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <TradeActions 
                   tradeSlug={trade.slug}
                   tradeName={trade.name}
                 />
-
-                {/* Stats */}
-                <div className="flex flex-col sm:flex-row gap-8 sm:gap-16 pt-6">
-                  <div>
-                    <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">
-                      100+
-                    </div>
-                    <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
-                      {trade.name} specialists<br />in {constituencyData.name}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">
-                      500+
-                    </div>
-                    <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
-                      Verified reviews<br />for local {trade.name.toLowerCase()}
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -91,6 +92,119 @@ export default function TradePage({ params }: Props) {
             <MapComponent constituency={constituencyData} />
           </div>
         </div>
+
+        {/* Full Width Additional Content - Show if override data available */}
+        {tradeOverrides && (
+          <div className="mt-8">
+            <div className="bg-white rounded-[16px] p-6 sm:p-8 lg:p-12">
+              <div className="max-w-4xl mx-auto space-y-8">
+                
+                {/* Services Section */}
+                {tradeOverrides.services && (
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-gray-900">Common services</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {tradeOverrides.services.map((service: string, index: number) => (
+                        <div key={index} className="flex items-center space-x-3 text-gray-700">
+                          <div className="w-2 h-2 bg-indigo-500 rounded-full flex-shrink-0"></div>
+                          <span>{service}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* When to Call */}
+                {tradeOverrides.whenToCall && (
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-gray-900">When to call a {trade.name.toLowerCase()}</h2>
+                    <p className="text-gray-600 leading-relaxed">{tradeOverrides.whenToCall}</p>
+                  </div>
+                )}
+
+                {/* What to Expect */}
+                {tradeOverrides.whatToExpect && (
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-gray-900">What to expect</h2>
+                    <p className="text-gray-600 leading-relaxed">{tradeOverrides.whatToExpect}</p>
+                  </div>
+                )}
+
+                {/* Pricing Insight */}
+                {tradeOverrides.pricingInsight && (
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-gray-900">Pricing insight</h2>
+                    <p className="text-gray-600 leading-relaxed">{tradeOverrides.pricingInsight.summary}</p>
+                    {tradeOverrides.pricingInsight.tips && tradeOverrides.pricingInsight.tips.length > 0 && (
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-medium text-gray-900">Money-saving tips</h3>
+                        <ul className="space-y-2">
+                          {tradeOverrides.pricingInsight.tips.map((tip: string, index: number) => (
+                            <li key={index} className="flex items-start space-x-3 text-gray-600">
+                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Nearby Areas */}
+                {tradeOverrides.nearbyAreas && tradeOverrides.nearbyAreas.length > 0 && (
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-gray-900">Nearby areas</h2>
+                    <div className="flex flex-wrap gap-3">
+                      {tradeOverrides.nearbyAreas.map((area: { name: string; slug: string }, index: number) => (
+                        <a
+                          key={index}
+                          href={`/${tradeSlug}/${area.slug}`}
+                          className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors text-sm font-medium"
+                        >
+                          {area.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Related Trades */}
+                {tradeOverrides.relatedTrades && tradeOverrides.relatedTrades.length > 0 && (
+                  <div className="space-y-4">
+                    <h2 className="text-2xl font-semibold text-gray-900">Related services</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {tradeOverrides.relatedTrades.map((relatedTrade: { tradeName: string; slug: string; reason: string }, index: number) => (
+                        <a
+                          key={index}
+                          href={`/${relatedTrade.slug}`}
+                          className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900 mb-2">{relatedTrade.tradeName}</h3>
+                              <p className="text-sm text-gray-600">{relatedTrade.reason}</p>
+                            </div>
+                            <ArrowRightIcon className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors flex-shrink-0 ml-3" />
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Job Banner */}
+        <div className="mt-8">
+          <JobBanner 
+            tradeName={trade.name}
+          />
+        </div>
+
       </div>
     </div>
   );

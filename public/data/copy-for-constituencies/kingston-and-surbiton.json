@@ -1,0 +1,98 @@
+{
+    "code": "E14000725",
+    "name": "Kingston and Surbiton",
+    "slug": "kingston-and-surbiton",
+    "region": "London",
+    "tradeOverrides": {
+        "roofing": {
+            "metaTitle": "Roofing Services in Kingston and Surbiton | White River",
+            "metaDescription": "Find reliable roofing specialists in Kingston and Surbiton for roof repairs, replacements and maintenance. Compare local professionals near you.",
+            "intro": "Local roofers in Kingston and Surbiton handle everything from minor leak repairs to full re-roofing. Homes across the area, from Edwardian terraces near Kingston town centre to 1930s semis in Surbiton, often need upkeep after seasonal storms or moss build-up.",
+            "whenToCall": "Call a roofer if you notice missing tiles, damp ceilings or sagging gutters. Kingston’s varied housing stock and frequent rain mean regular roof inspections are essential to prevent costly damage.",
+            "services": [
+                "Flat roofs",
+                "Pitched roofs",
+                "Roof cleaning",
+                "Chimney repairs",
+                "Gutters, fascias & soffits",
+                "Emergency roof repairs",
+                "Leadwork & flashing",
+                "Skylights & dormers",
+                "Roof insulation",
+                "Roof inspection reports"
+            ],
+            "whatToExpect": "Most roofers start with an inspection and provide photos before quoting. Smaller jobs are often completed the same day, while full re-roofing can take one to two weeks depending on weather and materials.",
+            "pricingInsight": {
+                "summary": "Roofing costs depend on property size, roof type, and access. Minor repairs start from around £120, while complete re-roofing projects range from £4,000 to £9,000 for a typical three-bedroom semi-detached house in Kingston and Surbiton.",
+                "tips": [
+                    "Request a written quote that includes scaffolding and waste disposal.",
+                    "Check if insulation or roof ventilation upgrades can be added during re-roofing to save on long-term heating costs.",
+                    "Regular maintenance and moss removal can extend your roof’s life and reduce major repair bills."
+                ]
+            },
+            "areasCovered": [
+                "Norbiton",
+                "Tolworth",
+                "Berrylands",
+                "Hook",
+                "New Malden",
+                "Chessington"
+            ],
+            "nearbyAreas": [
+                {
+                    "name": "Richmond Park",
+                    "slug": "richmond-park"
+                },
+                {
+                    "name": "Wimbledon",
+                    "slug": "wimbledon"
+                },
+                {
+                    "name": "Epsom and Ewell",
+                    "slug": "epsom-and-ewell"
+                }
+            ],
+            "relatedTrades": [
+                {
+                    "tradeName": "Insulation & Energy Efficiency",
+                    "slug": "insulation",
+                    "reason": "Improve heat retention and reduce energy loss through the roof."
+                },
+                {
+                    "tradeName": "Scaffolding",
+                    "slug": "scaffolding",
+                    "reason": "Provides safe access for roof inspections and repairs."
+                },
+                {
+                    "tradeName": "Painting & Decorating",
+                    "slug": "painting",
+                    "reason": "Restores interior surfaces after leak or damp repairs."
+                },
+                {
+                    "tradeName": "Plastering & Rendering",
+                    "slug": "plastering",
+                    "reason": "Often needed after internal water damage from roof leaks."
+                }
+            ],
+            "schema": {
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "name": "Roofing in Kingston and Surbiton | White River Trades",
+                "description": "Discover trusted local roofers in Kingston and Surbiton. White River Trades connects homeowners with vetted roofing professionals near you.",
+                "mainEntity": {
+                    "@type": "Service",
+                    "serviceType": "Roofing",
+                    "areaServed": {
+                        "@type": "AdministrativeArea",
+                        "name": "Kingston and Surbiton"
+                    }
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "White River Trades",
+                    "url": "https://whiterivertrades.com"
+                }
+            }
+        }
+    }
+}
