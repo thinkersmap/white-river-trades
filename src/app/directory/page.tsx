@@ -100,6 +100,13 @@ export default function DirectoryPage() {
       try {
         setLoading(true);
         console.time('[directory] fetchCompanies')
+        if (!supabase) {
+          console.warn('[directory] Supabase not configured, skipping fetch')
+          setCompanies([]);
+          setConstituencies([]);
+          setRegions([]);
+          return;
+        }
         const { data, error } = await supabase
           .from('roofing_companies_enriched')
           .select('CompanyName, "RegAddress.PostCode", constituency_name, region_name, IncorporationDate, latitude, longitude')

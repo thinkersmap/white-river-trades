@@ -43,6 +43,10 @@ export default function TradePage({ params }: Props) {
   const companiesResult = tradeSlug === 'roofing' ? use(
     (async () => {
       console.time('[trade page] fetch companies')
+      if (!supabase) {
+        console.warn('[trade page] Supabase not configured, skipping companies fetch')
+        return { data: [] }
+      }
       const res = await supabase
         .from("roofing_companies_enriched")
         .select('CompanyName, "RegAddress.PostCode", IncorporationDate, constituency_name, latitude, longitude')
@@ -67,6 +71,10 @@ export default function TradePage({ params }: Props) {
   const totalCountResult = tradeSlug === 'roofing' ? use(
     (async () => {
       console.time('[trade page] fetch total count')
+      if (!supabase) {
+        console.warn('[trade page] Supabase not configured, skipping count fetch')
+        return { count: 0 }
+      }
       const res = await supabase
         .from("roofing_companies_enriched")
         .select('*', { count: 'exact', head: true })
