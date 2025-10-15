@@ -11,7 +11,6 @@ import {
   MapPinIcon,
   CalendarIcon,
   BuildingOfficeIcon,
-  ChevronDownIcon,
   XMarkIcon
 } from "@heroicons/react/20/solid";
 import { supabase } from "@/lib/supabaseClient";
@@ -25,15 +24,7 @@ type CompanyRow = {
   latitude: number | null;
   longitude: number | null;
 };
-
-
-
-function formatIncorporationDate(value: string | null): string | null {
-  if (!value) return null;
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
-}
+ 
 
 function constituencyFromSlug(slug: string): string {
   // Simple conversion: replace hyphens with spaces and capitalize words
@@ -126,7 +117,11 @@ export default function DirectoryPage() {
 
         // Extract unique constituencies and regions
         const uniqueConstituencies = [...new Set(companiesData.map(c => c.constituency_name))].sort();
-        const uniqueRegions = [...new Set(companiesData.map(c => c.region_name).filter(Boolean))].sort();
+        const uniqueRegions = [...new Set(
+          companiesData
+            .map(c => c.region_name)
+            .filter((r): r is string => Boolean(r))
+        )].sort();
         
         setConstituencies(uniqueConstituencies);
         setRegions(uniqueRegions);

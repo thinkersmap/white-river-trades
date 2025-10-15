@@ -9,7 +9,6 @@ import MapComponent from "@/components/map/MapComponent";
 import { JobBanner } from "@/components/shared/JobBanner";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import { supabase } from "@/lib/supabaseClient";
-import { formatPostcode } from "@/lib/postcodes";
 
 type CompanyCardRow = {
   CompanyName: string;
@@ -145,7 +144,6 @@ export default function TradePage({ params }: Props) {
                   tradeName={trade.name}
                   constituencySlug={constituencySlug}
                   constituencyName={constituencyData?.name}
-                  postcode={constituencyData?.postcode}
                 />
               </div>
             </div>
