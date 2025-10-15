@@ -56,8 +56,8 @@ export function JobDescriptionDialog({
   const [isSubmitted, setIsSubmitted] = useState(false);
   
   // State for boundary data
-  const [boundaryData, setBoundaryData] = useState<{geometry: {type: string, coordinates: number[][][] | number[][][][]}} | null>(null);
-  const [boundaryLoading, setBoundaryLoading] = useState(false);
+  const [, setBoundaryData] = useState<{geometry: {type: string, coordinates: number[][][] | number[][][][]}} | null>(null);
+  const [, setBoundaryLoading] = useState(false);
   
   
 
@@ -224,64 +224,8 @@ export function JobDescriptionDialog({
     }
   };
 
-  // Function to convert GeoJSON coordinates to SVG path
-  const convertGeoJSONToSVGPath = (geometry: {type: string, coordinates: number[][][] | number[][][][]}, width: number = 160, height: number = 160) => {
-    if (!geometry || !geometry.coordinates) return '';
-    
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    
-    // Find bounding box
-    const processCoordinates = (coords: number[] | number[][] | number[][][] | number[][][][]) => {
-      if (Array.isArray(coords[0])) {
-        (coords as number[][] | number[][][] | number[][][][]).forEach(processCoordinates);
-      } else if (coords.length >= 2) {
-        const [x, y] = coords as number[];
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-      }
-    };
-    
-    processCoordinates(geometry.coordinates);
-    
-    if (minX === Infinity) return '';
-    
-    // Calculate scale and offset
-    const scaleX = width / (maxX - minX);
-    const scaleY = height / (maxY - minY);
-    const scale = Math.min(scaleX, scaleY) * 0.8; // 0.8 for padding
-    const offsetX = (width - (maxX - minX) * scale) / 2;
-    const offsetY = (height - (maxY - minY) * scale) / 2;
-    
-    // Convert coordinates to SVG path
-    const convertRing = (ring: number[][]) => {
-      return ring.map(([x, y]) => {
-        const svgX = (x - minX) * scale + offsetX;
-        const svgY = height - ((y - minY) * scale + offsetY); // Flip Y axis
-        return `${svgX},${svgY}`;
-      }).join(' ');
-    };
-    
-    if (geometry.type === 'Polygon') {
-      const rings = geometry.coordinates as number[][][];
-      return rings.map((ring: number[][], index: number) => {
-        const path = convertRing(ring);
-        return index === 0 ? `M ${path} Z` : `M ${path} Z`;
-      }).join(' ');
-    } else if (geometry.type === 'MultiPolygon') {
-      return (geometry.coordinates as number[][][][]).map((polygon: number[][][]) => {
-        return polygon.map((ring: number[][], index: number) => {
-          const path = convertRing(ring);
-          return index === 0 ? `M ${path} Z` : `M ${path} Z`;
-        }).join(' ');
-      }).join(' ');
-    }
-    
-    return '';
-  };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Clear previous errors
     setFieldErrors({});
     
@@ -315,14 +259,55 @@ export function JobDescriptionDialog({
       return;
     }
     
-    // Handle form submission
-    console.log("Job description submitted:", formData);
-    setIsSubmitted(true);
+    // Set loading state
+    setIsLoading(true);
     
-    // Load boundary data for the constituency
-    const constituencyName = formData.division || division;
-    if (constituencyName) {
-      loadBoundaryData(constituencyName);
+    try {
+      // Prepare data for submission
+      const submissionData = {
+        tradeName,
+        problemDescription: problemDescription || problemInput,
+        location: formData.location || postcode,
+        division: formData.division || division,
+        contactInfo: formData.contactInfo,
+        additionalInfo,
+        urgency: formData.urgency,
+        timeline: formData.timeline
+      };
+
+      // Submit to Airtable
+      const response = await fetch('/api/submit-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Failed to submit lead');
+      }
+
+      // Success - show success screen
+      setIsSubmitted(true);
+      
+      // Load boundary data for the constituency
+      const constituencyName = formData.division || division;
+      if (constituencyName) {
+        loadBoundaryData(constituencyName);
+      }
+
+    } catch (error) {
+      console.error('Error submitting lead:', error);
+      
+      // Show error to user
+      setFieldErrors({
+        submit: 'Failed to submit your request. Please try again or contact us directly.'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1104,23 +1089,43 @@ export function JobDescriptionDialog({
 
           {/* Footer */}
           <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4 sm:p-6">
-            <div className="max-w-2xl mx-auto flex justify-end space-x-3">
-              {currentStep === steps.length - 1 ? (
-                <button
-                  onClick={handleSubmit}
-                  className="px-8 py-3 bg-black text-white text-base font-medium rounded-xl hover:bg-gray-900 transition-colors"
-                >
-                  Submit Request
-                </button>
-              ) : (
-                <button
-                  onClick={handleNext}
-                  disabled={steps[currentStep]?.id === 'location' && !formData.location.trim()}
-                  className="px-8 py-3 bg-black text-white text-base font-medium rounded-xl hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Next
-                </button>
+            <div className="max-w-2xl mx-auto">
+              {/* Error message for submission */}
+              {fieldErrors.submit && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{fieldErrors.submit}</p>
+                </div>
               )}
+              
+              <div className="flex justify-end space-x-3">
+                {currentStep === steps.length - 1 ? (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                    className="px-8 py-3 bg-black text-white text-base font-medium rounded-xl hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit Request'
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNext}
+                    disabled={steps[currentStep]?.id === 'location' && !formData.location.trim()}
+                    className="px-8 py-3 bg-black text-white text-base font-medium rounded-xl hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                )}
+              </div>
             </div>
           </div>
             </>

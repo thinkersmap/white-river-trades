@@ -6,6 +6,7 @@ import { Navigation } from "@/components/home/Navigation";
 import { Hero } from "@/components/home/Hero";
 import { SearchDialog } from "@/components/dialogs/SearchDialog";
 import { TradesDialog } from "@/components/dialogs/TradesDialog";
+import { FinalCTA } from "@/components/shared/FinalCTA";
 import { saveSearchData, clearSearchData, getSearchData } from "@/lib/searchData";
 
 const searchExamples = [
@@ -344,40 +345,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA Search Section */}
-      <section className="px-4 pb-16 lg:pb-24">
-        <div className="max-w-[120rem] mx-auto">
-          <div className="relative overflow-hidden rounded-2xl bg-slate-950 ring-1 ring-white/10">
-            {/* Gradient wash */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-sky-500/15 via-cyan-400/10 to-indigo-500/15" />
-            <div className="relative px-6 sm:px-10 py-10 sm:py-14 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 items-center">
-              <div className="lg:col-span-1">
-                <h2 className="text-white text-2xl sm:text-3xl font-semibold tracking-tight">Ready to get started?</h2>
-                <p className="mt-2 text-white/80 text-sm sm:text-base">Describe your job and we’ll match you to the right local trade.</p>
-              </div>
-              <div className="lg:col-span-2">
-                <div className="group cursor-pointer" onClick={() => setIsOpen(true)}>
-                  <div className="relative rounded-2xl bg-white text-gray-900 shadow-sm">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </div>
-                    <input
-                      readOnly
-                      aria-label="Open search"
-                      value={searchExamples[placeholderIndex]}
-                      className="w-full pl-12 pr-28 py-4 sm:py-5 rounded-2xl bg-white text-gray-700 placeholder:text-gray-400"
-                      placeholder={searchExamples[placeholderIndex]}
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <span className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs sm:text-sm">Search</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <FinalCTA 
+        onSearch={() => setIsOpen(true)}
+      />
 
       {/* Footer */}
       <footer className="bg-slate-950 border-t border-white/10">
