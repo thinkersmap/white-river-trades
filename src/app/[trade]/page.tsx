@@ -1,12 +1,11 @@
-"use client";
-
 import { use } from "react";
 import { Navigation } from "@/components/home/Navigation";
 import { trades } from "@/data/trades";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
-import { TradeActions } from "@/components/trade/TradeActions";
+import { PostcodeSearch } from "@/components/shared/PostcodeSearch";
+import { ConstituencyCards } from "@/components/trade/ConstituencyCards";
 
 type Props = {
   params: Promise<{
@@ -50,28 +49,36 @@ export default function TradePage({ params }: Props) {
                   {trade.description || `Find trusted ${trade.name.toLowerCase()} professionals near you. We'll match you with experienced specialists who understand your requirements.`}
                 </p>
 
-                <TradeActions 
-                  tradeSlug={trade.slug}
-                  tradeName={trade.name}
-                />
+                {/* Subcategories */}
+                {trade.subcategories && trade.subcategories.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                      {trade.subcategories.map((subcategory) => (
+                        <span
+                          key={subcategory.slug}
+                          className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full"
+                          title={subcategory.description}
+                        >
+                          {subcategory.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <PostcodeSearch tradeSlug={trade.slug} />
 
                 {/* Stats */}
                 <div className="flex flex-col sm:flex-row gap-8 sm:gap-16 pt-6">
                   <div>
                     <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">
-                      500+
+                      650
                     </div>
                     <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
-                      {trade.name} specialists<br />across the UK
+                      local divisions<br />across the UK
                     </div>
                   </div>
                   <div>
-                    <div className="text-3xl sm:text-4xl lg:text-[48px] leading-none font-normal text-gray-900">
-                      1K+
-                    </div>
-                    <div className="mt-2 sm:mt-3 text-sm sm:text-[15px] text-gray-500 font-medium">
-                      Verified reviews<br />for {trade.name.toLowerCase()}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -89,6 +96,12 @@ export default function TradePage({ params }: Props) {
             />
           </div>
         </div>
+
+        {/* Constituency Cards */}
+        <ConstituencyCards 
+          tradeSlug={trade.slug}
+          tradeName={trade.name}
+        />
       </div>
     </div>
   );

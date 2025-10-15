@@ -8,15 +8,25 @@ import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import OSM from 'ol/source/OSM';
-import { Fill, Stroke, Style } from 'ol/style';
+import { Fill, Stroke, Style, Circle } from 'ol/style';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
+import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
 import proj4 from 'proj4';
 import 'ol/ol.css';
 
 // Define the British National Grid projection
 proj4.defs("EPSG:27700", "+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs");
+
+interface CompanyMarker {
+  CompanyName: string;
+  "RegAddress.PostCode": string | null;
+  IncorporationDate: string | null;
+  constituency_name: string;
+  latitude: number | null;
+  longitude: number | null;
+}
 
 interface MapComponentProps {
   constituency: ConstituencyMeta & { 
@@ -25,9 +35,10 @@ interface MapComponentProps {
       coordinates: number[][][];
     }
   };
+  companies?: CompanyMarker[];
 }
 
-export default function MapComponent({ constituency }: MapComponentProps) {
+export default function MapComponent({ constituency, companies = [] }: MapComponentProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -128,6 +139,39 @@ export default function MapComponent({ constituency }: MapComponentProps) {
         })
       });
 
+      // Create company markers
+      const companyFeatures: Feature[] = [];
+      companies.forEach((company) => {
+        if (company.latitude && company.longitude) {
+          const companyFeature = new Feature({
+            geometry: new Point(fromLonLat([company.longitude, company.latitude])),
+            name: company.CompanyName
+          });
+          
+          companyFeatures.push(companyFeature);
+        }
+      });
+
+      const companySource = new VectorSource({
+        features: companyFeatures
+      });
+
+      const companyLayer = new VectorLayer({
+        source: companySource,
+        style: new Style({
+          image: new Circle({
+            radius: 6,
+            fill: new Fill({
+              color: '#ef4444' // Red color for company markers
+            }),
+            stroke: new Stroke({
+              color: '#ffffff',
+              width: 2
+            })
+          })
+        })
+      });
+
       // Create map
       const map = new Map({
         target: mapRef.current,
@@ -135,7 +179,8 @@ export default function MapComponent({ constituency }: MapComponentProps) {
           new TileLayer({
             source: new OSM()
           }),
-          vectorLayer
+          vectorLayer,
+          companyLayer
         ],
         view: new View({
           center: fromLonLat([-0.1, 51.5]),
@@ -166,7 +211,7 @@ export default function MapComponent({ constituency }: MapComponentProps) {
         mapInstanceRef.current.setTarget(undefined);
       }
     };
-  }, [constituency.geometry]);
+  }, [constituency.geometry, companies]);
 
   if (error) {
     return (

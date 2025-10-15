@@ -114,21 +114,21 @@ export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) 
               {/* How it works */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-4">
                 <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">①</div>
+                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">1</div>
                   <div>
                     <div className="text-sm font-semibold text-gray-900">Tell us what you need</div>
                     <div className="mt-1 text-xs text-gray-500 leading-relaxed">Describe the job or service you&apos;re looking for.</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">②</div>
+                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">2</div>
                   <div>
                     <div className="text-sm font-semibold text-gray-900">Share your location</div>
                     <div className="mt-1 text-xs text-gray-500 leading-relaxed">Enter your postcode so we can find pros near you.</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">③</div>
+                  <div className="shrink-0 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-900">3</div>
                   <div>
                     <div className="text-sm font-semibold text-gray-900">Get matched instantly</div>
                     <div className="mt-1 text-xs text-gray-500 leading-relaxed">We&apos;ll match you with the right local trade.</div>

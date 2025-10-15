@@ -8,6 +8,16 @@ import { TradeActions } from "@/components/trade/TradeActions";
 import MapComponent from "@/components/map/MapComponent";
 import { JobBanner } from "@/components/shared/JobBanner";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
+import { supabase } from "@/lib/supabaseClient";
+
+type CompanyCardRow = {
+  CompanyName: string;
+  "RegAddress.PostCode": string | null;
+  IncorporationDate: string | null;
+  constituency_name: string;
+  latitude: number | null;
+  longitude: number | null;
+};
 
 type Props = {
   params: Promise<{
@@ -28,6 +38,55 @@ export default function TradePage({ params }: Props) {
   if (!trade) notFound();
 
   const Icon = trade.icon;
+  // Only fetch companies for roofing trade (only trade with company data available)
+
+  const companiesResult = tradeSlug === 'roofing' ? use(
+    (async () => {
+      console.time('[trade page] fetch companies')
+      if (!supabase) {
+        console.warn('[trade page] Supabase not configured, skipping companies fetch')
+        return { data: [] }
+      }
+      const res = await supabase
+        .from("roofing_companies_enriched")
+        .select('CompanyName, "RegAddress.PostCode", IncorporationDate, constituency_name, latitude, longitude')
+        .ilike("constituency_name", constituencyData.name)
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null)
+        .order("IncorporationDate", { ascending: true, nullsFirst: false })
+        .limit(20)
+      console.timeEnd('[trade page] fetch companies')
+      if (res.error) {
+        console.error('[trade page] supabase error', res.error)
+      } else {
+        console.log('[trade page] companies loaded', res.data?.length ?? 0)
+      }
+      return res
+    })()
+  ) : { data: [] };
+
+  const companies = (companiesResult?.data ?? []) as CompanyCardRow[];
+
+  // Fetch total count for the message
+  const totalCountResult = tradeSlug === 'roofing' ? use(
+    (async () => {
+      console.time('[trade page] fetch total count')
+      if (!supabase) {
+        console.warn('[trade page] Supabase not configured, skipping count fetch')
+        return { count: 0 }
+      }
+      const res = await supabase
+        .from("roofing_companies_enriched")
+        .select('*', { count: 'exact', head: true })
+        .ilike("constituency_name", constituencyData.name)
+      console.timeEnd('[trade page] fetch total count')
+      if (res.error) console.error('[trade page] count error', res.error)
+      else console.log('[trade page] total count', res.count)
+      return res
+    })()
+  ) : { count: 0 };
+
+  const totalCount = totalCountResult?.count ?? 0;
 
   // Get trade-specific override data if available
   const tradeOverrides = constituencyData.overrides?.tradeOverrides?.[tradeSlug];
@@ -47,13 +106,13 @@ export default function TradePage({ params }: Props) {
           <div className="bg-white rounded-[16px] flex items-center">
             <div className="px-6 sm:px-8 lg:px-16 py-12 lg:py-20 w-full">
               <div className="space-y-8 lg:space-y-10">
-                <Breadcrumbs items={breadcrumbItems} />
+                <Breadcrumbs 
+                  items={breadcrumbItems} 
+                  icon={<Icon className="w-4 h-4 text-gray-600" />}
+                />
 
-                {/* Trade Icon */}
+                {/* Title */}
                 <div className="space-y-6">
-                  <div className="inline-block p-3 bg-gray-100 rounded-xl shadow-sm">
-                    <Icon className="w-8 h-8 text-gray-600" />
-                  </div>
                   <h1 className="text-4xl sm:text-5xl lg:text-[72px] leading-[1.1] font-normal tracking-[-0.02em] text-gray-900">
                     {trade.name} in {constituencyData.name}
                   </h1>
@@ -64,6 +123,15 @@ export default function TradePage({ params }: Props) {
                     constituencyData.overrides?.shortDescription ||
                     `Find trusted ${trade.name.toLowerCase()} in ${constituencyData.name}. We'll match you with experienced professionals who understand local properties and requirements.`}
                 </p>
+
+                {/* Company count message for trades with company data */}
+                {tradeSlug === 'roofing' && totalCount > 0 && (
+                  <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-blue-800 font-medium">
+                      We&apos;ve found {totalCount.toLocaleString()} companies in {constituencyData.name}
+                    </p>
+                  </div>
+                )}
 
                 {/* Areas Covered - Show if override data available */}
                 {tradeOverrides?.areasCovered && (
@@ -82,6 +150,8 @@ export default function TradePage({ params }: Props) {
                 <TradeActions 
                   tradeSlug={trade.slug}
                   tradeName={trade.name}
+                  constituencySlug={constituencySlug}
+                  constituencyName={constituencyData?.name}
                 />
               </div>
             </div>
@@ -89,7 +159,7 @@ export default function TradePage({ params }: Props) {
 
           {/* Right Map Container */}
           <div className="bg-[#e8eaed] rounded-[16px] overflow-hidden min-h-[400px] lg:sticky lg:top-4">
-            <MapComponent constituency={constituencyData} />
+            <MapComponent constituency={constituencyData} companies={companies} />
           </div>
         </div>
 
@@ -197,6 +267,8 @@ export default function TradePage({ params }: Props) {
             </div>
           </div>
         )}
+
+        {/* Local Companies Carousel - Removed per request */}
 
         {/* Job Banner */}
         <div className="mt-8">
