@@ -274,6 +274,7 @@ export default function TradePage({ params }: Props) {
         <div className="mt-8">
           <JobBanner 
             tradeName={trade.name}
+            divisionName={constituencyData?.name}
           />
         </div>
 

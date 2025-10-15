@@ -369,29 +369,31 @@ export function JobDescriptionDialog({
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
             <h3 className="font-semibold text-gray-900 mb-4">Your Job</h3>
             <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Service</span>
-                <span className="font-medium">{tradeName}</span>
+              {/* Service - stacked on mobile, inline on sm+ */}
+              <div className="sm:flex sm:items-center sm:justify-between">
+                <span className="text-gray-700">Service</span>
+                <div className="mt-1 sm:mt-0 font-medium text-gray-900">{tradeName}</div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Location</span>
-                <span className="font-medium">{formData.location || postcode || formData.division || division}</span>
+              {/* Location - stacked on mobile, inline on sm+ */}
+              <div className="sm:flex sm:items-center sm:justify-between">
+                <span className="text-gray-700">Location</span>
+                <div className="mt-1 sm:mt-0 font-medium text-gray-900">{formData.location || postcode || formData.division || division}</div>
               </div>
               {(problemDescription || problemInput) && (
                 <div className="pt-3 border-t border-gray-100">
-                  <span className="text-gray-600 text-sm">Description</span>
-                  <p className="text-sm text-gray-700 mt-1">
+                  <span className="text-gray-700 text-sm">Description</span>
+                  <p className="text-sm text-gray-900 mt-1">
                     &ldquo;{problemDescription || problemInput}&rdquo;
                   </p>
                 </div>
               )}
               
               <div className="pt-3 border-t border-gray-100">
-                <span className="text-gray-600 text-sm">Contact</span>
+                <span className="text-gray-700 text-sm">Contact</span>
                 <div className="mt-1 space-y-1">
                   <p className="text-sm font-medium text-gray-900">{formData.contactInfo.name}</p>
-                  <p className="text-sm text-gray-600">{formData.contactInfo.email}</p>
-                  <p className="text-sm text-gray-600">{formData.contactInfo.phone}</p>
+                  <p className="text-sm text-gray-900">{formData.contactInfo.email}</p>
+                  <p className="text-sm text-gray-900">{formData.contactInfo.phone}</p>
                 </div>
               </div>
             </div>

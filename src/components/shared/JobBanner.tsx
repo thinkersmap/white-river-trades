@@ -1,12 +1,49 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ArrowRightIcon, CheckIcon, ShieldCheckIcon, HeartIcon } from "@heroicons/react/20/solid";
+import { JobDescriptionDialog } from "@/components/shared/JobDescriptionDialog";
+import { getSearchData, clearSearchData } from "@/lib/searchData";
 
 interface JobBannerProps {
   tradeName: string;
+  divisionName?: string;
+  postcode?: string;
 }
 
-export function JobBanner({ tradeName }: JobBannerProps) {
+export function JobBanner({ tradeName, divisionName, postcode }: JobBannerProps) {
+  const [showDialog, setShowDialog] = useState(false);
+  const [hasValidSearchData, setHasValidSearchData] = useState(false);
+  const [problemDescription, setProblemDescription] = useState<string | undefined>(undefined);
+  const [aiAnalysis, setAiAnalysis] = useState<string | undefined>(undefined);
+  const [savedPostcode, setSavedPostcode] = useState<string | undefined>(undefined);
+  const [savedDivision, setSavedDivision] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const data = getSearchData();
+    const valid = !!data && data.selectedTrade === tradeName;
+    setHasValidSearchData(valid);
+    if (valid) {
+      setProblemDescription(data.problemDescription || undefined);
+      setAiAnalysis(data.aiAnalysis || undefined);
+      setSavedPostcode(data.postcode || undefined);
+      setSavedDivision(data.division || undefined);
+    }
+  }, [tradeName]);
+
+  const handleDescribeClick = () => {
+    const data = getSearchData();
+    if (data && data.selectedTrade && data.selectedTrade !== tradeName) {
+      clearSearchData();
+    }
+
+    // Prefer provided division/postcode from page when available
+    const nextDivision = divisionName || data?.division;
+    const nextPostcode = postcode || data?.postcode;
+    setSavedDivision(nextDivision || undefined);
+    setSavedPostcode(nextPostcode || undefined);
+    setShowDialog(true);
+  };
 
   return (
     <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 sm:p-8 lg:p-12 text-white relative overflow-hidden">
@@ -33,7 +70,7 @@ export function JobBanner({ tradeName }: JobBannerProps) {
 
         <div className="text-center mb-6 sm:mb-8">
           <button
-            onClick={() => console.log('Describe your job clicked')}
+            onClick={handleDescribeClick}
             className="px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 text-lg sm:text-xl shadow-xl hover:shadow-2xl transform hover:scale-105 mx-auto w-full sm:w-auto"
           >
             Describe your job
@@ -58,6 +95,16 @@ export function JobBanner({ tradeName }: JobBannerProps) {
           </div>
         </div>
       </div>
+
+      <JobDescriptionDialog
+        isOpen={showDialog}
+        onClose={() => setShowDialog(false)}
+        tradeName={tradeName}
+        problemDescription={hasValidSearchData ? problemDescription : undefined}
+        aiAnalysis={hasValidSearchData ? aiAnalysis : undefined}
+        postcode={savedPostcode}
+        division={savedDivision}
+      />
     </div>
   );
 }
