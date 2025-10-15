@@ -470,7 +470,7 @@ export function JobDescriptionDialog({
                 <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-[-0.01em] mb-3">
                   Job Summary
                 </h2>
-                <p className="text-base text-gray-500">
+                <p className="text-base text-gray-700">
                   Here&apos;s what we understand about your project
                 </p>
               </div>
@@ -508,7 +508,7 @@ export function JobDescriptionDialog({
                                   setFieldErrors(prev => ({ ...prev, problem: '' }));
                                 }
                               }}
-                              className={`w-full h-24 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent resize-none ${
+                              className={`w-full h-24 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent resize-none text-gray-900 placeholder:text-gray-500 ${
                                 fieldErrors.problem 
                                   ? 'border-red-300 focus:ring-red-500' 
                                   : 'border-gray-300 focus:ring-blue-500'
@@ -532,7 +532,7 @@ export function JobDescriptionDialog({
                             </div>
                           </div>
                         ) : (
-                          <p className="text-gray-700 leading-relaxed">&ldquo;{problemDescription || problemInput}&rdquo;</p>
+                          <p className="text-gray-900 leading-relaxed">&ldquo;{problemDescription || problemInput}&rdquo;</p>
                         )}
                       </div>
                     </div>
@@ -558,7 +558,7 @@ export function JobDescriptionDialog({
                             <textarea
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                              className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 placeholder:text-gray-500"
                               placeholder="Describe your problem in detail..."
                             />
                             <div className="flex space-x-2">
@@ -657,7 +657,7 @@ export function JobDescriptionDialog({
                                   setFieldErrors(prev => ({ ...prev, location: '' }));
                                 }
                               }}
-                              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+                              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent text-gray-900 placeholder:text-gray-500 ${
                                 fieldErrors.location 
                                   ? 'border-red-300 focus:ring-red-500' 
                                   : 'border-gray-300 focus:ring-blue-500'
@@ -698,11 +698,11 @@ export function JobDescriptionDialog({
                             </div>
                           </div>
                         ) : (
-                          <div className="text-gray-700 space-y-1">
+                          <div className="text-gray-900 space-y-1">
                             {formData.location && (
                               <div className="flex items-center space-x-2">
                                 <span className="text-xs text-gray-500 uppercase tracking-wide">Postcode:</span>
-                                <span className="font-mono text-sm bg-white px-2 py-1 rounded border">
+                                <span className="font-mono text-sm bg-white px-2 py-1 rounded border text-gray-900">
                                   {formData.location}
                                 </span>
                               </div>
@@ -710,7 +710,7 @@ export function JobDescriptionDialog({
                             {formData.division && (
                               <div className="flex items-center space-x-2">
                                 <span className="text-xs text-gray-500 uppercase tracking-wide">Division:</span>
-                                <span className="text-sm">{formData.division}</span>
+                                <span className="text-sm text-gray-900">{formData.division}</span>
                               </div>
                             )}
                           </div>
@@ -731,7 +731,7 @@ export function JobDescriptionDialog({
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-gray-900 mb-2">Add Location</h4>
-                        <p className="text-gray-600 text-sm mb-3">Let tradespeople know where the work needs to be done.</p>
+                        <p className="text-gray-700 text-sm mb-3">Let tradespeople know where the work needs to be done.</p>
                         <button
                           onClick={() => startEditing('location', '')}
                           className="text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-2 rounded hover:bg-blue-50 transition-colors"
@@ -769,7 +769,7 @@ export function JobDescriptionDialog({
                           <textarea
                             value={editValue}
                             onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                              className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 placeholder:text-gray-500"
                             placeholder="Add any additional details..."
                           />
                           <div className="flex space-x-2">
@@ -792,7 +792,7 @@ export function JobDescriptionDialog({
                           </div>
                         </div>
                       ) : (
-                          <p className="text-gray-700 text-sm leading-relaxed">{additionalInfo}</p>
+                          <p className="text-gray-900 text-sm leading-relaxed">{additionalInfo}</p>
                         )}
                       </div>
                     </div>
@@ -813,7 +813,7 @@ export function JobDescriptionDialog({
                             <textarea
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                              className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 placeholder:text-gray-500"
                               placeholder="Add any additional details..."
                             />
                             <div className="flex space-x-2">
@@ -870,7 +870,7 @@ export function JobDescriptionDialog({
                 <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-[-0.01em] mb-3">
                   Describe Your Problem
                 </h2>
-                <p className="text-base text-gray-500">
+                <p className="text-base text-gray-700">
                   Tell us what&apos;s wrong or what you need done
                 </p>
               </div>
@@ -881,7 +881,7 @@ export function JobDescriptionDialog({
                   <textarea
                     value={formData.problem}
                     onChange={(e) => setFormData(prev => ({ ...prev, problem: e.target.value }))}
-                    className="w-full h-32 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all resize-none"
+                    className="w-full h-32 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all resize-none text-gray-900 placeholder:text-gray-500"
                     placeholder="Describe your problem in detail..."
                   />
                 </div>
@@ -898,14 +898,14 @@ export function JobDescriptionDialog({
                 <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-[-0.01em] mb-3">
                   Location Details
                 </h2>
-                <p className="text-base text-gray-500">
+                <p className="text-base text-gray-700">
                   Where is the work needed?
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Property Address</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">Property Address</label>
                   {fieldErrors.location && (
                     <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-md">
                       <p className="text-sm text-red-600">{fieldErrors.location}</p>
@@ -921,7 +921,7 @@ export function JobDescriptionDialog({
                         setFieldErrors(prev => ({ ...prev, location: '' }));
                       }
                     }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all text-gray-900 placeholder:text-gray-500 ${
                       fieldErrors.location 
                         ? 'border-red-300 focus:ring-red-500' 
                         : 'border-gray-200 focus:ring-black'
@@ -942,18 +942,18 @@ export function JobDescriptionDialog({
                 <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-[-0.01em] mb-3">
                   Timeline & Urgency
                 </h2>
-                <p className="text-base text-gray-500">
+                <p className="text-base text-gray-700">
                   When do you need this work completed?
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">How urgent is this?</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">How urgent is this?</label>
                   <select
                     value={formData.urgency}
                     onChange={(e) => setFormData(prev => ({ ...prev, urgency: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all text-gray-900"
                   >
                     <option value="low">Low - Can wait a few weeks</option>
                     <option value="medium">Medium - Within a week</option>
@@ -963,12 +963,12 @@ export function JobDescriptionDialog({
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Preferred Timeline</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">Preferred Timeline</label>
                   <input
                     type="text"
                     value={formData.timeline}
                     onChange={(e) => setFormData(prev => ({ ...prev, timeline: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all text-gray-900 placeholder:text-gray-500"
                     placeholder="e.g., Next weekend, Within 2 weeks"
                   />
                 </div>
@@ -985,14 +985,14 @@ export function JobDescriptionDialog({
                 <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-[-0.01em] mb-3">
                   Contact Information
                 </h2>
-                <p className="text-base text-gray-500">
+                <p className="text-base text-gray-700">
                   How should tradespeople reach you?
                 </p>
               </div>
 
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Full Name</label>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">Full Name</label>
                   <input
                     type="text"
                     value={formData.contactInfo.name}
@@ -1000,7 +1000,7 @@ export function JobDescriptionDialog({
                       ...prev, 
                       contactInfo: { ...prev.contactInfo, name: e.target.value }
                     }))}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all text-gray-900 placeholder:text-gray-500 ${
                       fieldErrors.name ? 'border-red-300 focus:ring-red-500' : 'border-gray-200'
                     }`}
                     placeholder="Your full name"
@@ -1011,8 +1011,8 @@ export function JobDescriptionDialog({
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                  <p className="text-xs text-gray-500 mb-3">Used to send you quotes and project updates</p>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
+                  <p className="text-xs text-gray-700 mb-3">Used to send you quotes and project updates</p>
                   <input
                     type="email"
                     value={formData.contactInfo.email}
@@ -1020,7 +1020,7 @@ export function JobDescriptionDialog({
                       ...prev, 
                       contactInfo: { ...prev.contactInfo, email: e.target.value }
                     }))}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all text-gray-900 placeholder:text-gray-500 ${
                       fieldErrors.email ? 'border-red-300 focus:ring-red-500' : 'border-gray-200'
                     }`}
                     placeholder="your.email@example.com"
@@ -1031,8 +1031,8 @@ export function JobDescriptionDialog({
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
-                  <p className="text-xs text-gray-500 mb-3">Used to contact you and confirm job details</p>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">Phone Number</label>
+                  <p className="text-xs text-gray-700 mb-3">Used to contact you and confirm job details</p>
                   <input
                     type="tel"
                     value={formData.contactInfo.phone}
@@ -1040,7 +1040,7 @@ export function JobDescriptionDialog({
                       ...prev, 
                       contactInfo: { ...prev.contactInfo, phone: e.target.value }
                     }))}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all text-gray-900 placeholder:text-gray-500 ${
                       fieldErrors.phone ? 'border-red-300 focus:ring-red-500' : 'border-gray-200'
                     }`}
                     placeholder="Your phone number"
