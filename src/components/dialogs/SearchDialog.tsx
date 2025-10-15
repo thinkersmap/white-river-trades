@@ -174,6 +174,8 @@ export function SearchDialog({
               <LocationStep
                 selectedTrade={selectedTrade}
                 tradeIcon={trades.find(t => t.name === selectedTrade)?.icon || (() => null)}
+                problemDescription={searchQuery}
+                aiAnalysis={searchResults?.overview}
               />
             ) : (
               <div className="p-4 sm:p-6">

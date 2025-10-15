@@ -2,17 +2,37 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getConstituencyFromPostcode } from '@/lib/postcodes';
 import { trades } from '@/data/trades';
+import { saveSearchData, clearSearchData } from '@/lib/searchData';
 
 interface LocationStepProps {
   selectedTrade: string;
   tradeIcon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  problemDescription?: string;
+  aiAnalysis?: string;
 }
 
-export function LocationStep({ selectedTrade, tradeIcon: Icon }: LocationStepProps) {
+export function LocationStep({ selectedTrade, tradeIcon: Icon, problemDescription, aiAnalysis }: LocationStepProps) {
   const router = useRouter();
   const [postcode, setPostcode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Clear search data if the selected trade doesn't match the saved trade
+  React.useEffect(() => {
+    const savedData = localStorage.getItem('white-river-search-data');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        if (parsed.selectedTrade && parsed.selectedTrade !== selectedTrade) {
+          clearSearchData();
+        }
+      } catch (e) {
+        // If there's an error parsing, clear the data
+        console.warn('[LocationStep] failed to parse saved data', e);
+        clearSearchData();
+      }
+    }
+  }, [selectedTrade]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,15 +42,31 @@ export function LocationStep({ selectedTrade, tradeIcon: Icon }: LocationStepPro
     setError(null);
 
     try {
+      const t0 = performance.now();
+      console.log("[LocationStep] submit", { selectedTrade, postcode });
       const constituency = await getConstituencyFromPostcode(postcode);
+      console.log("[LocationStep] constituency resolved", constituency, `in ${Math.round(performance.now()-t0)}ms`);
+      
+      // Save search data with postcode and division information
+      // Always save postcode and division, even if no problem description
+      saveSearchData({
+        problemDescription: problemDescription || '',
+        aiAnalysis: aiAnalysis || '',
+        selectedTrade: selectedTrade,
+        postcode: postcode,
+        division: constituency.name
+      });
       
       // Look up the trade by its display name and use its canonical slug
       const tradeSlug = trades.find(t => t.name === selectedTrade)?.slug
         || selectedTrade.toLowerCase().replace(/[^a-z0-9]+/g, "-");
       
       // Redirect to the trade/constituency page
-      router.push(`/${tradeSlug}/${constituency.slug}`);
+      const target = `/${tradeSlug}/${constituency.slug}`;
+      console.log("[LocationStep] navigating to", target);
+      router.push(target);
     } catch (error) {
+      console.error("[LocationStep] error", error);
       setError(error instanceof Error ? error.message : 'Failed to find your constituency');
       setIsLoading(false);
     }
@@ -92,7 +128,7 @@ export function LocationStep({ selectedTrade, tradeIcon: Icon }: LocationStepPro
               disabled={isLoading || !postcode.trim()}
               className="w-full py-4 bg-black text-white text-base font-medium rounded-xl hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Finding local trades...' : 'Find local trades'}
+              {isLoading ? 'Connecting...' : 'Connect to your area'}
             </button>
           </div>
         </form>

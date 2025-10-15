@@ -1,6 +1,8 @@
+import React from 'react';
 import { Dialog } from '@headlessui/react';
 import { trades } from '@/data/trades';
 import { DialogHeader } from '../shared/DialogHeader';
+import { clearSearchData } from '@/lib/searchData';
 
 interface TradesDialogProps {
   isOpen: boolean;
@@ -15,6 +17,14 @@ export function TradesDialog({
   onBackToSearch,
   onSelectTrade,
 }: TradesDialogProps) {
+  // Clear search data when trades dialog opens
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log('TradesDialog opened - clearing search data');
+      clearSearchData();
+    }
+  }, [isOpen]);
+
   return (
     <Dialog
       open={isOpen}
