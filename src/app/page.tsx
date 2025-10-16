@@ -305,7 +305,14 @@ export default function Home() {
     <div className="min-h-screen bg-[#f5f5f7] flex flex-col">
       <Navigation />
       <Hero 
-        onSearch={() => setIsOpen(true)}
+        onSearch={() => {
+          setIsOpen(true);
+          // Track SearchOpened event when search dialog is opened from Hero
+          fbqTrack('SearchOpened', {
+            content_name: 'search_dialog_opened',
+            content_category: 'search',
+          });
+        }}
         searchExamples={searchExamples}
         placeholderIndex={placeholderIndex}
       />
@@ -356,9 +363,9 @@ export default function Home() {
       <FinalCTA 
         onSearch={() => {
           setIsOpen(true);
-          // Track Search event when search is initiated from FinalCTA
-          fbqTrack('Search', {
-            search_string: 'homepage_search_initiated',
+          // Track SearchOpened event when search dialog is opened from FinalCTA
+          fbqTrack('SearchOpened', {
+            content_name: 'search_dialog_opened',
             content_category: 'search',
           });
         }}
