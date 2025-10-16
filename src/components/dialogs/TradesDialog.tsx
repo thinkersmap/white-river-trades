@@ -3,6 +3,7 @@ import { Dialog } from '@headlessui/react';
 import { trades } from '@/data/trades';
 import { DialogHeader } from '../shared/DialogHeader';
 import { clearSearchData } from '@/lib/searchData';
+import { fbqTrack } from '@/lib/fbpixel';
 
 interface TradesDialogProps {
   isOpen: boolean;
@@ -64,7 +65,16 @@ export function TradesDialog({
                             `}
                           >
                             <button
-                              onClick={() => trade.available && onSelectTrade(trade.name)}
+                              onClick={() => {
+                                if (trade.available) {
+                                  // Track TradeSelected event
+                                  fbqTrack('TradeSelected', {
+                                    content_name: trade.name,
+                                    content_category: 'trade',
+                                  });
+                                  onSelectTrade(trade.name);
+                                }
+                              }}
                               className={`
                                 w-full p-3 sm:p-4 text-left transition-all
                                 ${trade.available 
