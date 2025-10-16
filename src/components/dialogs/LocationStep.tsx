@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { getConstituencyFromPostcode } from '@/lib/postcodes';
 import { trades } from '@/data/trades';
 import { saveSearchData, clearSearchData } from '@/lib/searchData';
+import { fbqTrack } from '@/lib/fbpixel';
 
 interface LocationStepProps {
   selectedTrade: string;
@@ -46,6 +47,14 @@ export function LocationStep({ selectedTrade, tradeIcon: Icon, problemDescriptio
       console.log("[LocationStep] submit", { selectedTrade, postcode });
       const constituency = await getConstituencyFromPostcode(postcode);
       console.log("[LocationStep] constituency resolved", constituency, `in ${Math.round(performance.now()-t0)}ms`);
+      
+      // Track ConnectedToDivision event
+      fbqTrack('ConnectedToDivision', {
+        content_name: constituency.name,
+        content_category: 'division',
+        postcode: postcode,
+        trade: selectedTrade,
+      });
       
       // Save search data with postcode and division information
       // Always save postcode and division, even if no problem description
