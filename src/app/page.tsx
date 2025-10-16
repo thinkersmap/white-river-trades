@@ -9,6 +9,7 @@ import { SearchDialog } from "@/components/dialogs/SearchDialog";
 import { TradesDialog } from "@/components/dialogs/TradesDialog";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { saveSearchData, clearSearchData, getSearchData } from "@/lib/searchData";
+import { fbqTrack } from "@/lib/fbpixel";
 
 const searchExamples = [
   "boiler won't turn on",
@@ -222,6 +223,12 @@ export default function Home() {
         selectedTrade: data.recommendedTrade
       });
       
+      // Track Facebook Search event (on successful results)
+      fbqTrack('Search', {
+        search_string: searchQuery,
+        content_category: data.recommendedTrade,
+      });
+
       // Save search data for use in other pages
       saveSearchData({
         problemDescription: searchQuery,
@@ -347,7 +354,14 @@ export default function Home() {
       </section>
 
       <FinalCTA 
-        onSearch={() => setIsOpen(true)}
+        onSearch={() => {
+          setIsOpen(true);
+          // Track Search event when search is initiated from FinalCTA
+          fbqTrack('Search', {
+            search_string: 'homepage_search_initiated',
+            content_category: 'search',
+          });
+        }}
       />
 
       {/* Footer */}

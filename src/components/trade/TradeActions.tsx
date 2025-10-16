@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { JobDescriptionDialog } from "@/components/shared/JobDescriptionDialog";
 import { getSearchData, clearSearchData } from "@/lib/searchData";
+import { fbqTrack } from "@/lib/fbpixel";
 
 interface TradeActionsProps {
   tradeSlug: string;
@@ -13,8 +13,7 @@ interface TradeActionsProps {
   postcode?: string;
 }
 
-export function TradeActions({ tradeName, constituencySlug, constituencyName, postcode }: TradeActionsProps) {
-  const router = useRouter();
+export function TradeActions({ tradeName, constituencyName, postcode }: TradeActionsProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [savedPostcode, setSavedPostcode] = useState<string | undefined>(undefined);
   const [savedDivision, setSavedDivision] = useState<string | undefined>(undefined);
@@ -30,7 +29,7 @@ export function TradeActions({ tradeName, constituencySlug, constituencyName, po
       console.log('Trade mismatch detected, clearing data:', { saved: searchData.selectedTrade, current: tradeName });
       clearSearchData();
     }
-  }, [tradeName, searchData]);
+  }, [tradeName, searchData, hasValidSearchData]);
 
   const handleContinue = () => {
     // Get fresh search data
@@ -62,6 +61,13 @@ export function TradeActions({ tradeName, constituencySlug, constituencyName, po
     }));
     
     setShowDialog(true);
+    // Track StartLead when the dialog is opened
+    fbqTrack('StartLead', {
+      content_name: tradeName,
+      content_category: 'trade',
+      postcode: nextPostcode,
+      division: nextDivision,
+    });
   };
 
   return (

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Dialog } from '@headlessui/react';
 import { DialogHeader } from './DialogHeader';
 import { constituenciesMeta } from '@/data/constituencies-meta';
+import { fbqTrack } from "@/lib/fbpixel";
 
 interface JobDescriptionDialogProps {
   isOpen: boolean;
@@ -304,6 +305,15 @@ export function JobDescriptionDialog({
 
       // Success - show success screen
       setIsSubmitted(true);
+      // Track successful Lead event
+      fbqTrack('Lead', {
+        content_name: tradeName,
+        content_category: 'trade',
+        value: undefined,
+        currency: 'GBP',
+        postcode: formData.location || postcode,
+        division: formData.division || division,
+      });
       
       // Load boundary data for the constituency
       const constituencyName = formData.division || division;
