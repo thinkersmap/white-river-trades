@@ -266,6 +266,12 @@ export default function Home() {
     setSearchQuery(tradeName.toLowerCase());
     setShowTrades(false);
     setStep(2);
+    
+    // Track TradeSelected event
+    fbqTrack('TradeSelected', {
+      content_name: tradeName,
+      content_category: 'trade',
+    });
   };
 
   // Scroll spy for steps

@@ -390,7 +390,7 @@ export function SearchDialog({
                      onClick={() => setView('trades')}
                      className="w-full py-3 text-center text-sm text-gray-600 hover:text-gray-900"
                    >
-                     Browse available trades →
+                     Browse all trades →
                    </button>
                 </div>
               </div>

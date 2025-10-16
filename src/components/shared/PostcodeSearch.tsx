@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getConstituencyFromPostcode } from "@/lib/postcodes";
 import { saveSearchData } from "@/lib/searchData";
 import { trades } from "@/data/trades";
+import { fbqTrack } from "@/lib/fbpixel";
 
 interface PostcodeSearchProps {
   tradeSlug: string;
@@ -28,6 +29,14 @@ export function PostcodeSearch({ tradeSlug }: PostcodeSearchProps) {
       // Get trade name from slug
       const trade = trades.find(t => t.slug === tradeSlug);
       const tradeName = trade?.name || tradeSlug;
+      
+      // Track ConnectedToDivision event
+      fbqTrack('ConnectedToDivision', {
+        content_name: constituency.name,
+        content_category: 'division',
+        postcode: trimmed,
+        trade: tradeName,
+      });
       
       // Save search data with postcode and division information
       saveSearchData({

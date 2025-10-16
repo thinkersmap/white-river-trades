@@ -1,4 +1,5 @@
 import { trades } from '@/data/trades';
+import { fbqTrack } from '@/lib/fbpixel';
 
 interface TradeMatch {
   tradeName: string;
@@ -166,6 +167,12 @@ export function SearchResults({
                     onClick={() => {
                       setSelectedTrade(trade.name);
                       setStep(2);
+                      
+                      // Track TradeSelected event
+                      fbqTrack('TradeSelected', {
+                        content_name: trade.name,
+                        content_category: 'trade',
+                      });
                     }}
                     className="w-full px-4 py-3 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
                   >
