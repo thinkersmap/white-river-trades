@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ContactPage() {
   return (
@@ -6,7 +7,7 @@ export default function ContactPage() {
       <div className="max-w-3xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <Link href="/" className="flex items-center gap-3">
-            <img src="/images/logo.png" alt="White River Trades logo" className="h-8 w-8 rounded-full object-cover" />
+            <Image src="/images/logo.png" alt="White River Trades logo" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
             <span className="text-lg font-semibold text-gray-900">White River Trades</span>
           </Link>
           <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">Back</Link>
