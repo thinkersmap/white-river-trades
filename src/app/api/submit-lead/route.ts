@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Airtable API configuration
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
+const AIRTABLE_TABLE_ID = process.env.AIRTABLE_TABLE_ID; // Prefer table ID per Airtable best practices
 const AIRTABLE_ACCESS_TOKEN = process.env.AIRTABLE_ACCESS_TOKEN;
 
 export async function POST(request: NextRequest) {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate environment variables
-    if (!AIRTABLE_BASE_ID || !AIRTABLE_ACCESS_TOKEN) {
+    if (!AIRTABLE_BASE_ID || !AIRTABLE_TABLE_ID || !AIRTABLE_ACCESS_TOKEN) {
       console.error('Missing Airtable configuration');
       return NextResponse.json(
         { success: false, error: 'Server configuration error' },
@@ -50,24 +51,36 @@ export async function POST(request: NextRequest) {
         'Urgency': urgency || 'medium',
         'Timeline': timeline || '',
         'Status': 'New Lead',
-        'Date Submitted': new Date().toISOString(),
-      }
+      },
+      // Allow Airtable to coerce values to the right types (e.g. select options)
+      typecast: true,
     };
 
     // Create record in Airtable using REST API
-    const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Leads`, {
+    const response = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${AIRTABLE_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
+        // Ask Airtable to return the created record in the response body
+        'Prefer': 'return=representation',
       },
       body: JSON.stringify(airtableData),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Airtable API error:', errorData);
-      throw new Error(`Airtable API error: ${response.status}`);
+      let errorMessage = `Airtable API error: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        console.error('Airtable API error:', errorData);
+        errorMessage = errorData?.error?.message || errorMessage;
+      } catch {
+        // ignore JSON parse errors
+      }
+      return NextResponse.json(
+        { success: false, error: errorMessage },
+        { status: 502 }
+      );
     }
 
     const result = await response.json();
