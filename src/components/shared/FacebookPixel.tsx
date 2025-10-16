@@ -17,7 +17,7 @@ function FacebookPixelInner(): null {
   return null;
 }
 
-export function FacebookPixel(): JSX.Element {
+export function FacebookPixel() {
   return (
     <Suspense fallback={null}>
       <FacebookPixelInner />
