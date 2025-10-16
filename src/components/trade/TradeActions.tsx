@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { JobDescriptionDialog } from "@/components/shared/JobDescriptionDialog";
 import { getSearchData, clearSearchData } from "@/lib/searchData";
+import { fbqTrack } from "@/lib/fbpixel";
 
 interface TradeActionsProps {
   tradeSlug: string;
@@ -62,6 +63,13 @@ export function TradeActions({ tradeName, constituencySlug, constituencyName, po
     }));
     
     setShowDialog(true);
+    // Track StartLead when the dialog is opened
+    fbqTrack('StartLead', {
+      content_name: tradeName,
+      content_category: 'trade',
+      postcode: nextPostcode,
+      division: nextDivision,
+    });
   };
 
   return (

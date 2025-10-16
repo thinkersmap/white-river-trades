@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ArrowRightIcon, CheckIcon, ShieldCheckIcon, HeartIcon } from "@heroicons/react/20/solid";
 import { JobDescriptionDialog } from "@/components/shared/JobDescriptionDialog";
 import { getSearchData, clearSearchData } from "@/lib/searchData";
+import { fbqTrack } from "@/lib/fbpixel";
 
 interface JobBannerProps {
   tradeName: string;
@@ -43,6 +44,14 @@ export function JobBanner({ tradeName, divisionName, postcode }: JobBannerProps)
     setSavedDivision(nextDivision || undefined);
     setSavedPostcode(nextPostcode || undefined);
     setShowDialog(true);
+    
+    // Track StartLead when the dialog is opened
+    fbqTrack('StartLead', {
+      content_name: tradeName,
+      content_category: 'trade',
+      postcode: nextPostcode,
+      division: nextDivision,
+    });
   };
 
   return (
