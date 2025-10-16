@@ -267,8 +267,8 @@ export default function Home() {
     setShowTrades(false);
     setStep(2);
     
-    // Track TradeSelected event
-    fbqTrack('TradeSelected', {
+    // Track SuggestedTradeSelected event
+    fbqTrack('SuggestedTradeSelected', {
       content_name: tradeName,
       content_category: 'trade',
     });

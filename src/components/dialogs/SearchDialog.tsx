@@ -4,6 +4,7 @@ import { DialogHeader } from '../shared/DialogHeader';
 import { LocationStep } from './LocationStep';
 import { trades } from '@/data/trades';
 import { useState } from 'react';
+import { fbqTrack } from '@/lib/fbpixel';
 interface SearchResult {
   overview: string;
   recommendedTrade: string;
@@ -120,6 +121,11 @@ export function SearchDialog({
                               <button
                                 onClick={() => {
                                   if (trade.available) {
+                                    // Track SuggestedTradeSelected event
+                                    fbqTrack('SuggestedTradeSelected', {
+                                      content_name: trade.name,
+                                      content_category: 'trade',
+                                    });
                                     setSelectedTrade(trade.name);
                                     setStep(2);
                                     setView('location');
@@ -357,6 +363,11 @@ export function SearchDialog({
                                         {/* Select Button */}
                                         <button 
                                           onClick={() => {
+                                            // Track SuggestedTradeSelected event
+                                            fbqTrack('SuggestedTradeSelected', {
+                                              content_name: trade.name,
+                                              content_category: 'trade',
+                                            });
                                             setSelectedTrade(trade.name);
                                             setStep(2);
                                             setView('location');
@@ -387,7 +398,14 @@ export function SearchDialog({
                   </div>
 
                    <button
-                     onClick={() => setView('trades')}
+                     onClick={() => {
+                       setView('trades');
+                       // Track BrowseTrades event when user clicks to browse trades
+                       fbqTrack('BrowseTrades', {
+                         content_name: 'browse_trades_clicked',
+                         content_category: 'navigation',
+                       });
+                     }}
                      className="w-full py-3 text-center text-sm text-gray-600 hover:text-gray-900"
                    >
                      Browse all trades →

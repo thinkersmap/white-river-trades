@@ -168,8 +168,8 @@ export function SearchResults({
                       setSelectedTrade(trade.name);
                       setStep(2);
                       
-                      // Track TradeSelected event
-                      fbqTrack('TradeSelected', {
+                      // Track SuggestedTradeSelected event
+                      fbqTrack('SuggestedTradeSelected', {
                         content_name: trade.name,
                         content_category: 'trade',
                       });
