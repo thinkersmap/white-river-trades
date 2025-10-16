@@ -67,8 +67,9 @@ export function TradesDialog({
                             <button
                               onClick={() => {
                                 if (trade.available) {
-                                  // Track TradeSelected event
-                                  fbqTrack('TradeSelected', {
+                                  console.log('TradesDialog: Firing directTradeSelected for', trade.name);
+                                  // Track directTradeSelected event
+                                  fbqTrack('directTradeSelected', {
                                     content_name: trade.name,
                                     content_category: 'trade',
                                   });

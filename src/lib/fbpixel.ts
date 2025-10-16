@@ -11,14 +11,19 @@ declare global {
 
 export function fbqTrack(event: string, params?: PixelEventParams): void {
   if (typeof window === "undefined") return;
-  if (typeof window.fbq !== "function") return;
+  if (typeof window.fbq !== "function") {
+    console.warn("Facebook Pixel not loaded - fbq function not available");
+    return;
+  }
   try {
+    console.log(`[Facebook Pixel] Firing event: ${event}`, params);
     if (params) {
       window.fbq("track", event as unknown as never, params as unknown as never);
     } else {
       window.fbq("track", event as unknown as never);
     }
-  } catch {
+  } catch (error) {
+    console.error("Facebook Pixel error:", error);
     // swallow to avoid breaking UX if pixel fails
   }
 }

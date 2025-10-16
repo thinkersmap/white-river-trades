@@ -266,6 +266,8 @@ export default function Home() {
     setSearchQuery(tradeName.toLowerCase());
     setShowTrades(false);
     setStep(2);
+    
+    console.log('handleSelectTrade: No event fired here - events should be fired by individual components');
   };
 
   // Scroll spy for steps
