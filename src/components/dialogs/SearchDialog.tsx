@@ -121,8 +121,8 @@ export function SearchDialog({
                               <button
                                 onClick={() => {
                                   if (trade.available) {
-                                    // Track SuggestedTradeSelected event
-                                    fbqTrack('SuggestedTradeSelected', {
+                                    // Track directTradeSelected event
+                                    fbqTrack('directTradeSelected', {
                                       content_name: trade.name,
                                       content_category: 'trade',
                                     });
