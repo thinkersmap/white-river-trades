@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { fbqPageView } from "@/lib/fbpixel";
 
-export function FacebookPixel(): null {
+function FacebookPixelInner(): null {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -15,6 +15,14 @@ export function FacebookPixel(): null {
   }, [pathname, searchParams?.toString()]);
 
   return null;
+}
+
+export function FacebookPixel(): JSX.Element {
+  return (
+    <Suspense fallback={null}>
+      <FacebookPixelInner />
+    </Suspense>
+  );
 }
 
 
