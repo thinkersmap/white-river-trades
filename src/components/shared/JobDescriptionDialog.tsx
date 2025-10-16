@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog } from '@headlessui/react';
 import { DialogHeader } from './DialogHeader';
 import { constituenciesMeta } from '@/data/constituencies-meta';
@@ -69,7 +69,8 @@ export function JobDescriptionDialog({
     steps.push({ id: "summary", title: "Job Summary" });
     
     // Add steps for missing mandatory information
-    if (!postcode && !division) {
+    const hasAnyLocation = Boolean(formData.location || formData.division || postcode || division);
+    if (!hasAnyLocation) {
       steps.push({ id: "location", title: "Location" });
     }
     
@@ -80,6 +81,17 @@ export function JobDescriptionDialog({
   };
 
   const steps = getAvailableSteps();
+
+  // Sync internal state with incoming props when dialog opens or props change
+  useEffect(() => {
+    if (!isOpen) return;
+    setFormData(prev => ({
+      ...prev,
+      problem: problemDescription || prev.problem,
+      location: postcode || prev.location,
+      division: division || prev.division,
+    }));
+  }, [isOpen, problemDescription, postcode, division]);
 
   // Helper functions for inline editing
   const startEditing = (field: string, currentValue: string) => {

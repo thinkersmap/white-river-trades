@@ -16,6 +16,8 @@ interface TradeActionsProps {
 export function TradeActions({ tradeName, constituencySlug, constituencyName, postcode }: TradeActionsProps) {
   const router = useRouter();
   const [showDialog, setShowDialog] = useState(false);
+  const [savedPostcode, setSavedPostcode] = useState<string | undefined>(undefined);
+  const [savedDivision, setSavedDivision] = useState<string | undefined>(undefined);
   
   // Get search data from localStorage and check for mismatch
   const searchData = getSearchData();
@@ -41,23 +43,23 @@ export function TradeActions({ tradeName, constituencySlug, constituencyName, po
       return; // Don't open dialog with mismatched data
     }
     
-    // Save additional location data if available
-    if (constituencyName || postcode) {
-      const updatedSearchData = {
-        ...currentSearchData,
-        postcode: postcode || currentSearchData?.postcode,
-        division: constituencyName || currentSearchData?.division,
-        selectedTrade: tradeName
-      };
-      
-      // Update localStorage with additional data
-      if (updatedSearchData) {
-        localStorage.setItem('white-river-search-data', JSON.stringify({
-          ...updatedSearchData,
-          timestamp: Date.now()
-        }));
-      }
-    }
+    // Prefer provided division/postcode from page when available, else from saved data
+    const nextDivision = constituencyName || currentSearchData?.division;
+    const nextPostcode = postcode || currentSearchData?.postcode;
+    setSavedDivision(nextDivision || undefined);
+    setSavedPostcode(nextPostcode || undefined);
+
+    // Persist merged data for later flows
+    const updatedSearchData = {
+      ...currentSearchData,
+      postcode: nextPostcode,
+      division: nextDivision,
+      selectedTrade: tradeName
+    };
+    localStorage.setItem('white-river-search-data', JSON.stringify({
+      ...updatedSearchData,
+      timestamp: Date.now()
+    }));
     
     setShowDialog(true);
   };
@@ -85,8 +87,8 @@ export function TradeActions({ tradeName, constituencySlug, constituencyName, po
         tradeName={tradeName}
         problemDescription={hasValidSearchData ? searchData?.problemDescription : undefined}
         aiAnalysis={hasValidSearchData ? searchData?.aiAnalysis : undefined}
-        postcode={postcode || searchData?.postcode}
-        division={constituencyName || searchData?.division}
+        postcode={savedPostcode}
+        division={savedDivision}
       />
     </>
   );
