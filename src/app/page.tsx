@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/home/Navigation";
 import { Hero } from "@/components/home/Hero";
@@ -357,9 +358,9 @@ export default function Home() {
               © 2024 White River Trades
             </p>
             <div className="flex items-center space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Privacy</a>
-              <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Terms</a>
-              <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Contact</a>
+              <Link href="/privacy" className="text-white/60 hover:text-white text-sm transition-colors">Privacy</Link>
+              <Link href="/terms" className="text-white/60 hover:text-white text-sm transition-colors">Terms</Link>
+              <Link href="/contact" className="text-white/60 hover:text-white text-sm transition-colors">Contact</Link>
             </div>
           </div>
         </div>
