@@ -143,7 +143,7 @@ export function Hero({ onSearch, searchExamples, placeholderIndex }: HeroProps) 
         <div className="bg-[#e8eaed] rounded-[16px] overflow-hidden min-h-[400px]">
           <div className="relative w-full h-full min-h-[400px]">
             <Image
-              src="/images/hero-2.png"
+              src="/images/hero-3.jpg"
               alt="Skilled roofer working on a roof"
               fill
               priority
