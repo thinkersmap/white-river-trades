@@ -69,7 +69,6 @@ export default function Home() {
   const [messageIndex, setMessageIndex] = useState(0);
   const [stepsActive, setStepsActive] = useState(0);
   const stepRefs = useRef<HTMLDivElement[]>([]);
-  const [mobileStepsOpen, setMobileStepsOpen] = useState(false);
   const [stepHeights, setStepHeights] = useState<number[]>([]);
 
   // Function to measure maximum content height for each step
@@ -104,7 +103,7 @@ export default function Home() {
         // Add padding for breathing room and ensure minimum height
         // Use smaller minimum heights on mobile
         const isMobile = window.innerWidth < 640; // sm breakpoint
-        const minHeight = isMobile ? 300 : 400; // 300px on mobile, 400px on desktop
+        const minHeight = isMobile ? 400 : 600; // Larger minimum heights for new design
         const paddedHeight = Math.max(measuredHeight + 48, minHeight);
         heights[index] = paddedHeight;
         
@@ -270,7 +269,7 @@ export default function Home() {
     console.log('handleSelectTrade: No event fired here - events should be fired by individual components');
   };
 
-  // Scroll spy for steps
+  // Scroll spy for steps (now 3 steps instead of 5)
   useEffect(() => {
     let raf = 0;
     const handler = () => {
@@ -290,7 +289,7 @@ export default function Home() {
             bestIdx = idx;
           }
         });
-        if (bestIdx !== stepsActive) setStepsActive(bestIdx);
+        if (bestIdx !== stepsActive && bestIdx < 3) setStepsActive(bestIdx);
       });
     };
     handler();
@@ -334,31 +333,9 @@ export default function Home() {
             </div> */}
 
       {/* Process Steps Section */}
-      <section className="px-4 py-16 lg:py-24 relative">
-        <div className="max-w-[120rem] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
-          {/* Left vertical steps */}
-          <div className="lg:col-span-3">
-            <StepsNav
-              active={stepsActive}
-              onClickStep={(i:number) => stepRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            />
-          </div>
-          {/* Right showcase panel */}
-          <div className="lg:col-span-9">
-            {/* Mobile sticky step indicator */}
-            <div className="lg:hidden sticky top-0 z-40 bg-transparent mb-3">
-              <MobileSteps
-                active={stepsActive}
-                onSelect={(i:number) => {
-                  setMobileStepsOpen(false);
-                  stepRefs.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                open={mobileStepsOpen}
-                setOpen={setMobileStepsOpen}
-              />
-            </div>
+      <section className="flex-1 p-4 py-16 lg:py-24 relative">
+        <div className="h-full grid grid-cols-1 gap-4">
             <StepsScrollSections stepRefs={stepRefs} stepHeights={stepHeights} />
-          </div>
         </div>
       </section>
 
@@ -425,160 +402,84 @@ export default function Home() {
   );
 }
 
-// Inline components for the steps showcase (five steps, with subheadings and graphic placeholders)
-function StepsNav({ active, onClickStep }: { active: number; onClickStep: (i: number) => void }) {
-  const items = [
-    { id: 0, label: '01 Search', activeBg: 'bg-sky-700', doneBg: 'bg-sky-400', dotActive: 'from-sky-400 to-cyan-300', dotDone: 'from-sky-300 to-cyan-200', ring: 'ring-sky-400/40' },
-    { id: 1, label: '02 Select', activeBg: 'bg-rose-600', doneBg: 'bg-rose-400', dotActive: 'from-rose-400 to-fuchsia-300', dotDone: 'from-rose-300 to-fuchsia-200', ring: 'ring-rose-400/40' },
-    { id: 2, label: '03 Connect', activeBg: 'bg-emerald-600', doneBg: 'bg-emerald-400', dotActive: 'from-emerald-400 to-teal-300', dotDone: 'from-emerald-300 to-teal-200', ring: 'ring-emerald-400/40' },
-    { id: 3, label: '04 Request', activeBg: 'bg-amber-600', doneBg: 'bg-amber-400', dotActive: 'from-amber-400 to-orange-300', dotDone: 'from-amber-300 to-orange-200', ring: 'ring-amber-400/40' },
-    { id: 4, label: '05 Confirm', activeBg: 'bg-violet-600', doneBg: 'bg-violet-400', dotActive: 'from-violet-400 to-indigo-300', dotDone: 'from-violet-300 to-indigo-200', ring: 'ring-violet-400/40' },
-  ];
-  return (
-    <div className="sticky top-24 hidden lg:block">
-      <ul className="space-y-1">
-        {items.map((item) => (
-          <li key={item.id} className="flex items-center gap-3">
-            <span
-              className={`shrink-0 w-2 h-2 rounded-[2px] ${
-                item.id === active
-                  ? `bg-gradient-to-br ${item.dotActive}`
-                  : item.id < active
-                  ? `bg-gradient-to-br ${item.dotDone}`
-                  : 'bg-gray-300'
-              }`}
-            />
-            <button
-              onClick={() => onClickStep(item.id)}
-              className={`flex-1 text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                item.id === active
-                  ? `bg-slate-900 text-white ring-1 ${item.ring}`
-                  : item.id < active
-                  ? 'text-gray-900 hover:bg-gray-100'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              {item.label}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
-// Mobile sticky steps indicator with expandable list
-function MobileSteps({ active, onSelect, open, setOpen }: { active: number; onSelect: (i:number) => void; open: boolean; setOpen: (v:boolean)=>void }) {
-  const items = [
-    { id: 0, label: '01 Search', activeBg: 'bg-sky-700', doneBg: 'bg-sky-400', dotActive: 'from-sky-400 to-cyan-300', dotDone: 'from-sky-300 to-cyan-200', ring: 'ring-sky-400/40', tone: 'from-sky-500/20 via-cyan-400/10 to-indigo-500/20' },
-    { id: 1, label: '02 Select', activeBg: 'bg-rose-600', doneBg: 'bg-rose-400', dotActive: 'from-rose-400 to-fuchsia-300', dotDone: 'from-rose-300 to-fuchsia-200', ring: 'ring-rose-400/40', tone: 'from-rose-500/20 via-fuchsia-400/10 to-purple-500/20' },
-    { id: 2, label: '03 Connect', activeBg: 'bg-emerald-600', doneBg: 'bg-emerald-400', dotActive: 'from-emerald-400 to-teal-300', dotDone: 'from-emerald-300 to-teal-200', ring: 'ring-emerald-400/40', tone: 'from-emerald-500/20 via-teal-400/10 to-cyan-500/20' },
-    { id: 3, label: '04 Request', activeBg: 'bg-amber-600', doneBg: 'bg-amber-400', dotActive: 'from-amber-400 to-orange-300', dotDone: 'from-amber-300 to-orange-200', ring: 'ring-amber-400/40', tone: 'from-amber-400/20 via-orange-400/10 to-pink-400/20' },
-    { id: 4, label: '05 Confirm', activeBg: 'bg-violet-600', doneBg: 'bg-violet-400', dotActive: 'from-violet-400 to-indigo-300', dotDone: 'from-violet-300 to-indigo-200', ring: 'ring-violet-400/40', tone: 'from-violet-500/20 via-indigo-400/10 to-blue-500/20' },
-  ];
-  const current = items[active] ?? items[0];
-  return (
-    <div className="px-4 sm:px-5">
-      {/* Main indicator bar */}
-      <div className="relative overflow-hidden rounded-2xl bg-slate-950 ring-1 ring-white/10 text-white">
-        {/* Gradient wash */}
-        <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${current.tone} rounded-2xl`} />
-        
-        <div className="relative flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <span
-              className={`shrink-0 w-2 h-2 rounded-[2px] ${
-                active === current.id
-                  ? `bg-gradient-to-br ${current.dotActive}`
-                  : `bg-gradient-to-br ${current.dotDone}`
-              }`}
-            />
-            <span className="text-sm font-medium">{current.label}</span>
-          </div>
-          <button
-            onClick={() => setOpen(!open)}
-            className="text-white/80 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10"
-            aria-label="Toggle steps"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      
-      {open && (
-        <div className="mt-2 space-y-1">
-          {items.map((item) => (
-            <div key={item.id} className="relative overflow-hidden rounded-2xl bg-slate-950 ring-1 ring-white/10">
-              {/* Gradient wash */}
-              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${item.tone} rounded-2xl`} />
-              
-              <button
-                onClick={() => onSelect(item.id)}
-                className={`relative w-full text-left px-4 py-3 text-sm font-medium flex items-center gap-3 transition-all duration-200 ${
-                  item.id === active 
-                    ? `text-white ring-1 ${item.ring} bg-white/5` 
-                    : 'text-white/80 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <span
-                  className={`shrink-0 w-2 h-2 rounded-[2px] ${
-                    item.id === active
-                      ? `bg-gradient-to-br ${item.dotActive}`
-                      : item.id < active
-                      ? `bg-gradient-to-br ${item.dotDone}`
-                      : 'bg-gray-400'
-                  }`}
-                />
-                <span>{item.label}</span>
-                {item.id < active && (
-                  <div className="ml-auto">
-                    <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                )}
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Right column sections that reveal on scroll
+// Three main steps that reveal on scroll
 function StepsScrollSections({ stepRefs, stepHeights }: { stepRefs: React.MutableRefObject<HTMLDivElement[]>; stepHeights: number[] }) {
+  const [expandedHeights, setExpandedHeights] = useState<number[]>([]);
+  const expandedHeightsRef = useRef<number[]>([]);
+  
   const cards = [
     {
-      title: 'Type your problem or project in the search bar',
-      sub: 'Describe the job in a sentence or two to get started.',
+      title: 'Describe your problem and get AI-powered recommendations',
+      sub: 'Tell us what you need done and our AI will analyze your request to suggest the best trades for the job.',
       tone: 'from-sky-500/20 via-cyan-400/10 to-indigo-500/20',
+      stepNumber: '01',
     },
     {
-      title: 'Select a suitable trade based on our AI recommendations',
-      sub: 'We suggest the best trade for the job—switch anytime.',
-      tone: 'from-rose-500/20 via-fuchsia-400/10 to-purple-500/20',
-    },
-    {
-      title: 'Connect to your local division',
-      sub: 'We match you to the right constituency automatically.',
+      title: 'Connect to your local area and submit your details',
+      sub: 'We automatically match you to the right local division and collect your contact information to get started.',
       tone: 'from-emerald-500/20 via-teal-400/10 to-cyan-500/20',
-    },
-    {
-      title: 'Add your contact info then submit your request',
-      sub: 'We need these details to confirm your job quickly.',
-      tone: 'from-amber-400/20 via-orange-400/10 to-pink-400/20',
+      stepNumber: '02',
     },
     {
       title: 'Receive quotes and confirm your job',
-      sub: 'Compare options and choose the one that fits best.',
+      sub: 'Compare options from qualified trades and choose the one that fits your budget and timeline best.',
       tone: 'from-violet-500/20 via-indigo-400/10 to-blue-500/20',
+      stepNumber: '03',
     },
   ];
+
+  // Track when elements expand and maintain that height to prevent layout shifts
+  useEffect(() => {
+    const updateExpandedHeights = () => {
+      const newHeights = stepRefs.current.map((ref, index) => {
+        if (ref) {
+          const currentHeight = ref.offsetHeight;
+          const currentExpanded = expandedHeightsRef.current[index] || 0;
+          // Only update if the current height is larger than what we've seen before
+          return Math.max(currentHeight, currentExpanded);
+        }
+        return expandedHeightsRef.current[index] || 0;
+      });
+      expandedHeightsRef.current = newHeights;
+      setExpandedHeights(newHeights);
+    };
+
+    // Update heights when stepHeights change (elements become visible)
+    updateExpandedHeights();
+
+    // Use ResizeObserver to track height changes and maintain expanded state
+    const resizeObserver = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        const index = stepRefs.current.findIndex(ref => ref === entry.target);
+        if (index !== -1) {
+          const newHeight = entry.contentRect.height;
+          const currentExpanded = expandedHeightsRef.current[index] || 0;
+          const maxHeight = Math.max(currentExpanded, newHeight);
+          
+          if (maxHeight > currentExpanded) {
+            expandedHeightsRef.current[index] = maxHeight;
+            setExpandedHeights(prev => {
+              const newHeights = [...prev];
+              newHeights[index] = maxHeight;
+              return newHeights;
+            });
+          }
+        }
+      });
+    });
+
+    // Observe all step refs
+    stepRefs.current.forEach(ref => {
+      if (ref) resizeObserver.observe(ref);
+    });
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [stepHeights, stepRefs]);
   return (
-    <div className="space-y-8">
+    <>
       {cards.map((card, idx) => (
         <motion.section
           key={card.title}
@@ -588,49 +489,55 @@ function StepsScrollSections({ stepRefs, stepHeights }: { stepRefs: React.Mutabl
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ margin: '-20% 0px -20% 0px', once: true }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className={`relative overflow-hidden rounded-2xl p-8 lg:p-12 text-white bg-slate-950 ring-1 ring-white/10`}
+          className={`relative overflow-hidden rounded-[16px] p-6 sm:p-8 lg:p-16 text-white bg-slate-950 ring-1 ring-white/10`}
           style={{
-            minHeight: stepHeights[idx] ? `${stepHeights[idx]}px` : 
-              idx === 0 ? '16rem' : // Reduced fallback heights for mobile
-              idx === 1 ? '20rem' :
-              idx === 2 ? '18rem' :
-              idx === 3 ? '17rem' :
-              '19rem',
+            minHeight: expandedHeights[idx] ? `${expandedHeights[idx]}px` : 
+              stepHeights[idx] ? `${stepHeights[idx]}px` :
+              idx === 0 ? '24rem' : 
+              idx === 1 ? '28rem' :
+              '26rem',
             height: 'auto',
             transition: 'min-height 0.3s ease-out, height 0.3s ease-out'
           }}
         >
           {/* Gradient wash */}
-          <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${card.tone} rounded-2xl`} />
+          <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${card.tone} rounded-[16px]`} />
           {/* Soft radial glows */}
           <div className="hidden sm:block pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-cyan-500/10 blur-3xl" />
           <div className="hidden sm:block pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-fuchsia-500/10 blur-3xl" />
 
           <div className="relative h-full flex flex-col">
             <div className="flex-shrink-0">
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight">{card.title}</h3>
-              <p className="mt-1 text-sm sm:text-base text-white/80 max-w-3xl">{card.sub}</p>
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white font-bold text-lg">
+                  {card.stepNumber}
+                </div>
+              </div>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight">{card.title}</h3>
+              <p className="mt-3 text-base sm:text-lg text-white/80 max-w-4xl">{card.sub}</p>
             </div>
 
              {/* Media placeholder or animation - fills remaining height after header */}
              <div 
-               className="mt-8 transition-all duration-500 ease-out flex-1 flex flex-col"
+               className="mt-12 transition-all duration-500 ease-out flex-1 flex flex-col"
                style={{
-                 minHeight: '20rem',
+                 minHeight: '24rem',
                  transition: 'min-height 0.5s ease-out',
                  contain: 'layout style'
                }}
              >
               {idx === 0 ? (
-                <TypingSearchAnimation phrases={TYPING_PHRASES} />
+                <div className="flex flex-col justify-center h-full">
+                  <SearchToAnalysisAnimation phrases={TYPING_PHRASES} />
+                </div>
               ) : idx === 1 ? (
-                <SearchAnalyzeResultsAnimation />
+                <div className="flex flex-col justify-center h-full">
+                  <LocationToContactAnimation />
+                </div>
               ) : idx === 2 ? (
-                <PostcodeToDivisionAnimation />
-              ) : idx === 3 ? (
-                <ContactSubmissionAnimation />
-              ) : idx === 4 ? (
+                <div className="flex flex-col justify-center h-full">
                 <QuoteSkeletonAnimation />
+                </div>
               ) : (
                 <div className="h-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10"></div>
               )}
@@ -638,119 +545,22 @@ function StepsScrollSections({ stepRefs, stepHeights }: { stepRefs: React.Mutabl
           </div>
         </motion.section>
       ))}
-    </div>
+    </>
   );
 }
 
-// Hook: loops through phrases with optional mid-backspace and end spinner
-function useTypingLoop(phrases: string[], options?: { typeDelay?: number; backspaceDelay?: number; pauseBetween?: number; endSpinnerMs?: number; midResetEvery?: number; }) {
-  const { typeDelay = 70, backspaceDelay = 35, pauseBetween = 700, endSpinnerMs = 2200, midResetEvery = 0 } = options || {};
-  const [text, setText] = useState("");
-  const [cursorVisible, setCursorVisible] = useState(true);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [idx, setIdx] = useState(0);
 
-  useEffect(() => {
-    let t1: number | undefined;
-    let t2: number | undefined;
-    let t3: number | undefined;
-    const current = phrases[idx % phrases.length] || "";
-    const enableMidway = typeof midResetEvery === 'number' && midResetEvery > 0;
-    const midway = enableMidway && current.length > 6 && (idx % midResetEvery === midResetEvery - 1) ? Math.ceil(current.length * 0.5) : null;
-    let i = 0;
-    setText("");
-    setIsAnalyzing(false);
-    const cursor = window.setInterval(() => setCursorVisible((v) => !v), 600);
 
-    const typeForward = (limit: number, next: () => void) => {
-      t1 = window.setInterval(() => {
-        if (i < limit) {
-          setText(current.slice(0, i + 1));
-          i += 1;
-        } else {
-          window.clearInterval(t1);
-          next();
-        }
-      }, typeDelay);
-    };
-
-    const backspaceToZero = (next: () => void) => {
-      t2 = window.setInterval(() => {
-        if (i > 0) {
-          setText(current.slice(0, i - 1));
-          i -= 1;
-        } else {
-          window.clearInterval(t2);
-          next();
-        }
-      }, backspaceDelay);
-    };
-
-    const afterFinish = () => {
-      // Show spinner after every phrase, then move to next
-      setTimeout(() => setIsAnalyzing(true), 300);
-      t3 = window.setTimeout(() => {
-        setIsAnalyzing(false);
-        setIdx((p) => (p + 1) % phrases.length);
-      }, endSpinnerMs);
-    };
-
-    if (midway !== null) {
-      typeForward(midway, () => backspaceToZero(() => typeForward(current.length, afterFinish)));
-    } else {
-      typeForward(current.length, afterFinish);
-    }
-
-    return () => {
-      window.clearInterval(t1);
-      window.clearInterval(t2);
-      window.clearTimeout(t3);
-      window.clearInterval(cursor);
-    };
-  }, [idx, phrases, typeDelay, backspaceDelay, pauseBetween, endSpinnerMs, midResetEvery]);
-
-  return { text, cursorVisible, isAnalyzing } as const;
-}
-
-function TypingSearchAnimation({ phrases }: { phrases: string[] }) {
-  const { text, cursorVisible, isAnalyzing } = useTypingLoop(phrases, { typeDelay: 70, backspaceDelay: 35, pauseBetween: 700, endSpinnerMs: 1800, midResetEvery: 0 });
-  return (
-    <div className="flex-1 w-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10 flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-2xl">
-        <div className="relative rounded-xl bg-white text-gray-900 shadow-sm w-full">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </div>
-          <input
-            readOnly
-            aria-label="Search problem"
-            value={text}
-            className="w-full pl-10 pr-12 py-4 rounded-xl bg-white text-gray-900"
-          />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-            {!isAnalyzing ? (
-              <span className={`w-0.5 h-5 ${cursorVisible ? 'bg-blue-600' : 'bg-transparent'}`} />
-            ) : (
-              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin motion-reduce:animate-none" />
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Step 2: AI analysis + recommendations animation
-function SearchAnalyzeResultsAnimation() {
-  const [phase, setPhase] = useState<'typing' | 'analyzing' | 'results'>('typing');
+// Consolidated Step 1: Search to Analysis flow
+function SearchToAnalysisAnimation({ phrases }: { phrases: string[] }) {
+  const [phase, setPhase] = useState<'searching' | 'analyzing' | 'results'>('searching');
   const [typed, setTyped] = useState('');
-  const phrases = TYPING_PHRASES;
-  const [idx, setIdx] = useState(0);
-  const current = phrases[idx % phrases.length];
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const currentPhrase = phrases[phraseIdx % phrases.length];
 
   // Generate relevant analysis + recommendations per query
   const ctx = (() => {
-    const q = current.toLowerCase();
+    const q = currentPhrase.toLowerCase();
     if (q.includes('boiler') || q.includes('hot') || q.includes("won't turn on")) {
       return {
         analysis: 'Likely boiler ignition or pressure fault. Check pressure, pilot/ignition and valves. A Gas Engineer can diagnose safely.',
@@ -805,49 +615,48 @@ function SearchAnalyzeResultsAnimation() {
   useEffect(() => {
     let t1: number | undefined;
     let t2: number | undefined;
-    if (phase === 'typing') {
+    let t3: number | undefined;
+
+    if (phase === 'searching') {
       setTyped('');
       let i = 0;
       t1 = window.setInterval(() => {
-        if (i < current.length) {
-          setTyped(current.slice(0, i + 1));
+        if (i < currentPhrase.length) {
+          setTyped(currentPhrase.slice(0, i + 1));
           i += 1;
         } else {
           window.clearInterval(t1);
-          // brief pause then analyzing
-          t2 = window.setTimeout(() => setPhase('analyzing'), 350);
+          t2 = window.setTimeout(() => setPhase('analyzing'), 800);
         }
       }, 60);
     } else if (phase === 'analyzing') {
-      // show clear analyzing bar for a bit longer per feedback
       t1 = window.setTimeout(() => setPhase('results'), 2000);
     } else if (phase === 'results') {
-      // dwell so user can read suggestions, then advance
       t1 = window.setTimeout(() => {
-        setIdx((p) => (p + 1) % phrases.length);
-        setPhase('typing');
-      }, 4500);
+        setPhraseIdx((p) => (p + 1) % phrases.length);
+        setPhase('searching');
+      }, 4000);
     }
+
     return () => {
       window.clearInterval(t1);
       window.clearTimeout(t2);
+      window.clearTimeout(t3);
     };
-  }, [phase, current, phrases.length]);
+  }, [phase, currentPhrase, phrases.length]);
 
   return (
     <div className="flex-1 w-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10 flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-4xl space-y-4">
+      <div className="w-full max-w-4xl space-y-6">
         {/* Search bar */}
         <div className="relative rounded-xl bg-white text-gray-900 shadow-sm">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </div>
-          <input readOnly value={typed} className="w-full pl-10 pr-24 py-4 rounded-xl bg-white text-gray-900" />
+          <input readOnly value={typed} className="w-full pl-10 pr-4 py-4 rounded-xl bg-white text-gray-900" />
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            {phase === 'analyzing' ? (
+            {phase === 'analyzing' && (
               <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin motion-reduce:animate-none" />
-            ) : (
-              <span className="text-xs text-gray-400">Press Enter</span>
             )}
           </div>
         </div>
@@ -862,19 +671,24 @@ function SearchAnalyzeResultsAnimation() {
 
         {/* Results */}
         {phase === 'results' && (
-          <div className="space-y-4 flex-1">
+          <div className="space-y-4">
             <div className="bg-white/5 ring-1 ring-white/10 rounded-xl p-5 text-sm leading-relaxed text-white/85">
               {ctx.analysis}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {ctx.recs.map((r, i) => (
-                <div key={r.trade} className={`rounded-xl ring-1 ring-white/10 p-4 ${i === 0 ? 'bg-white/7' : 'bg-white/3 opacity-70'}`}>
+                <div key={r.trade} className={`rounded-xl ring-1 ring-white/10 p-4 ${i === 0 ? 'bg-white/7' : 'bg-white/3 opacity-50'}`}>
                   <div className="flex items-center justify-between">
-                    <div className="text-white font-medium text-sm">{r.trade}</div>
-                    <div className={`text-xs text-white/90 px-2 py-0.5 rounded-full bg-gradient-to-r ${r.tone}`}>{Math.round(r.match * 100)}%</div>
+                    <div className={`font-medium text-sm ${i === 0 ? 'text-white' : 'text-white/60'}`}>{r.trade}</div>
+                    <div className={`text-xs px-2 py-0.5 rounded-full ${i === 0 ? `text-white/90 bg-gradient-to-r ${r.tone}` : 'text-white/50 bg-white/10'}`}>
+                      {Math.round(r.match * 100)}%
+                    </div>
                   </div>
                   <div className="mt-3 h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
-                    <div className={`h-1.5 rounded-full bg-gradient-to-r ${r.tone}`} style={{ width: `${r.match * 100}%`, transition: 'width 600ms ease' }} />
+                    <div 
+                      className={`h-1.5 rounded-full ${i === 0 ? `bg-gradient-to-r ${r.tone}` : 'bg-white/20'}`} 
+                      style={{ width: `${r.match * 100}%`, transition: 'width 600ms ease' }} 
+                    />
                   </div>
                 </div>
               ))}
@@ -886,16 +700,22 @@ function SearchAnalyzeResultsAnimation() {
   );
 }
 
-// Step 3: Postcode -> connect to local division with boundary
-function PostcodeToDivisionAnimation() {
+// Consolidated Step 2: Location to Contact flow - Ultra Simple
+function LocationToContactAnimation() {
+  const [phase, setPhase] = useState<'searching' | 'loading' | 'map' | 'submitting' | 'complete'>('searching');
   const [sampleIdx, setSampleIdx] = useState(0);
   const current = POSTCODE_SAMPLES[sampleIdx % POSTCODE_SAMPLES.length];
-  const [phase, setPhase] = useState<'typing' | 'connecting' | 'connected'>('typing');
   const [typed, setTyped] = useState('');
   const [pathData, setPathData] = useState<string>('');
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
+  const [typingField, setTypingField] = useState<'name' | 'email' | 'phone' | null>(null);
 
   // Convert GeoJSON to simple SVG path
-  const geojsonToPath = (geometry: { type: string; coordinates: number[][][] | number[][][][] }, width = 320, height = 200) => {
+  const geojsonToPath = (geometry: { type: string; coordinates: number[][][] | number[][][][] }, width = 400, height = 300) => {
     if (!geometry || !geometry.coordinates) return '';
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     const walk = (coords: number[] | number[][] | number[][][]) => {
@@ -923,169 +743,277 @@ function PostcodeToDivisionAnimation() {
   };
 
   useEffect(() => {
-    let t1: number | undefined;
-    if (phase === 'typing') {
+    let t1: NodeJS.Timeout | undefined;
+    let t2: NodeJS.Timeout | undefined;
+    let t3: NodeJS.Timeout | undefined;
+
+    if (phase === 'searching') {
       setTyped('');
+      setPathData('');
+      setContactForm({ name: '', email: '', phone: '' });
+      setTypingField(null);
       let i = 0;
-      t1 = window.setInterval(() => {
+      t1 = setInterval(() => {
         if (i < current.postcode.length) {
           setTyped(current.postcode.slice(0, i + 1));
           i += 1;
         } else {
-          window.clearInterval(t1);
-          setPhase('connecting');
+          clearInterval(t1);
+          // Pause before moving to loading
+          t2 = setTimeout(() => setPhase('loading'), 1500);
         }
-      }, 70);
-    } else if (phase === 'connecting') {
-      // fetch boundary
+      }, 120);
+    } else if (phase === 'loading') {
+      // Brief loading state
+      t1 = setTimeout(() => {
+        setPhase('map');
+      }, 800);
+    } else if (phase === 'map') {
+      // Fetch boundary data
       (async () => {
         try {
           const res = await fetch(`/data/constituencies/${current.slug}.geojson`);
           if (res.ok) {
             const gj = await res.json();
-            const p = geojsonToPath(gj.geometry, 320, 200);
+            const p = geojsonToPath(gj.geometry, 400, 300);
             setPathData(p);
           } else {
             setPathData('');
           }
         } catch { setPathData(''); }
-        // slight pause to feel responsive
-        setTimeout(() => setPhase('connected'), 1600);
       })();
-    } else if (phase === 'connected') {
-      // dwell then next sample
-      t1 = window.setTimeout(() => {
+      
+      // Animate contact form filling with typewriter effect while map is pinging
+      const contactData = {
+        name: 'Sarah Johnson',
+        email: 'sarah.johnson@example.com',
+        phone: '020 7123 4567'
+      };
+      
+      // Type name
+      t1 = setTimeout(() => {
+        setTypingField('name');
+        let i = 0;
+        const nameInterval = setInterval(() => {
+          if (i < contactData.name.length) {
+            setContactForm(prev => ({ ...prev, name: contactData.name.slice(0, i + 1) }));
+            i += 1;
+          } else {
+            clearInterval(nameInterval);
+            setTypingField(null);
+          }
+        }, 80);
+      }, 500);
+      
+      // Type email
+      t2 = setTimeout(() => {
+        setTypingField('email');
+        let i = 0;
+        const emailInterval = setInterval(() => {
+          if (i < contactData.email.length) {
+            setContactForm(prev => ({ ...prev, email: contactData.email.slice(0, i + 1) }));
+            i += 1;
+          } else {
+            clearInterval(emailInterval);
+            setTypingField(null);
+          }
+        }, 60);
+      }, 1500);
+      
+      // Type phone
+      t3 = setTimeout(() => {
+        setTypingField('phone');
+        let i = 0;
+        const phoneInterval = setInterval(() => {
+          if (i < contactData.phone.length) {
+            setContactForm(prev => ({ ...prev, phone: contactData.phone.slice(0, i + 1) }));
+            i += 1;
+          } else {
+            clearInterval(phoneInterval);
+            setTypingField(null);
+          }
+        }, 100);
+      }, 2500);
+      
+      // Move to submitting after form is filled
+      setTimeout(() => setPhase('submitting'), 3500);
+    } else if (phase === 'submitting') {
+      t1 = setTimeout(() => setPhase('complete'), 1500);
+    } else if (phase === 'complete') {
+      t1 = setTimeout(() => {
         setSampleIdx((s) => (s + 1) % POSTCODE_SAMPLES.length);
-        setPhase('typing');
+        setPhase('searching');
       }, 3000);
     }
+
     return () => {
-      if (t1) window.clearInterval(t1);
+      if (t1) clearTimeout(t1);
+      if (t2) clearTimeout(t2);
+      if (t3) clearTimeout(t3);
     };
   }, [phase, current.postcode, current.slug]);
 
   return (
     <div className="flex-1 w-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10 flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-4xl space-y-5">
-        {/* Postcode bar */}
-        <div className="relative rounded-xl bg-white text-gray-900 shadow-sm">
+      <div className="w-full h-full flex flex-col items-center justify-center space-y-8">
+        {/* Postcode Input - Only show when searching */}
+        {phase === 'searching' && (
+          <div className="relative rounded-xl bg-white text-gray-900 shadow-sm max-w-md mx-auto">
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
           </div>
-          <input readOnly value={typed} className="w-full pl-10 pr-24 py-4 rounded-xl bg-white text-gray-900" />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            {phase === 'connecting' ? (
-              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin motion-reduce:animate-none" />
-            ) : (
-              <span className="text-xs text-gray-400">Enter postcode</span>
-            )}
-          </div>
-        </div>
-
-        {/* Connecting context */}
-        {phase === 'connecting' && (
-          <div className="bg-white/5 ring-1 ring-white/10 rounded-xl p-4 flex items-center justify-between">
-            <div className="text-sm text-white/80">Connecting you to your local division…</div>
-            <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin motion-reduce:animate-none" />
+            <input readOnly value={typed} className="w-full pl-10 pr-4 py-4 rounded-xl bg-white text-gray-900" placeholder="Enter your postcode" />
           </div>
         )}
 
-        {/* Connected: small map with boundary */}
-        {phase === 'connected' && (
-          <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch flex-1 min-h-0">
-            <div className="sm:col-span-2 flex flex-col justify-center">
-              <div className="text-white text-sm">Connected to</div>
-              <div className="text-white/90 text-lg font-semibold">{current.name}</div>
-              <div className="text-white/70 text-xs mt-1">Postcode {current.postcode}</div>
+        {/* Loading State */}
+        {phase === 'loading' && (
+          <div className="text-center">
+            <div className="w-12 h-12 mx-auto mb-4 relative">
+              <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin"></div>
             </div>
-            <div className="justify-self-end w-full sm:w-auto flex-1 flex flex-col">
-              <svg className="w-full flex-1 rounded-lg ring-1 ring-white/10" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+            <p className="text-white/80 text-lg">Loading {current.name}...</p>
+          </div>
+        )}
+
+        {/* Map with Contact Form - Show when map phase */}
+        {phase === 'map' && (
+          <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-6">
+            {/* Map */}
+            <div className="relative flex-1 h-96 bg-slate-900 rounded-2xl overflow-hidden">
+              <style jsx>{`
+                @keyframes radar-pulse {
+                  0% {
+                    transform: scale(0.3);
+                    opacity: 1;
+                  }
+                  100% {
+                    transform: scale(1.5);
+                    opacity: 0;
+                  }
+                }
+                .radar-ring-1 {
+                  animation: radar-pulse 2s infinite;
+                }
+                .radar-ring-2 {
+                  animation: radar-pulse 2s infinite 0.5s;
+                }
+                .radar-ring-3 {
+                  animation: radar-pulse 2s infinite 1s;
+                }
+              `}</style>
+              <svg className="w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
                 <defs>
-                  <linearGradient id="divGrad" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient id="mapGrad" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stopColor="#34d399" stopOpacity="0.25" />
                     <stop offset="100%" stopColor="#10b981" stopOpacity="0.45" />
                   </linearGradient>
                 </defs>
-                <rect x="0" y="0" width="320" height="200" fill="#0b1220" />
+                <rect x="0" y="0" width="400" height="300" fill="#0f172a" />
                 {pathData ? (
-                  <path d={pathData} fill="url(#divGrad)" stroke="#34d399" strokeWidth="2" />
+                  <g>
+                    <path d={pathData} fill="url(#mapGrad)" stroke="#34d399" strokeWidth="2" />
+                    <clipPath id="mapClip">
+                      <rect x="0" y="0" width="400" height="300" />
+                    </clipPath>
+                    <path d={pathData} fill="none" stroke="#34d399" strokeWidth="2" clipPath="url(#mapClip)" />
+                  </g>
                 ) : (
                   <g>
-                    <rect x="20" y="20" width="280" height="160" fill="#111827" />
-                    <text x="160" y="105" textAnchor="middle" fill="#9CA3AF" fontSize="12">Boundary unavailable</text>
+                    <rect x="20" y="20" width="360" height="260" fill="#1e293b" />
+                    <text x="200" y="150" textAnchor="middle" fill="#64748b" fontSize="14">Boundary unavailable</text>
                   </g>
                 )}
+                
+                {/* User location - static */}
+                <circle cx="200" cy="150" r="8" fill="#3b82f6" stroke="white" strokeWidth="2" />
+                <circle cx="200" cy="150" r="4" fill="white" />
               </svg>
+              
+              {/* CSS-based radar rings for better performance */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border border-blue-500 rounded-full radar-ring-1 opacity-60"></div>
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border border-blue-500 rounded-full radar-ring-2 opacity-40"></div>
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 border border-blue-500 rounded-full radar-ring-3 opacity-20"></div>
+            </div>
+          </div>
+
+            {/* Contact Form */}
+            <div className="w-full lg:w-80 bg-white/5 rounded-2xl p-6">
+              <h4 className="text-lg font-semibold text-white mb-4">Your Details</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-white/70 mb-2">Full Name</label>
+                  <div className="relative">
+              <input
+                readOnly
+                      value={contactForm.name} 
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
+                      placeholder="Enter your name"
+              />
+                    {typingField === 'name' && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white animate-pulse"></div>
+                    )}
+            </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-white/70 mb-2">Email</label>
+                  <div className="relative">
+              <input
+                readOnly
+                      value={contactForm.email} 
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
+                      placeholder="Enter your email"
+              />
+                    {typingField === 'email' && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white animate-pulse"></div>
+                    )}
+            </div>
+                </div>
+                <div>
+                  <label className="block text-sm text-white/70 mb-2">Phone</label>
+                  <div className="relative">
+              <input
+                readOnly
+                      value={contactForm.phone} 
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white"
+                      placeholder="Enter your phone"
+                    />
+                    {typingField === 'phone' && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white animate-pulse"></div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
 
-// Step 4: Contact details and submission success
-function ContactSubmissionAnimation() {
-  const [phase, setPhase] = useState<'form' | 'submitting' | 'submitted'>('form');
-  const [name] = useState('Sarah Johnson');
-  const [email] = useState('sarah.johnson@example.com');
-  const [phone] = useState('020 7123 4567');
-
-  useEffect(() => {
-    let t: number | undefined;
-    if (phase === 'form') t = window.setTimeout(() => setPhase('submitting'), 1600);
-    else if (phase === 'submitting') t = window.setTimeout(() => setPhase('submitted'), 1400);
-    else if (phase === 'submitted') t = window.setTimeout(() => setPhase('form'), 2400);
-    return () => window.clearTimeout(t);
-  }, [phase]);
-
-  return (
-    <div className="flex-1 w-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10 p-4 sm:p-6 flex items-center justify-center">
-      <div className="w-full max-w-3xl">
-        {/* Form */}
-        {phase !== 'submitted' && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
-            <div className="sm:col-span-1">
-              <label className="block text-xs text-white/70 mb-1">Full name</label>
-              <input
-                readOnly
-                value={name}
-                className="w-full px-3 py-2 rounded-lg bg-white text-gray-900 shadow-sm"
-              />
-            </div>
-            <div className="sm:col-span-1">
-              <label className="block text-xs text-white/70 mb-1">Email address</label>
-              <input
-                readOnly
-                value={email}
-                className="w-full px-3 py-2 rounded-lg bg-white text-gray-900 shadow-sm"
-              />
-            </div>
-            <div className="sm:col-span-1">
-              <label className="block text-xs text-white/70 mb-1">Phone number</label>
-              <input
-                readOnly
-                value={phone}
-                className="w-full px-3 py-2 rounded-lg bg-white text-gray-900 shadow-sm"
-              />
-            </div>
-          </div>
-        )}
-
+        {/* Submitting State */}
         {phase === 'submitting' && (
-          <div className="mt-6 bg-white/5 ring-1 ring-white/10 rounded-xl p-4 flex items-center justify-between">
-            <div className="text-sm text-white/80">Submitting your job request…</div>
-            <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin motion-reduce:animate-none" />
+          <div className="text-center">
+            <div className="w-12 h-12 mx-auto mb-4 relative">
+              <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin"></div>
+            </div>
+            <p className="text-white/80 text-lg">Submitting your request...</p>
           </div>
         )}
 
-        {phase === 'submitted' && (
-          <div className="mt-2 bg-emerald-500/15 ring-1 ring-emerald-400/40 rounded-xl p-5 flex items-center gap-3 flex-1">
-            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+        {/* Complete State with Agent */}
+        {phase === 'complete' && (
+          <div className="text-center max-w-md">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-2xl">
+              A
             </div>
-            <div className="text-white/90 text-sm">
-              Request submitted. We&apos;ll call you within <span className="font-semibold">24 hours</span> to confirm details.
+            <h3 className="text-xl font-semibold text-white mb-2">Alex Thompson</h3>
+            <p className="text-white/80 text-lg mb-4">Your dedicated agent will call you within 24 hours</p>
+            <div className="bg-emerald-500/20 rounded-lg p-4">
+              <p className="text-emerald-400 text-sm">Request submitted successfully!</p>
             </div>
           </div>
         )}
@@ -1097,48 +1025,78 @@ function ContactSubmissionAnimation() {
 // Step 5: Quote skeleton with visible price
 function QuoteSkeletonAnimation() {
   const quotes = [
-    { price: 425, date: '18 Mar 2024', desc: 'Boiler ignition repair and safety check' },
-    { price: 510, date: '19 Mar 2024', desc: 'Tap cartridge replacement and leak fix' },
-    { price: 365, date: '21 Mar 2024', desc: 'Socket installation with certification' },
+    { price: 425, date: '18 Mar 2024', desc: 'Boiler ignition repair and safety check', color: 'emerald' },
+    { price: 510, date: '19 Mar 2024', desc: 'Tap cartridge replacement and leak fix', color: 'blue' },
+    { price: 365, date: '21 Mar 2024', desc: 'Socket installation with certification', color: 'purple' },
   ];
   const [i, setI] = useState(0);
   const q = quotes[i % quotes.length];
+  
+  // Color schemes for different quotes
+  const colorSchemes = {
+    emerald: {
+      primary: 'from-emerald-500 to-teal-500',
+      secondary: 'from-teal-400 to-cyan-400',
+      accent: 'emerald-500',
+      ring: 'emerald-500/20',
+      text: 'emerald-400'
+    },
+    blue: {
+      primary: 'from-blue-500 to-indigo-500',
+      secondary: 'from-indigo-400 to-purple-400',
+      accent: 'blue-500',
+      ring: 'blue-500/20',
+      text: 'blue-400'
+    },
+    purple: {
+      primary: 'from-purple-500 to-pink-500',
+      secondary: 'from-pink-400 to-rose-400',
+      accent: 'purple-500',
+      ring: 'purple-500/20',
+      text: 'purple-400'
+    }
+  };
+  
+  const colors = colorSchemes[q.color as keyof typeof colorSchemes];
+  
   useEffect(() => {
     const t = window.setTimeout(() => setI((p) => (p + 1) % quotes.length), 3000);
     return () => window.clearTimeout(t);
   }, [i, quotes.length]);
 
   return (
-    <div className="flex-1 w-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10 p-4 sm:p-6 flex items-center justify-center">
+    <div className="flex-1 w-full rounded-2xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10 p-3 sm:p-6 flex items-center justify-center">
       <div className="w-full max-w-3xl">
-        <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
-          {/* Header with price */}
-          <div className="flex items-center justify-between">
-            <div className="h-5 w-40 rounded bg-white/10 animate-pulse" />
-            <div className="text-white text-2xl font-semibold">£{q.price}</div>
+        <div className={`rounded-xl sm:rounded-2xl bg-white/5 ring-1 ring-${colors.ring} p-4 sm:p-6 transition-all duration-500`}>
+          {/* Header with price - Mobile optimized */}
+          <div className="flex items-center justify-between mb-3 sm:mb-0">
+            <div className={`h-4 sm:h-5 w-24 sm:w-40 rounded bg-gradient-to-r ${colors.primary} animate-pulse`} />
+            <div className={`text-${colors.text} text-xl sm:text-2xl font-semibold transition-colors duration-500`}>£{q.price}</div>
           </div>
 
-          {/* Meta: date + description */}
-          <div className="mt-4 grid grid-cols-3 gap-3 items-center">
-            <div className="col-span-1 text-xs text-white/70">{q.date}</div>
-            <div className="col-span-2 text-sm text-white/85 truncate">{q.desc}</div>
+          {/* Meta: date + description - Mobile stack */}
+          <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-3 sm:items-center">
+            <div className="text-xs text-white/70">{q.date}</div>
+            <div className="text-sm text-white/85 sm:col-span-2 sm:truncate leading-relaxed">{q.desc}</div>
           </div>
 
-          {/* Line items skeleton */}
-          <div className="mt-6 space-y-3">
+          {/* Line items skeleton - Mobile optimized */}
+          <div className="mt-4 sm:mt-6 space-y-2 sm:space-y-3">
             {[1,2,3,4].map((i) => (
-              <div key={i} className="grid grid-cols-6 gap-3 items-center">
-                <div className="col-span-4 h-4 rounded bg-white/10 animate-pulse" />
-                <div className="col-span-1 h-4 rounded bg-white/10 animate-pulse" />
-                <div className="col-span-1 h-4 rounded bg-white/10 animate-pulse" />
+              <div key={i} className="grid grid-cols-6 gap-2 sm:gap-3 items-center">
+                <div className="col-span-4 h-3 sm:h-4 rounded bg-white/10 animate-pulse" />
+                <div className="col-span-1 h-3 sm:h-4 rounded bg-white/10 animate-pulse" />
+                <div className="col-span-1 h-3 sm:h-4 rounded bg-white/10 animate-pulse" />
               </div>
             ))}
           </div>
 
-          {/* Footer with confirm CTA (non-clickable) */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="h-5 w-28 rounded bg-white/10 animate-pulse" />
-            <div className="px-4 py-2 rounded-lg bg-white/10 ring-1 ring-white/15 text-white text-sm">Confirm job</div>
+          {/* Footer with confirm CTA - Mobile optimized */}
+          <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+            <div className="h-4 sm:h-5 w-20 sm:w-28 rounded bg-white/10 animate-pulse" />
+            <div className="px-3 sm:px-4 py-2 rounded-lg bg-white/10 ring-1 ring-white/15 text-white text-sm transition-all duration-500 text-center sm:text-left">
+              Confirm job
+            </div>
           </div>
         </div>
       </div>
