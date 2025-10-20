@@ -248,7 +248,7 @@ export default function Home() {
         <div className="max-w-[120rem] mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-white/60 text-sm">
-              © 2025 White River Trades
+              © 2025 White River Trades 
             </p>
             <div className="flex items-center space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-white/60 hover:text-white text-sm transition-colors">Privacy</Link>
