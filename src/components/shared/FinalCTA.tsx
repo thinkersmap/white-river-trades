@@ -8,9 +8,30 @@ interface FinalCTAProps {
 
 export function FinalCTA({ onSearch }: FinalCTAProps) {
   return (
-    <section className="px-4 py-16 lg:py-24">
-      <div className="max-w-[120rem] mx-auto">
-        <div className="bg-white rounded-[16px] overflow-hidden">
+    <section className="px-4 py-16 lg:py-24 relative overflow-hidden">
+      {/* Subtle abstract background elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Floating geometric shapes */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-blue-100/30 to-purple-100/30 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-cyan-100/40 to-blue-100/40 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-purple-100/20 to-pink-100/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{
+          backgroundImage: `
+            linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px'
+        }} />
+        
+        {/* Gradient orbs */}
+        <div className="absolute top-1/4 right-1/3 w-16 h-16 bg-gradient-to-br from-blue-200/20 to-cyan-200/20 rounded-full blur-xl animate-bounce" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-1/3 left-1/3 w-20 h-20 bg-gradient-to-br from-purple-200/15 to-pink-200/15 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+      </div>
+      
+      <div className="max-w-[120rem] mx-auto relative z-10">
+        <div className="bg-white/95 backdrop-blur-sm rounded-[16px] overflow-hidden shadow-xl border border-white/20">
           <div className="px-6 sm:px-8 lg:px-16 py-12 lg:py-20">
             <div className="text-center space-y-8 lg:space-y-10">
               {/* Main heading */}
@@ -66,49 +87,6 @@ export function FinalCTA({ onSearch }: FinalCTAProps) {
                 </div>
               </div>
 
-              {/* How it works - clean design */}
-              <div className="pt-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-4xl mx-auto">
-                  {/* Step 1 */}
-                  <div className="group">
-                    <div className="flex flex-col items-center text-center space-y-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm group-hover:bg-gray-200 transition-colors duration-200">
-                        1
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-sm font-semibold text-gray-900">Tell us what you need</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed max-w-[200px]">Describe the job or service you&apos;re looking for.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Step 2 */}
-                  <div className="group">
-                    <div className="flex flex-col items-center text-center space-y-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm group-hover:bg-gray-200 transition-colors duration-200">
-                        2
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-sm font-semibold text-gray-900">Share your location</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed max-w-[200px]">Enter your postcode so we can find pros near you.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Step 3 */}
-                  <div className="group">
-                    <div className="flex flex-col items-center text-center space-y-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 font-semibold text-sm group-hover:bg-gray-200 transition-colors duration-200">
-                        3
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-sm font-semibold text-gray-900">Get matched instantly</h3>
-                        <p className="text-xs text-gray-500 leading-relaxed max-w-[200px]">We&apos;ll match you with the right local trade.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
