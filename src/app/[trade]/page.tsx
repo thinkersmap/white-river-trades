@@ -1,6 +1,9 @@
 import { use } from "react";
 import { Navigation } from "@/components/home/Navigation";
-import { trades } from "@/data/trades";
+import { trades, homeServices } from "@/data/trades";
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
@@ -15,7 +18,7 @@ type Props = {
 
 export default function TradePage({ params }: Props) {
   const resolvedParams = use(params);
-  const trade = trades.find((t) => t.slug === resolvedParams.trade);
+  const trade = allWorkCategories.find((t) => t.slug === resolvedParams.trade);
   if (!trade) notFound();
 
   const Icon = trade.icon;
@@ -49,19 +52,23 @@ export default function TradePage({ params }: Props) {
                   {trade.description || `Find trusted ${trade.name.toLowerCase()} professionals near you. We'll match you with experienced specialists who understand your requirements.`}
                 </p>
 
-                {/* Subcategories */}
-                {trade.subcategories && trade.subcategories.length > 0 && (
+                {/* Common Jobs */}
+                {trade.commonJobs && trade.commonJobs.length > 0 && (
                   <div className="space-y-4">
                     <div className="flex flex-wrap gap-2">
-                      {trade.subcategories.map((subcategory) => (
+                      {trade.commonJobs.slice(0, 6).map((job, index) => (
                         <span
-                          key={subcategory.slug}
+                          key={index}
                           className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full"
-                          title={subcategory.description}
                         >
-                          {subcategory.name}
+                          {job}
                         </span>
                       ))}
+                      {trade.commonJobs.length > 6 && (
+                        <span className="px-3 py-1.5 bg-gray-50 text-gray-500 text-sm font-medium rounded-full">
+                          +{trade.commonJobs.length - 6} more
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}

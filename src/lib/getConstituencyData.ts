@@ -1,5 +1,8 @@
 import { constituenciesMeta } from "@/data/constituencies-meta";
-import { trades } from "@/data/trades";
+import { trades, homeServices } from "@/data/trades";
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
 import path from 'path';
 import fs from 'fs/promises';
 
@@ -44,10 +47,9 @@ export function getAllConstituencySlugs() {
 }
 
 export function getAllTradeConstituencyPairs() {
-  const availableTrades = trades.filter(t => t.available);
   const constituencies = constituenciesMeta;
 
-  return availableTrades.map(trade => ({
+  return allWorkCategories.map(trade => ({
     trade: trade.slug,
     constituency: constituencies.map(c => c.slug)
   }));

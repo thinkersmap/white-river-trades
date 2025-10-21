@@ -1,3 +1,5 @@
+// trades.ts (top of file)
+
 import {
   HomeModernIcon,
   WrenchScrewdriverIcon,
@@ -16,533 +18,1253 @@ import {
   GlobeEuropeAfricaIcon,
   CubeTransparentIcon,
   ClipboardDocumentCheckIcon,
-  MinusIcon,
-  Squares2X2Icon,
+  SunIcon,
+  BriefcaseIcon,
 } from "@heroicons/react/24/outline";
 
-export type SubCategory = {
-  name: string;
-  slug: string;
-  description: string;
-};
+export type WorkType = "Trade" | "HomeService" | "Planning";
 
-export type Trade = {
-  name: string;
+export interface WorkCategory {
+  id: string;
   slug: string;
+  name: string;
+  type: WorkType;
+  category: string; // grouping label (e.g. "Indoor Services", "MEP Trades")
   description: string;
-  sicCode: string;
-  sicName: string;
-  category: string;
+  roles: string[];
+  commonJobs: string[];
+  tags?: string[];
+  sicCode?: string;
+  sicName?: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  available: boolean;
-  subcategories: SubCategory[];
-};
+  images?: string[]; // NEW — image URLs or local imports
+  regulatory?: {
+    licensed?: boolean;
+    certs?: string[];
+  };
+  related?: string[];
+}
 
-export const trades: Trade[] = [
-  // --- Construction Trades ---
+export const homeServices: WorkCategory[] = [
+  {
+    id: "cleaning",
+    slug: "cleaning",
+    name: "Cleaning",
+    type: "HomeService",
+    category: "Indoor Services",
+    description:
+      "Residential and commercial cleaning, including routine maintenance, deep cleans, and move-in/move-out services.",
+    roles: ["Cleaner", "Housekeeper", "Cleaning Technician"],
+    commonJobs: [
+      "Deep cleaning kitchens and bathrooms",
+      "End-of-tenancy cleaning",
+      "Vacuuming, mopping, and dusting entire homes",
+      "Office janitorial work",
+    ],
+    tags: ["hygiene", "maintenance", "residential"],
+    sicCode: "81210",
+    sicName: "General cleaning of buildings",
+    icon: SparklesIcon,
+    images: [],
+  },
+  {
+    id: "landscaping",
+    slug: "landscaping",
+    name: "Landscaping & Lawn Care",
+    type: "HomeService",
+    category: "Outdoor Services",
+    description:
+      "Design, installation, and maintenance of gardens, lawns, and outdoor spaces for homes or small businesses.",
+    roles: ["Landscaper", "Gardener", "Groundskeeper"],
+    commonJobs: [
+      "Lawn mowing and edging",
+      "Planting trees and shrubs",
+      "Garden bed design",
+      "Installing irrigation systems",
+    ],
+    tags: ["outdoors", "plants", "maintenance"],
+    sicCode: "81300",
+    sicName: "Landscape service activities",
+    icon: GlobeEuropeAfricaIcon,
+    images: [],
+  },
+  {
+    id: "furniture-assembly",
+    slug: "furniture-assembly",
+    name: "Furniture Assembly",
+    type: "HomeService",
+    category: "Indoor Services",
+    description:
+      "Assembly and setup of flat-pack and modular furniture for residential and commercial clients.",
+    roles: ["Furniture Assembler", "Installer", "Handyman"],
+    commonJobs: [
+      "Assembling beds, wardrobes, and cabinets",
+      "Mounting shelves or wall units",
+      "Office furniture setup",
+    ],
+    tags: ["assembly", "handyman", "installation"],
+    sicCode: "95240",
+    sicName: "Repair of furniture and home furnishings",
+    icon: WrenchScrewdriverIcon,
+    images: [],
+  },
+  {
+    id: "handyman",
+    slug: "handyman",
+    name: "Handyman & General Maintenance",
+    type: "HomeService",
+    category: "Indoor Services",
+    description:
+      "General home maintenance, small repairs, and installations not requiring licensed trade professionals.",
+    roles: ["Handyman", "Maintenance Worker"],
+    commonJobs: [
+      "Fixing doors and locks",
+      "Hanging shelves and mirrors",
+      "Minor drywall or paint touch-ups",
+      "Basic plumbing or electrical fixes",
+    ],
+    tags: ["maintenance", "repairs", "indoor"],
+    sicCode: "95290",
+    sicName: "Repair of other personal and household goods",
+    icon: WrenchIcon,
+    images: [],
+  },
+  {
+    id: "pest-control",
+    slug: "pest-control",
+    name: "Pest Control",
+    type: "HomeService",
+    category: "Property Care",
+    description:
+      "Inspection and removal of insects, rodents, and other pests to maintain healthy living environments.",
+    roles: ["Exterminator", "Pest Control Technician"],
+    commonJobs: [
+      "Rodent and insect removal",
+      "Termite and bedbug treatments",
+      "Preventive pest management programs",
+    ],
+    tags: ["health", "safety", "extermination"],
+    sicCode: "81291",
+    sicName: "Disinfecting and exterminating services",
+    icon: ShieldCheckIcon,
+    regulatory: {
+      licensed: true,
+      certs: ["Pesticide Applicator License", "Public Health Permit"],
+    },
+    images: [],
+  },
+  {
+    id: "pool-maintenance",
+    slug: "pool-maintenance",
+    name: "Pool & Spa Maintenance",
+    type: "HomeService",
+    category: "Outdoor Services",
+    description:
+      "Regular cleaning, balancing chemicals, and mechanical maintenance for pools, spas, and hot tubs.",
+    roles: ["Pool Technician", "Maintenance Specialist"],
+    commonJobs: [
+      "Vacuuming pools and skimming debris",
+      "Adjusting chemical balance and filters",
+      "Repairing pumps and heaters",
+    ],
+    tags: ["water", "maintenance", "outdoors"],
+    sicCode: "96090",
+    sicName: "Other service activities n.e.c.",
+    icon: SparklesIcon,
+    regulatory: {
+      licensed: true,
+      certs: ["Pool Operator Certification (CPO)", "Water Treatment Safety"],
+    },
+    images: [],
+  },
+  {
+    id: "home-security",
+    slug: "home-security",
+    name: "Home Security & Smart Devices",
+    type: "HomeService",
+    category: "Technology Services",
+    description:
+      "Installation and maintenance of home security systems, cameras, and smart-home devices.",
+    roles: ["Security Installer", "Smart Home Technician", "Alarm Specialist"],
+    commonJobs: [
+      "Installing security cameras and motion sensors",
+      "Setting up smart locks and doorbells",
+      "Integrating smart-home systems with mobile apps",
+    ],
+    tags: ["technology", "security", "smart-home"],
+    sicCode: "80200",
+    sicName: "Security systems service activities",
+    icon: ShieldCheckIcon,
+    regulatory: {
+      licensed: true,
+      certs: ["Alarm System Installer License", "Electrical Safety Certification"],
+    },
+    images: [],
+  },
+];
 
-{
-  name: "Roofing",
-  slug: "roofing",
-  description: "Professional roof repairs, installations, and maintenance for homes and businesses.",
-  sicCode: "43910",
-  sicName: "Roofing activities",
-  category: "Construction Trades",
-  icon: HomeModernIcon,
-  available: true,
-  subcategories: [
-    { name: "Flat roofs", slug: "flat-roofs", description: "Installation and repair of flat roofing systems including felt, rubber, and GRP materials for durability and water resistance." },
-    { name: "Pitched roofs", slug: "pitched-roofs", description: "Construction and maintenance of pitched roof structures using tiles or slates for aesthetic and longevity." },
-    { name: "Roof cleaning", slug: "roof-cleaning", description: "Safe removal of moss, algae, and debris to maintain your roof’s appearance and lifespan." },
-    { name: "Chimney repairs", slug: "chimney-repairs", description: "Repointing, rebuilding, and maintenance of chimneys and flues to ensure structural integrity." },
-    { name: "Gutters, fascias & soffits", slug: "gutters-fascias-soffits", description: "Installation and repair of uPVC and aluminium guttering systems, fascia boards, and soffits." },
-    { name: "Emergency roof repairs", slug: "emergency-roof-repairs", description: "24/7 response to storm damage, leaks, and urgent roofing issues." },
-    { name: "Leadwork & flashing", slug: "leadwork-flashing", description: "Expert installation and restoration of lead flashings and valleys for watertight roofs." },
-    { name: "Skylights & dormers", slug: "skylights-dormers", description: "Fitting and maintenance of roof windows and dormer conversions to bring in natural light." },
-    { name: "Roof insulation", slug: "roof-insulation", description: "Energy-efficient insulation solutions to reduce heat loss and improve comfort." },
-    { name: "Roof inspection reports", slug: "roof-inspection-reports", description: "Detailed surveys and reports to assess roof condition for buyers or insurers." }
-  ]
-},
-{
-  name: "Carpentry",
-  slug: "carpentry",
-  description: "Expert carpentry services for interior and exterior woodwork projects.",
-  sicCode: "43390",
-  sicName: "Other building completion and finishing",
-  category: "Construction Trades",
-  icon: WrenchIcon,
-  available: true,
-  subcategories: [
-    { name: "Door hanging", slug: "door-hanging", description: "Precision installation and adjustment of interior and exterior doors for a perfect fit." },
-    { name: "Skirting & architraves", slug: "skirting-architraves", description: "Fitting of skirting boards, architraves, and mouldings for a clean interior finish." },
-    { name: "Custom furniture", slug: "custom-furniture", description: "Bespoke carpentry projects including shelves, storage, and built-in furniture." },
-    { name: "Decking", slug: "decking", description: "Design and installation of hardwood and composite decking for outdoor spaces." },
-    { name: "Garden structures", slug: "garden-structures", description: "Timber pergolas, sheds, and gazebos built to specification." },
-    { name: "Floor joists & framing", slug: "floor-joists-framing", description: "Structural carpentry including floor joists, timber framing, and supports." }
-  ]
-},
-{
-  name: "Joinery",
-  slug: "joinery",
-  description: "Bespoke joinery for windows, staircases, and fine interior finishes.",
-  sicCode: "43320",
-  sicName: "Joinery installation",
-  category: "Construction Trades",
-  icon: Cog6ToothIcon,
-  available: true,
-  subcategories: [
-    { name: "Fitted wardrobes", slug: "fitted-wardrobes", description: "Custom-built wardrobes and cabinetry for efficient use of space." },
-    { name: "Staircases", slug: "staircases", description: "Design, manufacture, and installation of bespoke timber staircases." },
-    { name: "Windows & frames", slug: "windows-frames", description: "Wooden window frame crafting and installation for heritage or modern homes." },
-    { name: "Loft boarding", slug: "loft-boarding", description: "Professional boarding of loft areas for safe storage access." },
-    { name: "Bespoke joinery", slug: "bespoke-joinery", description: "Tailor-made woodwork for architectural and decorative purposes." }
-  ]
-},
-{
-  name: "Bricklaying & General Building",
-  slug: "building",
-  description: "Residential and commercial building projects including extensions and renovations.",
-  sicCode: "41202",
-  sicName: "Construction of domestic buildings",
-  category: "Construction Trades",
-  icon: BuildingOffice2Icon,
-  available: true,
-  subcategories: [
-    { name: "Extensions", slug: "extensions", description: "Design and construction of single and double-storey home extensions." },
-    { name: "Renovations", slug: "renovations", description: "Full or partial home refurbishments with structural and aesthetic improvements." },
-    { name: "Garage conversions", slug: "garage-conversions", description: "Transform underused garages into additional living or office space." },
-    { name: "Bricklaying", slug: "bricklaying", description: "All aspects of brickwork including walls, paths, and garden features." },
-    { name: "Basement conversions", slug: "basement-conversions", description: "Waterproofed basement renovations for additional living or storage space." },
-    { name: "Damp proofing", slug: "damp-proofing", description: "Prevention and treatment of rising or penetrating damp in buildings." }
-  ]
-},
-{
-  name: "Plastering & Rendering",
-  slug: "plastering",
-  description: "Smooth finishes and durable rendering for walls and ceilings.",
-  sicCode: "43310",
-  sicName: "Plastering",
-  category: "Construction Trades",
-  icon: SparklesIcon,
-  available: true,
-  subcategories: [
-    { name: "Skimming", slug: "skimming", description: "Creating smooth surfaces over old plaster or drywall for decoration." },
-    { name: "Dry lining", slug: "dry-lining", description: "Installation of plasterboard and partitions for quick wall construction." },
-    { name: "Rendering", slug: "rendering", description: "Exterior wall coatings using cement or silicone renders for weather protection." },
-    { name: "Coving & mouldings", slug: "coving-mouldings", description: "Decorative plasterwork for ceilings, cornices, and interior detailing." },
-    { name: "Ceiling repairs", slug: "ceiling-repairs", description: "Repairing cracks, sagging, and water damage in ceilings." }
-  ]
-},
-{
-  name: "Painting & Decorating",
-  slug: "painting",
-  description: "Professional painting and decorative finishes for interiors and exteriors.",
-  sicCode: "43341",
-  sicName: "Painting",
-  category: "Construction Trades",
-  icon: PaintBrushIcon,
-  available: true,
-  subcategories: [
-    { name: "Interior painting", slug: "interior-painting", description: "High-quality wall and ceiling painting for a perfect finish." },
-    { name: "Exterior painting", slug: "exterior-painting", description: "Weather-resistant paintwork for homes and commercial properties." },
-    { name: "Wallpapering", slug: "wallpapering", description: "Professional wallpaper installation, pattern matching, and removal." },
-    { name: "Decorative finishes", slug: "decorative-finishes", description: "Specialist finishes such as feature walls, murals, and faux effects." },
-    { name: "Spray painting", slug: "spray-painting", description: "Airless spray painting for smooth, even coatings on large surfaces." }
-  ]
-},
-{
-  name: "Flooring & Tiling",
-  slug: "flooring",
-  description: "Expert installation of floors and wall tiles to enhance your living spaces.",
-  sicCode: "43330",
-  sicName: "Floor and wall covering",
-  category: "Construction Trades",
-  icon: RectangleStackIcon,
-  available: true,
-  subcategories: [
-    { name: "Wood & laminate flooring", slug: "wood-laminate-flooring", description: "Supply and fitting of hardwood, laminate, and engineered floors." },
-    { name: "Tile installation", slug: "tile-installation", description: "Professional tiling for kitchens, bathrooms, and floors." },
-    { name: "Carpet fitting", slug: "carpet-fitting", description: "Precise carpet cutting and installation for a seamless finish." },
-    { name: "Grouting & sealing", slug: "grouting-sealing", description: "Long-lasting waterproof sealing for tiled areas." },
-    { name: "Floor sanding", slug: "floor-sanding", description: "Restoration of wooden floors with sanding and refinishing." }
-  ]
-},
-{
-  name: "Loft Conversions & Extensions",
-  slug: "lofts",
-  description: "Transform your attic or loft space into a functional living area.",
-  sicCode: "41202",
-  sicName: "Construction of domestic buildings",
-  category: "Construction Trades",
-  icon: HomeIcon,
-  available: true,
-  subcategories: [
-    { name: "Dormer conversions", slug: "dormer-conversions", description: "Add space and light with a dormer extension to your roof." },
-    { name: "Mansard conversions", slug: "mansard-conversions", description: "Stylish loft transformations with additional headroom." },
-    { name: "Hip-to-gable conversions", slug: "hip-to-gable-conversions", description: "Maximise loft space by extending sloped roofs to full gables." },
-    { name: "Attic rooms", slug: "attic-rooms", description: "Convert unused attic space into bedrooms, offices, or studios." }
-  ]
-},
+// Append these to the same `homeServices` array
 
-// --- Home Services ---
+homeServices.push(
+  {
+    id: "moving-hauling",
+    slug: "moving-hauling",
+    name: "Moving & Hauling",
+    type: "HomeService",
+    category: "Logistics",
+    description:
+      "Household removals, furniture moves, and haulage including packing and on-site loading/unloading.",
+    roles: ["Mover", "Removalist", "Hauler"],
+    commonJobs: [
+      "House or flat removals",
+      "Single-item large furniture moves",
+      "Packing and unpacking services",
+      "On-site loading/unloading assistance",
+    ],
+    tags: ["moving", "removals", "transport"],
+    sicCode: "49420",
+    sicName: "Removal services",
+    icon: TruckIcon,
+    images: [],
+  },
+  {
+    id: "residential-painting",
+    slug: "residential-painting",
+    name: "Painting (Residential)",
+    type: "HomeService",
+    category: "Indoor Services",
+    description:
+      "Interior and exterior painting for homes, including prep, priming, and finishing.",
+    roles: ["Painter", "Decorator"],
+    commonJobs: [
+      "Interior room repainting",
+      "Exterior facade touch-ups",
+      "Trim and door painting",
+      "Wallpaper removal and surface prep",
+    ],
+    tags: ["decorating", "finishing", "interior"],
+    sicCode: "43341",
+    sicName: "Painting",
+    icon: PaintBrushIcon,
+    images: [],
+  },
+  {
+    id: "tree-services",
+    slug: "tree-services",
+    name: "Tree Services",
+    type: "HomeService",
+    category: "Outdoor Services",
+    description:
+      "Tree trimming, pruning, and removal for residential and small commercial properties.",
+    roles: ["Arborist", "Tree Surgeon", "Tree Removal Specialist"],
+    commonJobs: [
+      "Tree removal and stump grinding",
+      "Pruning and crown reduction",
+      "Storm damage cleanup",
+    ],
+    tags: ["trees", "outdoors", "safety"],
+    sicCode: "81300",
+    sicName: "Landscape service activities",
+    icon: GlobeEuropeAfricaIcon,
+    regulatory: {
+      licensed: true,
+      certs: ["Arborist Certification", "Pesticide Applicator (if chemicals used)"],
+    },
+    images: [],
+  },
+  {
+    id: "fence-installation",
+    slug: "fence-installation",
+    name: "Fence & Gate Installation",
+    type: "HomeService",
+    category: "Outdoor Services",
+    description:
+      "Installation and repair of timber, vinyl, and metal fences and garden gates.",
+    roles: ["Fence Installer", "Fence Builder"],
+    commonJobs: [
+      "Installing garden fencing",
+      "Repairing damaged panels or posts",
+      "Fitting garden gates and latches",
+    ],
+    tags: ["outdoors", "carpentry", "boundary"],
+    sicCode: "43999",
+    sicName: "Other specialised construction activities n.e.c.",
+    icon: RectangleStackIcon,
+    images: [],
+  },
+  {
+    id: "property-management",
+    slug: "property-management",
+    name: "Property Management",
+    type: "HomeService",
+    category: "Lifestyle & Management",
+    description:
+      "Residential property oversight including scheduling maintenance, inspections, and tenant coordination.",
+    roles: ["Property Manager", "Building Superintendent"],
+    commonJobs: [
+      "Arranging repairs and maintenance",
+      "Tenant move-in/move-out checks",
+      "Coordinating cleaning and landscaping",
+    ],
+    tags: ["management", "rentals", "maintenance"],
+    sicCode: "68320",
+    sicName: "Management of real estate on a fee or contract basis",
+    icon: BuildingOffice2Icon,
+    images: [],
+  },
+  {
+    id: "window-door-services",
+    slug: "window-door-services",
+    name: "Window & Door Services",
+    type: "HomeService",
+    category: "Indoor Services",
+    description:
+      "Replacement and repair of windows and doors, including sealing and hardware.",
+    roles: ["Window Installer", "Door Fitter"],
+    commonJobs: [
+      "Replacing double-glazed windows",
+      "Fitting new exterior doors",
+      "Resealing and draught-proofing frames",
+    ],
+    tags: ["glazing", "joinery", "energy"],
+    sicCode: "43342",
+    sicName: "Glazing",
+    icon: HomeModernIcon,
+    images: [],
+  },
+  {
+    id: "pressure-washing",
+    slug: "pressure-washing",
+    name: "Pressure Washing",
+    type: "HomeService",
+    category: "Outdoor Services",
+    description:
+      "High-pressure cleaning of exterior surfaces such as driveways, patios, decks, and siding.",
+    roles: ["Power Washer", "Exterior Cleaning Technician"],
+    commonJobs: [
+      "Driveway and patio washing",
+      "Deck and siding cleaning",
+      "Graffiti or stain removal",
+    ],
+    tags: ["cleaning", "exterior", "maintenance"],
+    sicCode: "81222",
+    sicName: "Specialised cleaning services",
+    icon: SparklesIcon,
+    images: [],
+  },
+  {
+    id: "appliance-repair",
+    slug: "appliance-repair",
+    name: "Appliance Repair & Installation",
+    type: "HomeService",
+    category: "Indoor Services",
+    description:
+      "Diagnosis, repair, and installation of household appliances.",
+    roles: ["Appliance Technician", "Installer"],
+    commonJobs: [
+      "Repairing washing machines and dishwashers",
+      "Installing ovens and hobs",
+      "Troubleshooting refrigerators and dryers",
+    ],
+    tags: ["repair", "installation", "electrical"],
+    sicCode: "95220",
+    sicName: "Repair of household appliances and home equipment",
+    icon: Cog6ToothIcon,
+    images: [],
+  },
+);
 
-{
-  name: "Kitchen Fitting",
-  slug: "kitchens",
-  description: "Professional kitchen installations, refurbishments, and upgrades for homes and landlords.",
-  sicCode: "43390",
-  sicName: "Other building completion and finishing",
-  category: "Home Services",
-  icon: ClipboardDocumentCheckIcon,
-  available: true,
-  subcategories: [
-    { name: "Full kitchen installation", slug: "full-kitchen-installation", description: "Complete kitchen fitting including cabinets, appliances, and finishing." },
-    { name: "Cabinet fitting", slug: "cabinet-fitting", description: "Installation and alignment of bespoke or flat-pack kitchen units." },
-    { name: "Worktop installation", slug: "worktop-installation", description: "Cutting and fitting of laminate, stone, or solid wood kitchen worktops." },
-    { name: "Kitchen refurbishment", slug: "kitchen-refurbishment", description: "Upgrading existing kitchens with new doors, handles, and finishes." },
-    { name: "Plumbing & electrical connections", slug: "plumbing-electrical-connections", description: "Safe connection of appliances, sinks, and lighting." }
-  ]
-},
-{
-  name: "Bathroom Fitting",
-  slug: "bathrooms",
-  description: "Design, installation, and renovation of modern and traditional bathrooms.",
-  sicCode: "43220",
-  sicName: "Plumbing, heat and air-conditioning installation",
-  category: "Home Services",
-  icon: FireIcon,
-  available: true,
-  subcategories: [
-    { name: "Bathroom installation", slug: "bathroom-installation", description: "Complete bathroom fitting including plumbing, tiling, and finishes." },
-    { name: "Shower fitting", slug: "shower-fitting", description: "Installation and replacement of showers, trays, and enclosures." },
-    { name: "Wet rooms", slug: "wet-rooms", description: "Luxury wet room installations with waterproofing and drainage systems." },
-    { name: "Bath replacement", slug: "bath-replacement", description: "Removal and installation of freestanding, corner, or standard baths." },
-    { name: "Waterproofing", slug: "waterproofing", description: "Professional sealing and tanking to protect walls and floors from moisture." }
-  ]
-},
-{
-  name: "Cleaning & Maintenance",
-  slug: "cleaning",
-  description: "Comprehensive residential and commercial cleaning services to keep properties spotless.",
-  sicCode: "81210",
-  sicName: "General cleaning of buildings",
-  category: "Home Services",
-  icon: SparklesIcon,
-  available: true,
-  subcategories: [
-    { name: "Gutter cleaning", slug: "gutter-cleaning", description: "Clearing blocked gutters to prevent overflow and damp damage." },
-    { name: "Pressure washing", slug: "pressure-washing", description: "High-pressure jet washing for driveways, patios, and exterior walls." },
-    { name: "Chimney sweeping", slug: "chimney-sweeping", description: "Professional chimney cleaning for safety and efficiency." },
-    { name: "End-of-tenancy cleaning", slug: "end-of-tenancy-cleaning", description: "Deep cleaning service for rental properties before new tenants move in." },
-    { name: "Carpet cleaning", slug: "carpet-cleaning", description: "Hot water extraction and stain removal for all carpet types." },
-    { name: "Domestic & commercial cleaning", slug: "domestic-commercial-cleaning", description: "Regular or one-off cleaning tailored to homes or offices." }
-  ]
-},
-{
-  name: "Handyman Services",
-  slug: "handyman",
-  description: "Trusted general repair and maintenance services for small home projects.",
-  sicCode: "43390",
-  sicName: "Other building completion and finishing",
-  category: "Home Services",
-  icon: WrenchScrewdriverIcon,
-  available: true,
-  subcategories: [
-    { name: "Furniture assembly", slug: "furniture-assembly", description: "Flat-pack furniture assembly and installation services." },
-    { name: "Mounting & hanging", slug: "mounting-hanging", description: "TVs, mirrors, shelves, and picture hanging with secure fixings." },
-    { name: "Small repairs", slug: "small-repairs", description: "Minor plumbing, electrical, and carpentry fixes for everyday issues." },
-    { name: "Curtain & blind fitting", slug: "curtain-blind-fitting", description: "Precise installation of curtain poles, blinds, and window fittings." },
-    { name: "Door handles & locks", slug: "door-handles-locks", description: "Replacing and repairing interior and exterior door hardware." },
-    { name: "General odd jobs", slug: "general-odd-jobs", description: "Flexible help for any minor household task or improvement." }
-  ]
-},
-{
-  name: "Windows & Doors",
-  slug: "windows",
-  description: "Installation and maintenance of doors, windows, and glazing systems.",
-  sicCode: "43342",
-  sicName: "Glazing",
-  category: "Home Services",
-  icon: CubeTransparentIcon,
-  available: true,
-  subcategories: [
-    { name: "Window replacement", slug: "window-replacement", description: "Supply and fit of double or triple-glazed windows." },
-    { name: "Door fitting", slug: "door-fitting", description: "Expert installation of wooden, composite, and uPVC doors." },
-    { name: "Double glazing repairs", slug: "double-glazing-repairs", description: "Sealed unit replacement and misted window repairs." },
-    { name: "Conservatories", slug: "conservatories", description: "Design and construction of glass conservatories and orangeries." },
-    { name: "Locks & handles", slug: "locks-handles", description: "Replacement of door and window locks, handles, and hinges." },
-    { name: "Bifold & sliding doors", slug: "bifold-sliding-doors", description: "Installation of aluminium and uPVC bifold or sliding door systems." }
-  ]
-},
-{
-  name: "Security & Smart Systems",
-  slug: "security",
-  description: "Protect your home or business with smart security and monitoring solutions.",
-  sicCode: "80200",
-  sicName: "Security systems service activities",
-  category: "Home Services",
-  icon: ShieldCheckIcon,
-  available: true,
-  subcategories: [
-    { name: "Alarm systems", slug: "alarm-systems", description: "Installation of wired and wireless intruder alarm systems." },
-    { name: "CCTV installation", slug: "cctv-installation", description: "Security camera systems for homes, offices, and commercial properties." },
-    { name: "Smart locks", slug: "smart-locks", description: "Keyless entry and app-controlled locking systems for modern homes." },
-    { name: "Door entry systems", slug: "door-entry-systems", description: "Intercom and video entry installations for enhanced access control." },
-    { name: "Smart home setup", slug: "smart-home-setup", description: "Integration of lighting, heating, and security into one connected system." },
-    { name: "Intercom systems", slug: "intercom-systems", description: "Audio and video intercom installation for residential or business use." }
-  ]
-},
+homeServices.push(
+  {
+    id: "window-cleaning",
+    slug: "window-cleaning",
+    name: "Window Cleaning",
+    type: "HomeService",
+    category: "Outdoor Services",
+    description:
+      "Cleaning of interior and exterior glass surfaces for residential and small commercial properties.",
+    roles: ["Window Cleaner", "Exterior Maintenance Technician"],
+    commonJobs: [
+      "Exterior and interior window washing",
+      "Screen and frame cleaning",
+      "High-reach window cleaning",
+    ],
+    tags: ["cleaning", "outdoors", "maintenance"],
+    sicCode: "81221",
+    sicName: "Window cleaning services",
+    icon: HomeIcon,
+    images: [],
+  },
+  {
+    id: "gutter-cleaning",
+    slug: "gutter-cleaning",
+    name: "Gutter Cleaning",
+    type: "HomeService",
+    category: "Outdoor Services",
+    description:
+      "Clearing and flushing gutters and downspouts to prevent leaks and water damage.",
+    roles: ["Cleaner", "Maintenance Worker"],
+    commonJobs: [
+      "Removing leaves and debris from gutters",
+      "Flushing downspouts",
+      "Inspecting for leaks and loose fittings",
+    ],
+    tags: ["cleaning", "maintenance", "outdoors"],
+    sicCode: "81222",
+    sicName: "Specialised cleaning services",
+    icon: TrashIcon,
+    images: [],
+  },
+  {
+    id: "snow-removal",
+    slug: "snow-removal",
+    name: "Snow & Ice Removal",
+    type: "HomeService",
+    category: "Seasonal Services",
+    description:
+      "Clearing snow and ice from driveways, sidewalks, and roofs during winter months.",
+    roles: ["Snow Plow Operator", "Grounds Crew Worker"],
+    commonJobs: [
+      "Plowing driveways and parking areas",
+      "Shoveling walkways and stairs",
+      "Applying salt or de-icer for safety",
+    ],
+    tags: ["seasonal", "winter", "safety"],
+    sicCode: "81300",
+    sicName: "Landscape service activities",
+    icon: TruckIcon,
+    images: [],
+  },
+  {
+    id: "home-organization",
+    slug: "home-organization",
+    name: "Home Organization & Staging",
+    type: "HomeService",
+    category: "Lifestyle & Management",
+    description:
+      "Decluttering, organizing, and staging homes for improved functionality or property sales.",
+    roles: ["Organizer", "Home Stager", "Decluttering Specialist"],
+    commonJobs: [
+      "Closet and storage organization",
+      "Decluttering living spaces",
+      "Home staging for real-estate listings",
+    ],
+    tags: ["organization", "interior", "decor"],
+    sicCode: "96090",
+    sicName: "Other service activities n.e.c.",
+    icon: ClipboardDocumentCheckIcon,
+    images: [],
+  },
+  {
+    id: "home-tech-support",
+    slug: "home-tech-support",
+    name: "Home Tech Support",
+    type: "HomeService",
+    category: "Technology Services",
+    description:
+      "Assistance with computers, Wi-Fi, and smart-home device setup or troubleshooting.",
+    roles: ["IT Support Specialist", "Smart Home Technician"],
+    commonJobs: [
+      "Setting up routers and Wi-Fi networks",
+      "Installing smart-home hubs or assistants",
+      "Troubleshooting connectivity or devices",
+    ],
+    tags: ["technology", "support", "network"],
+    sicCode: "95110",
+    sicName: "Repair of computers and peripheral equipment",
+    icon: BoltIcon,
+    images: [],
+  },
+  {
+    id: "energy-auditing",
+    slug: "energy-auditing",
+    name: "Energy Auditing & Efficiency Services",
+    type: "HomeService",
+    category: "Property Care",
+    description:
+      "Assessing energy consumption and recommending improvements for household efficiency and sustainability.",
+    roles: ["Energy Auditor", "Efficiency Consultant"],
+    commonJobs: [
+      "Conducting home energy audits",
+      "Testing insulation and air leakage",
+      "Advising on efficiency upgrades",
+    ],
+    tags: ["energy", "sustainability", "inspection"],
+    sicCode: "74901",
+    sicName: "Environmental consulting activities",
+    icon: SunIcon,
+    images: [],
+  },
+  {
+    id: "errand-assistance",
+    slug: "errand-assistance",
+    name: "Errand & Personal Assistance",
+    type: "HomeService",
+    category: "Lifestyle & Management",
+    description:
+      "Personalized errand-running, delivery, and assistance services for busy homeowners or seniors.",
+    roles: ["Personal Assistant", "Concierge", "Errand Runner"],
+    commonJobs: [
+      "Grocery or parcel deliveries",
+      "Pet or house-sitting",
+      "General personal errands",
+    ],
+    tags: ["personal", "assistance", "delivery"],
+    sicCode: "96090",
+    sicName: "Other service activities n.e.c.",
+    icon: ClipboardDocumentCheckIcon,
+    images: [],
+  },
+);
 
-// --- Outdoors & Landscaping ---
+// ---------------------------------------------
+// Part 3 — TRADES
+// ---------------------------------------------
 
-{
-  name: "Gardening & Landscaping",
-  slug: "gardening",
-  description: "Professional garden care, landscaping, and outdoor design services for every property type.",
-  sicCode: "81300",
-  sicName: "Landscape service activities",
-  category: "Outdoors & Landscaping",
-  icon: SparklesIcon,
-  available: true,
-  subcategories: [
-    { name: "Lawn care", slug: "lawn-care", description: "Mowing, feeding, and aerating lawns for healthy grass." },
-    { name: "Hedge trimming", slug: "hedge-trimming", description: "Regular hedge cutting and shaping for tidy boundaries." },
-    { name: "Tree surgery", slug: "tree-surgery", description: "Professional tree pruning, shaping, and removal." },
-    { name: "Fencing & decking", slug: "fencing-decking", description: "Installation and repair of timber or composite fences and decking." },
-    { name: "Patios & paving", slug: "patios-paving", description: "Design and laying of paved patios and walkways." },
-    { name: "Garden design", slug: "garden-design", description: "Full garden planning and transformation by landscaping experts." },
-    { name: "Turfing & planting", slug: "turfing-planting", description: "New lawn turfing, seeding, and garden bed planting." },
-    { name: "Ongoing maintenance", slug: "ongoing-maintenance", description: "Scheduled upkeep for residential and commercial gardens." }
-  ]
-},
-{
-  name: "Fencing & Gates",
-  slug: "fencing",
-  description: "Secure and stylish fencing and gate solutions for homes and businesses.",
-  sicCode: "43390",
-  sicName: "Other building completion and finishing",
-  category: "Outdoors & Landscaping",
-    icon: MinusIcon,
-  available: true,
-  subcategories: [
-    { name: "Timber fencing", slug: "timber-fencing", description: "Supply and fit of closeboard, panel, or picket fencing." },
-    { name: "Metal fencing", slug: "metal-fencing", description: "Installation of wrought iron and steel fencing for added security." },
-    { name: "Driveway gates", slug: "driveway-gates", description: "Manual or automated gate installations in wood or metal." },
-    { name: "Garden boundaries", slug: "garden-boundaries", description: "Boundary line fencing and property enclosures." },
-    { name: "Fence repairs", slug: "fence-repairs", description: "Post replacements, panel fixing, and storm damage repair." }
-  ]
-},
-{
-  name: "Driveways & Paving",
-  slug: "driveways",
-  description: "Beautiful, durable driveways and paved areas built to last.",
-  sicCode: "43390",
-  sicName: "Other building completion and finishing",
-  category: "Outdoors & Landscaping",
-  icon: Squares2X2Icon,
-  available: true,
-  subcategories: [
-    { name: "Block paving", slug: "block-paving", description: "Traditional and modern block driveways with pattern designs." },
-    { name: "Resin driveways", slug: "resin-driveways", description: "Low-maintenance, attractive resin-bound surfaces." },
-    { name: "Gravel & tarmac drives", slug: "gravel-tarmac-drives", description: "Affordable driveways with strong drainage properties." },
-    { name: "Patios", slug: "patios", description: "Custom patios for entertaining or relaxing outdoors." },
-    { name: "Pathways", slug: "pathways", description: "Stone, concrete, or brick paths for gardens and access routes." },
-    { name: "Kerbing", slug: "kerbing", description: "Edging and kerb installations to finish driveways and paths." }
-  ]
-},
-{
-  name: "Tree Surgery",
-  slug: "tree-surgery",
-  description: "Qualified arborists providing safe tree pruning, felling, and maintenance services.",
-  sicCode: "81300",
-  sicName: "Landscape service activities",
-  category: "Outdoors & Landscaping",
-  icon: GlobeEuropeAfricaIcon,
-  available: true,
-  subcategories: [
-    { name: "Tree felling", slug: "tree-felling", description: "Safe and controlled removal of large or hazardous trees." },
-    { name: "Pruning", slug: "pruning", description: "Crown reduction and shaping to maintain healthy tree growth." },
-    { name: "Stump removal", slug: "stump-removal", description: "Grinding and removal of stumps to clear garden areas." },
-    { name: "Hedge cutting", slug: "hedge-cutting", description: "Neat trimming and shaping of hedges and bushes." },
-    { name: "Emergency callouts", slug: "emergency-callouts", description: "Rapid response for storm-damaged or fallen trees." }
-  ]
-},
-{
-  name: "Scaffolding",
-  slug: "scaffolding",
-  description: "Reliable scaffolding hire and access platforms for construction and repairs.",
-  sicCode: "43991",
-  sicName: "Scaffold erection",
-  category: "Outdoors & Landscaping",
-  icon: BuildingOffice2Icon,
-  available: true,
-  subcategories: [
-    { name: "Scaffolding hire", slug: "scaffolding-hire", description: "Short or long-term scaffold hire for residential and commercial projects." },
-    { name: "Temporary roofing", slug: "temporary-roofing", description: "Protective coverings to shield worksites from the weather." },
-    { name: "Access platforms", slug: "access-platforms", description: "Safe access solutions for building, painting, or roof work." },
-    { name: "Tower scaffolds", slug: "tower-scaffolds", description: "Mobile tower systems for smaller construction and maintenance jobs." }
-  ]
-},
+export const trades: WorkCategory[] = [
+  {
+    id: "carpentry",
+    slug: "carpentry",
+    name: "Carpentry",
+    type: "Trade",
+    category: "Structural & Finishing Trades",
+    description:
+      "Construction, installation, and repair of wooden structures, framing, cabinetry, and joinery for residential and commercial projects.",
+    roles: ["Carpenter", "Joiner", "Cabinetmaker"],
+    commonJobs: [
+      "Building wooden frameworks and partitions",
+      "Installing doors, windows, and trims",
+      "Custom cabinetry and furniture",
+    ],
+    tags: ["construction", "woodwork", "framing"],
+    sicCode: "43320",
+    sicName: "Joinery installation",
+    icon: WrenchIcon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["Apprenticeship in Carpentry or Joinery"],
+    },
+  },
+  {
+    id: "roofing",
+    slug: "roofing",
+    name: "Roofing",
+    type: "Trade",
+    category: "Structural & Finishing Trades",
+    description:
+      "Installation, maintenance, and repair of flat and pitched roofing systems, including waterproofing and insulation.",
+    roles: ["Roofer", "Roof Installer", "Roof Repair Specialist"],
+    commonJobs: [
+      "Installing new roof systems",
+      "Repairing leaks and flashing",
+      "Replacing shingles or tiles",
+      "Installing insulation and waterproof membranes",
+    ],
+    tags: ["construction", "waterproofing", "maintenance"],
+    sicCode: "43910",
+    sicName: "Roofing activities",
+    icon: HomeModernIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Roofing Contractor License", "Working at Heights Certification"],
+    },
+  },
+  {
+    id: "masonry",
+    slug: "masonry",
+    name: "Masonry & Bricklaying",
+    type: "Trade",
+    category: "Structural & Finishing Trades",
+    description:
+      "Construction and repair of structures using brick, stone, and concrete blocks.",
+    roles: ["Mason", "Bricklayer", "Stonemason"],
+    commonJobs: [
+      "Building walls, chimneys, and pathways",
+      "Restoring stone or brick structures",
+      "Constructing retaining walls",
+    ],
+    tags: ["construction", "stonework", "foundations"],
+    sicCode: "43999",
+    sicName: "Other specialised construction activities n.e.c.",
+    icon: BuildingOffice2Icon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["Masonry or Bricklaying Apprenticeship"],
+    },
+  },
+  {
+    id: "tiling-flooring",
+    slug: "tiling-flooring",
+    name: "Tiling & Flooring",
+    type: "Trade",
+    category: "Structural & Finishing Trades",
+    description:
+      "Installation of ceramic, stone, vinyl, and wood flooring and wall tiles for interior and exterior applications.",
+    roles: ["Tiler", "Floor Layer", "Flooring Installer"],
+    commonJobs: [
+      "Installing tile or hardwood floors",
+      "Laying vinyl or laminate flooring",
+      "Bathroom and kitchen tiling",
+    ],
+    tags: ["finishing", "interior", "construction"],
+    sicCode: "43330",
+    sicName: "Floor and wall covering",
+    icon: RectangleStackIcon,
+    images: [],
+  },
+  {
+    id: "drywall",
+    slug: "drywall",
+    name: "Drywall & Plastering",
+    type: "Trade",
+    category: "Structural & Finishing Trades",
+    description:
+      "Installation and finishing of drywall panels and plaster surfaces for walls and ceilings.",
+    roles: ["Drywaller", "Plasterer", "Finisher"],
+    commonJobs: [
+      "Hanging drywall panels",
+      "Plastering and skimming walls",
+      "Repairing cracks or water damage",
+    ],
+    tags: ["interior", "walls", "finishing"],
+    sicCode: "43310",
+    sicName: "Plastering",
+    icon: RectangleStackIcon,
+    images: [],
+  },
+  {
+    id: "painting-decorating",
+    slug: "painting-decorating",
+    name: "Painting & Decorating (Trade)",
+    type: "Trade",
+    category: "Structural & Finishing Trades",
+    description:
+      "Professional painting, finishing, and decorating for large-scale or commercial projects.",
+    roles: ["Painter", "Decorator"],
+    commonJobs: [
+      "Interior and exterior painting for buildings",
+      "Applying coatings and protective finishes",
+      "Surface prep and finishing for commercial sites",
+    ],
+    tags: ["painting", "decorating", "finishing"],
+    sicCode: "43341",
+    sicName: "Painting",
+    icon: PaintBrushIcon,
+    images: [],
+  },
+  {
+    id: "glazing",
+    slug: "glazing",
+    name: "Glazing & Glass Installation",
+    type: "Trade",
+    category: "Structural & Finishing Trades",
+    description:
+      "Installation and replacement of glass panels, storefronts, and window systems.",
+    roles: ["Glazier", "Glass Installer"],
+    commonJobs: [
+      "Installing double-glazed windows",
+      "Replacing broken glass panels",
+      "Sealing and weatherproofing windows",
+    ],
+    tags: ["glass", "windows", "installation"],
+    sicCode: "43342",
+    sicName: "Glazing",
+    icon: CubeTransparentIcon,
+    images: [],
+  },
+];
 
-// --- Structural & Specialist Trades ---
+// Append to `trades` array
 
-{
-  name: "General Building & Renovation",
-  slug: "building",
-  description: "Comprehensive construction, extension, and renovation work for all property types.",
-  sicCode: "41202",
-  sicName: "Construction of domestic buildings",
-  category: "Structural & Specialist Trades",
-  icon: HomeModernIcon,
-  available: true,
-  subcategories: [
-    { name: "Extensions", slug: "extensions", description: "Single and double-storey extensions designed and built to your needs." },
-    { name: "Loft conversions", slug: "loft-conversions", description: "Turn unused attic space into bedrooms or offices." },
-    { name: "Garage conversions", slug: "garage-conversions", description: "Transform garages into practical living or working areas." },
-    { name: "Bricklaying", slug: "bricklaying", description: "Brick, block, and stonework for new builds or repairs." },
-    { name: "Structural work", slug: "structural-work", description: "Load-bearing wall removals and steel beam installations." },
-    { name: "Renovations & refurbishments", slug: "renovations-refurbishments", description: "Full property upgrades and modernisations." },
-    { name: "Damp proofing", slug: "damp-proofing", description: "Prevention and repair of moisture ingress and rising damp." },
-    { name: "Basements", slug: "basements", description: "Excavation and conversion of basements into usable rooms." }
-  ]
-},
-{
-  name: "Plastering & Rendering",
-  slug: "plastering",
-  description: "High-quality interior plasterwork and durable external rendering services.",
-  sicCode: "43310",
-  sicName: "Plastering",
-  category: "Structural & Specialist Trades",
-  icon: PaintBrushIcon,
-  available: true,
-  subcategories: [
-    { name: "Skimming & plaster repairs", slug: "skimming-plaster-repairs", description: "Smooth finishing for walls and ceilings, ideal for decorating." },
-    { name: "Ceiling reboarding", slug: "ceiling-reboarding", description: "Replacing damaged or uneven ceilings with fresh plasterboard." },
-    { name: "External rendering", slug: "external-rendering", description: "Protective cement or silicone render for exterior walls." },
-    { name: "Pebble dashing", slug: "pebble-dashing", description: "Decorative and weather-resistant finish for exterior walls." },
-    { name: "Coving & mouldings", slug: "coving-mouldings", description: "Ornamental plaster features for interior decoration." },
-    { name: "Dry lining", slug: "dry-lining", description: "Fast and efficient wall boarding for new builds and refurbishments." }
-  ]
-},
-{
-  name: "Insulation & Energy Efficiency",
-  slug: "insulation",
-  description: "Improve comfort and reduce energy bills with modern insulation solutions.",
-  sicCode: "43290",
-  sicName: "Other construction installation",
-  category: "Structural & Specialist Trades",
-  icon: FireIcon,
-  available: true,
-  subcategories: [
-    { name: "Loft insulation", slug: "loft-insulation", description: "Energy-saving insulation installed in attic and roof spaces." },
-    { name: "Cavity wall insulation", slug: "cavity-wall-insulation", description: "Filling wall cavities to prevent heat loss." },
-    { name: "Roof insulation", slug: "roof-insulation", description: "Thermal and sound insulation under pitched or flat roofs." },
-    { name: "Draft proofing", slug: "draft-proofing", description: "Sealing gaps around doors and windows to prevent draughts." },
-    { name: "Home energy assessments", slug: "home-energy-assessments", description: "Evaluate home energy performance and identify improvements." }
-  ]
-},
-{
-  name: "Damp & Waterproofing",
-  slug: "damp-proofing",
-  description: "Protect properties from water damage, rising damp, and mould with expert treatments.",
-  sicCode: "43999",
-  sicName: "Other specialised construction activities n.e.c.",
-  category: "Structural & Specialist Trades",
-  icon: ShieldCheckIcon,
-  available: true,
-  subcategories: [
-    { name: "Rising damp treatment", slug: "rising-damp-treatment", description: "Injection or membrane-based solutions for rising damp." },
-    { name: "Basement waterproofing", slug: "basement-waterproofing", description: "Internal and external waterproofing for basements and cellars." },
-    { name: "Mould removal", slug: "mould-removal", description: "Cleaning and treatment to prevent fungal regrowth." },
-    { name: "Tanking", slug: "tanking", description: "Protective waterproof coatings for below-ground walls and floors." },
-    { name: "Condensation control", slug: "condensation-control", description: "Ventilation and dehumidification systems to prevent damp." }
-  ]
-},
-{
-  name: "Loft Conversions & Extensions",
-  slug: "lofts",
-  description: "Expand living space with professional loft conversions and property extensions.",
-  sicCode: "41202",
-  sicName: "Construction of domestic buildings",
-  category: "Structural & Specialist Trades",
-  icon: HomeModernIcon,
-  available: true,
-  subcategories: [
-    { name: "Dormer conversions", slug: "dormer-conversions", description: "Add extra headroom and space with a dormer extension." },
-    { name: "Hip-to-gable", slug: "hip-to-gable", description: "Transform sloped roofs to vertical walls for larger loft areas." },
-    { name: "Mansard conversions", slug: "mansard-conversions", description: "Maximise attic space with elegant mansard-style extensions." },
-    { name: "Attic rooms", slug: "attic-rooms", description: "Convert lofts into bedrooms, offices, or playrooms." },
-    { name: "Insulation & stairs", slug: "insulation-stairs", description: "Proper insulation and access solutions for comfort and safety." }
-  ]
-},
+trades.push(
+  {
+    id: "plumbing",
+    slug: "plumbing",
+    name: "Plumbing",
+    type: "Trade",
+    category: "Mechanical, Electrical & Plumbing (MEP)",
+    description:
+      "Installation, repair, and maintenance of water, drainage, and gas systems in residential and commercial buildings.",
+    roles: ["Plumber", "Pipefitter", "Gas Fitter", "Drainage Specialist"],
+    commonJobs: [
+      "Installing or repairing sinks, toilets, and showers",
+      "Fixing leaks or burst pipes",
+      "Installing water heaters and boilers",
+      "Connecting dishwashers or washing machines",
+    ],
+    tags: ["water", "gas", "heating", "repair"],
+    sicCode: "43220",
+    sicName: "Plumbing, heat and air-conditioning installation",
+    icon: FireIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Plumbing License", "Gas Safe Registration"],
+    },
+  },
+  {
+    id: "electrical",
+    slug: "electrical",
+    name: "Electrical",
+    type: "Trade",
+    category: "Mechanical, Electrical & Plumbing (MEP)",
+    description:
+      "Electrical installation, maintenance, and inspection for power, lighting, and control systems.",
+    roles: ["Electrician", "Electrical Technician", "Electrical Contractor"],
+    commonJobs: [
+      "Installing sockets, switches, and lighting",
+      "Wiring new homes or renovations",
+      "Replacing circuit breakers and panels",
+      "Testing and certifying electrical systems",
+    ],
+    tags: ["electric", "wiring", "power"],
+    sicCode: "43210",
+    sicName: "Electrical installation",
+    icon: BoltIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Electrical License", "Safety Compliance Certification"],
+    },
+  },
+  {
+    id: "hvac",
+    slug: "hvac",
+    name: "Heating, Ventilation & Air Conditioning (HVAC)",
+    type: "Trade",
+    category: "Mechanical, Electrical & Plumbing (MEP)",
+    description:
+      "Installation and servicing of heating, cooling, and air-handling systems for residential and commercial properties.",
+    roles: ["HVAC Technician", "Refrigeration Mechanic", "Air Conditioning Installer"],
+    commonJobs: [
+      "Installing or servicing air conditioning units",
+      "Maintaining boilers and furnaces",
+      "Repairing heat pumps",
+      "Ductwork installation and cleaning",
+    ],
+    tags: ["heating", "cooling", "air", "mechanical"],
+    sicCode: "43220",
+    sicName: "Plumbing, heat and air-conditioning installation",
+    icon: Cog6ToothIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["EPA Section 608", "HVAC Certification", "Refrigeration Safety"],
+    },
+  },
+  {
+    id: "gas-fitting",
+    slug: "gas-fitting",
+    name: "Gas Fitting",
+    type: "Trade",
+    category: "Mechanical, Electrical & Plumbing (MEP)",
+    description:
+      "Installation and maintenance of natural gas and propane systems, including piping and appliances.",
+    roles: ["Gas Fitter", "Gas Technician"],
+    commonJobs: [
+      "Connecting gas appliances (stoves, heaters, boilers)",
+      "Inspecting and testing gas lines for safety",
+      "Installing gas meters and regulators",
+    ],
+    tags: ["gas", "heating", "safety"],
+    sicCode: "43220",
+    sicName: "Plumbing, heat and air-conditioning installation",
+    icon: FireIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Gas Fitter License", "Gas Safe Registration"],
+    },
+  },
+  {
+    id: "refrigeration",
+    slug: "refrigeration",
+    name: "Refrigeration Systems",
+    type: "Trade",
+    category: "Mechanical, Electrical & Plumbing (MEP)",
+    description:
+      "Installation, maintenance, and repair of refrigeration systems for domestic, commercial, and industrial use.",
+    roles: ["Refrigeration Mechanic", "Cooling Technician", "Service Engineer"],
+    commonJobs: [
+      "Servicing walk-in coolers and freezers",
+      "Repairing refrigeration compressors",
+      "Installing air-cooling or ice-making systems",
+    ],
+    tags: ["cooling", "hvac", "mechanical"],
+    sicCode: "43220",
+    sicName: "Plumbing, heat and air-conditioning installation",
+    icon: Cog6ToothIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["EPA Section 608 Certification", "Refrigeration Mechanic License"],
+    },
+  },
+  {
+    id: "solar-installation",
+    slug: "solar-installation",
+    name: "Solar & Renewable Energy Installation",
+    type: "Trade",
+    category: "Mechanical, Electrical & Plumbing (MEP)",
+    description:
+      "Installation and maintenance of solar panels, inverters, and renewable energy systems for homes and businesses.",
+    roles: ["Solar Installer", "PV Technician", "Renewable Energy Specialist"],
+    commonJobs: [
+      "Installing rooftop solar panels and wiring",
+      "Connecting inverters and batteries",
+      "Performing maintenance and output checks",
+    ],
+    tags: ["solar", "renewable", "energy"],
+    sicCode: "43210",
+    sicName: "Electrical installation",
+    icon: SunIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["PV Installation Certification", "Electrical Safety Certification"],
+    },
+  },
+);
 
-// --- Energy, Mechanical & Waste ---
+// Append to `trades` array
 
-{
-  name: "Heating & Air Conditioning (HVAC)",
-  slug: "hvac",
-  description: "Installation and maintenance of efficient heating, cooling, and ventilation systems.",
-  sicCode: "43220",
-  sicName: "Plumbing, heat and air-conditioning installation",
-  category: "Energy, Mechanical & Waste",
-  icon: FireIcon,
-  available: true,
-  subcategories: [
-    { name: "Air conditioning installation", slug: "air-conditioning-installation", description: "Design and installation of cooling and ventilation systems." },
-    { name: "Heat pumps", slug: "heat-pumps", description: "Energy-efficient air and ground source heat pump installations." },
-    { name: "Ventilation systems", slug: "ventilation-systems", description: "Mechanical ventilation and air recovery (MVHR) solutions." },
-    { name: "Boiler servicing", slug: "boiler-servicing", description: "Routine maintenance and safety checks for gas and oil boilers." },
-    { name: "Climate control", slug: "climate-control", description: "Integrated temperature management systems for homes and offices." }
-  ]
-},
-{
-  name: "Solar & Renewables",
-  slug: "renewables",
-  description: "Harness renewable energy with solar, battery, and EV charging installations.",
-  sicCode: "43210",
-  sicName: "Electrical installation",
-  category: "Energy, Mechanical & Waste",
-  icon: BoltIcon,
-  available: true,
-  subcategories: [
-    { name: "Solar panel installation", slug: "solar-panel-installation", description: "Design and installation of residential and commercial solar systems." },
-    { name: "Battery storage", slug: "battery-storage", description: "Store excess energy with lithium battery systems for home and business use." },
-    { name: "EV charging", slug: "ev-charging", description: "Installation of electric vehicle charging points at homes or workplaces." },
-    { name: "Energy monitoring", slug: "energy-monitoring", description: "Smart monitoring systems for tracking energy efficiency and savings." },
-    { name: "Off-grid systems", slug: "off-grid-systems", description: "Independent renewable setups for remote or eco-conscious properties." }
-  ]
-},
-{
-  name: "Waste & Skip Hire",
-  slug: "waste",
-  description: "Eco-friendly waste removal and skip hire services for homes and construction sites.",
-  sicCode: "38110",
-  sicName: "Collection of non-hazardous waste",
-  category: "Energy, Mechanical & Waste",
-  icon: TrashIcon,
-  available: true,
-  subcategories: [
-    { name: "Skip hire", slug: "skip-hire", description: "Various skip sizes available for domestic and commercial waste." },
-    { name: "Rubbish removal", slug: "rubbish-removal", description: "On-demand waste collection and clearance services." },
-    { name: "Garden waste clearance", slug: "garden-waste-clearance", description: "Removal of soil, branches, and garden waste after landscaping." },
-    { name: "Construction waste", slug: "construction-waste", description: "Safe removal of rubble, plaster, and building site waste." },
-    { name: "Recycling services", slug: "recycling-services", description: "Environmentally responsible waste processing and recycling." }
-  ]
-},
-{
-  name: "Removals & Storage",
-  slug: "removals",
-  description: "Stress-free house moves and professional storage solutions.",
-  sicCode: "49420",
-  sicName: "Removal services",
-  category: "Energy, Mechanical & Waste",
-  icon: TruckIcon,
-  available: true,
-  subcategories: [
-    { name: "House removals", slug: "house-removals", description: "Full or partial home moving services with packing and transport." },
-    { name: "Packing services", slug: "packing-services", description: "Careful packing and unpacking for safe transportation of goods." },
-    { name: "Storage solutions", slug: "storage-solutions", description: "Short and long-term storage for furniture and household items." },
-    { name: "Furniture moving", slug: "furniture-moving", description: "Single-item or full furniture relocation services." },
-    { name: "Commercial moves", slug: "commercial-moves", description: "Office and business relocation services with minimal downtime." }
-  ]
-}]
+trades.push(
+  {
+    id: "concrete-foundations",
+    slug: "concrete-foundations",
+    name: "Concrete & Foundations",
+    type: "Trade",
+    category: "Structural & Heavy Trades",
+    description:
+      "Pouring, forming, and finishing concrete for foundations, driveways, and structural components.",
+    roles: ["Concrete Finisher", "Form Setter", "Foundation Worker"],
+    commonJobs: [
+      "Laying and finishing concrete slabs",
+      "Forming footings and foundations",
+      "Repairing cracks or resurfacing concrete",
+    ],
+    tags: ["construction", "foundations", "building"],
+    sicCode: "43999",
+    sicName: "Other specialised construction activities n.e.c.",
+    icon: RectangleStackIcon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["OSHA Construction Safety Certification"],
+    },
+  },
+  {
+    id: "excavation",
+    slug: "excavation",
+    name: "Excavation & Earthmoving",
+    type: "Trade",
+    category: "Structural & Heavy Trades",
+    description:
+      "Site preparation, grading, trenching, and digging for construction, utilities, and landscaping.",
+    roles: ["Excavator Operator", "Heavy Equipment Operator", "Groundworker"],
+    commonJobs: [
+      "Grading sites and clearing land",
+      "Digging trenches for utilities",
+      "Site preparation for foundations or landscaping",
+    ],
+    tags: ["earthworks", "machinery", "construction"],
+    sicCode: "43120",
+    sicName: "Site preparation",
+    icon: TruckIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Heavy Equipment Operator License", "Excavation Safety Certification"],
+    },
+  },
+  {
+    id: "steelwork-fabrication",
+    slug: "steelwork-fabrication",
+    name: "Steelwork & Fabrication",
+    type: "Trade",
+    category: "Structural & Heavy Trades",
+    description:
+      "Fabrication and installation of structural steel frameworks, beams, and metal assemblies.",
+    roles: ["Ironworker", "Fabricator", "Structural Steel Erector"],
+    commonJobs: [
+      "Installing steel beams and frames",
+      "Fabricating structural components",
+      "Welding and bolting assemblies on site",
+    ],
+    tags: ["metalwork", "construction", "structural"],
+    sicCode: "25110",
+    sicName: "Manufacture of metal structures and parts",
+    icon: WrenchIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Welding Certification", "Rigging & Lifting Safety"],
+    },
+  },
+  {
+    id: "welding",
+    slug: "welding",
+    name: "Welding & Metal Fabrication",
+    type: "Trade",
+    category: "Structural & Heavy Trades",
+    description:
+      "Joining and repairing metal parts for construction, manufacturing, and repair applications.",
+    roles: ["Welder", "Metal Fabricator", "Sheet Metal Worker"],
+    commonJobs: [
+      "Structural steel welding",
+      "Repairing or fabricating metal components",
+      "Custom metalwork and fabrication",
+    ],
+    tags: ["metalwork", "construction", "repair"],
+    sicCode: "25990",
+    sicName: "Manufacture of other fabricated metal products n.e.c.",
+    icon: Cog6ToothIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["AWS Welding Certification", "Hot Work Safety Training"],
+    },
+  },
+  {
+    id: "demolition",
+    slug: "demolition",
+    name: "Demolition",
+    type: "Trade",
+    category: "Structural & Heavy Trades",
+    description:
+      "Controlled dismantling and removal of structures, walls, and materials for redevelopment or renovation.",
+    roles: ["Demolition Worker", "Site Operative"],
+    commonJobs: [
+      "Interior strip-outs and removals",
+      "Controlled demolition of buildings",
+      "Debris removal and site clearance",
+    ],
+    tags: ["construction", "deconstruction", "safety"],
+    sicCode: "43110",
+    sicName: "Demolition",
+    icon: TrashIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Demolition Contractor License", "Asbestos Awareness Training"],
+    },
+  },
+  {
+    id: "scaffolding",
+    slug: "scaffolding",
+    name: "Scaffolding & Access Systems",
+    type: "Trade",
+    category: "Structural & Heavy Trades",
+    description:
+      "Erection and dismantling of scaffolding structures to provide safe access for construction and maintenance work.",
+    roles: ["Scaffolder", "Access Technician"],
+    commonJobs: [
+      "Erecting scaffolding for construction sites",
+      "Installing safety rails and planks",
+      "Dismantling and inspecting scaffold structures",
+    ],
+    tags: ["construction", "safety", "access"],
+    sicCode: "43991",
+    sicName: "Scaffold erection",
+    icon: BuildingOffice2Icon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Scaffolding License", "Working at Heights Certification"],
+    },
+  },
+);
+
+// Append to `trades` array
+
+trades.push(
+  {
+    id: "fire-protection",
+    slug: "fire-protection",
+    name: "Fire Protection Systems",
+    type: "Trade",
+    category: "Specialized & Technical Trades",
+    description:
+      "Installation, maintenance, and inspection of fire suppression and alarm systems in residential, commercial, and industrial settings.",
+    roles: ["Fire Alarm Technician", "Sprinkler Installer", "Fire Safety Inspector"],
+    commonJobs: [
+      "Installing fire alarms and sprinkler systems",
+      "Inspecting fire extinguishers and safety devices",
+      "Testing and maintaining emergency systems",
+    ],
+    tags: ["safety", "fire", "compliance"],
+    sicCode: "43210",
+    sicName: "Electrical installation",
+    icon: FireIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Fire Protection Contractor License", "NFPA Certification"],
+    },
+  },
+  {
+    id: "insulation",
+    slug: "insulation",
+    name: "Insulation Installation",
+    type: "Trade",
+    category: "Specialized & Technical Trades",
+    description:
+      "Installation of thermal, soundproofing, and fire-resistant insulation in walls, roofs, and floors.",
+    roles: ["Insulation Installer", "Energy Efficiency Technician"],
+    commonJobs: [
+      "Installing fiberglass or spray foam insulation",
+      "Soundproofing walls and ceilings",
+      "Applying fire-retardant insulation materials",
+    ],
+    tags: ["energy", "efficiency", "thermal"],
+    sicCode: "43290",
+    sicName: "Other construction installation",
+    icon: RectangleStackIcon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["Insulation Safety Training", "Energy Efficiency Certification"],
+    },
+  },
+  {
+    id: "waterproofing",
+    slug: "waterproofing",
+    name: "Waterproofing & Damp Treatment",
+    type: "Trade",
+    category: "Specialized & Technical Trades",
+    description:
+      "Application of coatings and membranes to prevent water penetration in foundations, basements, and roofs.",
+    roles: ["Waterproofing Technician", "Basement Specialist"],
+    commonJobs: [
+      "Sealing foundations and basements",
+      "Applying waterproof coatings or membranes",
+      "Installing sump pumps and drainage systems",
+    ],
+    tags: ["moisture", "protection", "construction"],
+    sicCode: "43290",
+    sicName: "Other construction installation",
+    icon: FireIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Waterproofing Contractor License", "Safety Compliance Certification"],
+    },
+  },
+  {
+    id: "elevator-installation",
+    slug: "elevator-installation",
+    name: "Elevator & Lift Systems",
+    type: "Trade",
+    category: "Specialized & Technical Trades",
+    description:
+      "Installation and maintenance of elevators, lifts, and escalator systems in residential and commercial buildings.",
+    roles: ["Elevator Mechanic", "Lift Installer", "Maintenance Technician"],
+    commonJobs: [
+      "Installing elevator systems and cabling",
+      "Routine maintenance and safety inspections",
+      "Modernizing older lift systems",
+    ],
+    tags: ["mechanical", "elevators", "safety"],
+    sicCode: "43290",
+    sicName: "Other construction installation",
+    icon: RectangleStackIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Elevator Mechanic License", "Electrical Safety Training"],
+    },
+  },
+  {
+    id: "low-voltage",
+    slug: "low-voltage",
+    name: "Low Voltage & Telecommunications",
+    type: "Trade",
+    category: "Specialized & Technical Trades",
+    description:
+      "Installation and maintenance of low-voltage systems including networking, communications, and audiovisual systems.",
+    roles: ["Data Cabler", "Telecom Technician", "AV Installer"],
+    commonJobs: [
+      "Installing structured cabling for networks",
+      "Setting up audiovisual and control systems",
+      "Running low-voltage wiring for access control and CCTV",
+    ],
+    tags: ["data", "network", "technology"],
+    sicCode: "43210",
+    sicName: "Electrical installation",
+    icon: BoltIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Low Voltage License", "Cabling Technician Certification"],
+    },
+  },
+  {
+    id: "ev-charging",
+    slug: "ev-charging",
+    name: "EV Charging Installation",
+    type: "Trade",
+    category: "Specialized & Technical Trades",
+    description:
+      "Installation of electric vehicle charging stations and integration with electrical systems for homes and businesses.",
+    roles: ["EV Installer", "Electrical Technician", "Energy Specialist"],
+    commonJobs: [
+      "Installing EV home chargers",
+      "Upgrading circuits for charging stations",
+      "Testing and maintaining charging systems",
+    ],
+    tags: ["electric", "energy", "sustainability"],
+    sicCode: "43210",
+    sicName: "Electrical installation",
+    icon: BoltIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["Electrical Contractor License", "EV Charging Installation Certification"],
+    },
+  },
+  {
+    id: "signage-installation",
+    slug: "signage-installation",
+    name: "Signage & Graphics Installation",
+    type: "Trade",
+    category: "Specialized & Technical Trades",
+    description:
+      "Installation and maintenance of commercial signs, graphics, and display systems.",
+    roles: ["Sign Installer", "Vinyl Technician", "Display Specialist"],
+    commonJobs: [
+      "Mounting exterior and interior signage",
+      "Installing LED and digital display systems",
+      "Applying vehicle or window graphics",
+    ],
+    tags: ["signage", "graphics", "installation"],
+    sicCode: "43999",
+    sicName: "Other specialised construction activities n.e.c.",
+    icon: ClipboardDocumentCheckIcon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["Working at Heights Certification"],
+    },
+  },
+);
+
+trades.push(
+  {
+    id: "architectural-design",
+    slug: "architectural-design",
+    name: "Architectural Design",
+    type: "Planning",
+    category: "Project & Planning Services",
+    description: "Produces building designs, layouts, and technical drawings for planning and construction approval.",
+    roles: ["Architectural Designer", "Building Designer"],
+    commonJobs: [
+      "Create concept and technical drawings",
+      "Submit building control applications",
+      "Design residential extensions or conversions"
+    ],
+    tags: ["planning", "design", "architecture"],
+    sicCode: "71111",
+    sicName: "Architectural activities",
+    icon: BuildingOffice2Icon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["RIBA Registration", "Planning Permission Advisory"],
+    },
+  },
+  {
+    id: "civil-structural-engineering",
+    slug: "civil-structural-engineering",
+    name: "Civil & Structural Engineering",
+    type: "Planning",
+    category: "Project & Planning Services",
+    description: "Provides structural calculations, load assessments, and engineering support for new builds and renovations.",
+    roles: ["Structural Engineer", "Civil Engineer"],
+    commonJobs: [
+      "Foundation design and load calculations",
+      "Structural reports for loft conversions",
+      "Steel beam sizing and verification"
+    ],
+    tags: ["engineering", "structure", "planning"],
+    sicCode: "71122",
+    sicName: "Engineering related scientific and technical consulting activities",
+    icon: Cog6ToothIcon,
+    images: [],
+    regulatory: {
+      licensed: true,
+      certs: ["ICE Membership", "Chartered Engineer Registration"],
+    },
+  },
+  {
+    id: "planning-consultancy",
+    slug: "planning-consultancy",
+    name: "Planning Consultancy",
+    type: "Planning",
+    category: "Project & Planning Services",
+    description: "Advises on planning permission, building regulations, and local authority approvals.",
+    roles: ["Planning Consultant", "Building Control Advisor"],
+    commonJobs: [
+      "Planning permission applications",
+      "Building regulation consultancy",
+      "Permitted development advice"
+    ],
+    tags: ["planning", "regulations", "consulting"],
+    sicCode: "71129",
+    sicName: "Other engineering activities",
+    icon: ClipboardDocumentCheckIcon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["RTPI Membership"],
+    },
+  },
+  {
+    id: "interior-design",
+    slug: "interior-design",
+    name: "Interior Design & Layout",
+    type: "Planning",
+    category: "Project & Planning Services",
+    description: "Creates interior layouts, material selections, and finishes for residential and commercial spaces.",
+    roles: ["Interior Designer", "Kitchen Designer"],
+    commonJobs: [
+      "Design room layouts and colour schemes",
+      "Select finishes, lighting, and furniture",
+      "Coordinate with contractors on installation"
+    ],
+    tags: ["interior", "design", "renovation"],
+    sicCode: "74102",
+    sicName: "Specialised design activities",
+    icon: RectangleStackIcon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["BIID Accreditation"],
+    },
+  },
+  {
+    id: "project-management",
+    slug: "project-management",
+    name: "Project Management",
+    type: "Planning",
+    category: "Project & Planning Services",
+    description: "Oversees the coordination of trades, scheduling, and budgeting for construction projects.",
+    roles: ["Project Manager", "Site Coordinator"],
+    commonJobs: [
+      "Schedule and coordinate multiple trades",
+      "Budget tracking and procurement",
+      "Supervise project delivery and quality"
+    ],
+    tags: ["management", "coordination", "construction"],
+    sicCode: "70229",
+    sicName: "Management consultancy activities (other than financial management)",
+    icon: BriefcaseIcon,
+    images: [],
+    regulatory: {
+      licensed: false,
+      certs: ["PMP Certification", "CSCS Manager Card"],
+    },
+  },
+);

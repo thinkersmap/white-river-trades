@@ -1,7 +1,10 @@
 import { use } from "react";
 import { Navigation } from "@/components/home/Navigation";
 import { getConstituencyBySlug } from "@/lib/getConstituencyData";
-import { trades } from "@/data/trades";
+import { trades, homeServices } from "@/data/trades";
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { TradeActions } from "@/components/trade/TradeActions";
@@ -34,7 +37,7 @@ export default function TradePage({ params }: Props) {
   const constituencyData = use(getConstituencyBySlug(constituencySlug));
   if (!constituencyData) notFound();
 
-  const trade = trades.find((t) => t.slug === tradeSlug);
+  const trade = allWorkCategories.find((t) => t.slug === tradeSlug);
   if (!trade) notFound();
 
   const Icon = trade.icon;

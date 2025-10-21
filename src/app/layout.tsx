@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import Link from "next/link";
 import { FacebookPixel } from "@/components/shared/FacebookPixel";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -97,6 +98,22 @@ export default function RootLayout({
       >
         <FacebookPixel />
         {children}
+        
+        {/* Footer */}
+        <footer className="bg-slate-950 border-t border-white/10">
+          <div className="max-w-[120rem] mx-auto px-4 py-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-white/60 text-sm">
+                © 2025 White River Trades 
+              </p>
+              <div className="flex items-center space-x-6 mt-4 md:mt-0">
+                <Link href="/privacy" className="text-white/60 hover:text-white text-sm transition-colors">Privacy</Link>
+                <Link href="/terms" className="text-white/60 hover:text-white text-sm transition-colors">Terms</Link>
+                <Link href="/contact" className="text-white/60 hover:text-white text-sm transition-colors">Contact</Link>
+              </div>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );

@@ -1,6 +1,9 @@
 import React from 'react';
 import { Dialog } from '@headlessui/react';
-import { trades } from '@/data/trades';
+import { trades, homeServices } from '@/data/trades';
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
 import { DialogHeader } from '../shared/DialogHeader';
 import { clearSearchData } from '@/lib/searchData';
 import { fbqTrack } from '@/lib/fbpixel';
@@ -48,41 +51,30 @@ export function TradesDialog({
                 <p className="text-base text-gray-500">Browse our selection of trusted local trades and services.</p>
               </div>
               {/* Group trades by category */}
-              {Array.from(new Set(trades.map(t => t.category))).map(category => (
+              {Array.from(new Set(allWorkCategories.map(t => t.category))).map(category => (
                 <div key={category}>
                   <h3 className="text-sm font-medium text-gray-400 mb-4">{category}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {trades
+                    {allWorkCategories
                       .filter(trade => trade.category === category)
                       .map((trade) => {
                         const Icon = trade.icon;
                         return (
                           <div 
                             key={trade.name}
-                            className={`
-                              bg-gray-50/60 border border-gray-200/60 rounded-md overflow-hidden transition-all
-                              ${!trade.available && 'opacity-60'}
-                            `}
+                            className="bg-gray-50/60 border border-gray-200/60 rounded-md overflow-hidden transition-all"
                           >
                             <button
                               onClick={() => {
-                                if (trade.available) {
-                                  console.log('TradesDialog: Firing directTradeSelected for', trade.name);
-                                  // Track directTradeSelected event
-                                  fbqTrack('directTradeSelected', {
-                                    content_name: trade.name,
-                                    content_category: 'trade',
-                                  });
-                                  onSelectTrade(trade.name);
-                                }
+                                console.log('TradesDialog: Firing directTradeSelected for', trade.name);
+                                // Track directTradeSelected event
+                                fbqTrack('directTradeSelected', {
+                                  content_name: trade.name,
+                                  content_category: 'trade',
+                                });
+                                onSelectTrade(trade.name);
                               }}
-                              className={`
-                                w-full p-3 sm:p-4 text-left transition-all
-                                ${trade.available 
-                                  ? 'hover:bg-gray-100/50 active:bg-gray-100' 
-                                  : 'cursor-not-allowed'
-                                }
-                              `}
+                              className="w-full p-3 sm:p-4 text-left transition-all hover:bg-gray-100/50 active:bg-gray-100"
                             >
                               <div className="flex items-start gap-3">
                                 <div className="p-1.5 bg-gray-100 rounded-md shrink-0">
@@ -91,23 +83,20 @@ export function TradesDialog({
                                 <div className="min-w-0 space-y-1.5 sm:space-y-2">
                                   <div className="flex items-center gap-2">
                                     <span className="text-sm font-medium text-gray-900">{trade.name}</span>
-                                    {!trade.available && (
-                                      <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Coming Soon</span>
-                                    )}
                                   </div>
                                   <div className="text-xs text-gray-600 line-clamp-2">{trade.description}</div>
                                   <div className="flex gap-1.5 flex-wrap">
-                                    {trade.subcategories.slice(0, 2).map(sub => (
+                                    {trade.commonJobs.slice(0, 2).map((job, index) => (
                                       <span 
-                                        key={sub.slug}
+                                        key={index}
                                         className="inline-flex text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"
                                       >
-                                        {sub.name}
+                                        {job}
                                       </span>
                                     ))}
-                                    {trade.subcategories.length > 2 && (
+                                    {trade.commonJobs.length > 2 && (
                                       <span className="inline-flex text-[10px] text-gray-400">
-                                        +{trade.subcategories.length - 2}
+                                        +{trade.commonJobs.length - 2}
                                       </span>
                                     )}
                                   </div>

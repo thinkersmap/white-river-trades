@@ -18,7 +18,9 @@ export async function POST(request: NextRequest) {
       contactInfo, 
       additionalInfo,
       urgency,
-      timeline 
+      timeline,
+      intent,
+      aiAnalysis
     } = body;
 
     if (!tradeName || !contactInfo?.name || !contactInfo?.email || !contactInfo?.phone) {
@@ -50,6 +52,8 @@ export async function POST(request: NextRequest) {
         'Additional Info': additionalInfo || '',
         'Urgency': urgency || 'medium',
         'Timeline': timeline || '',
+        'Intent': intent || 'problem',
+        'AI Analysis': aiAnalysis || '',
         'Status': 'New Lead',
       },
       // Allow Airtable to coerce values to the right types (e.g. select options)

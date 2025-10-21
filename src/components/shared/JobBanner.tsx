@@ -19,6 +19,9 @@ export function JobBanner({ tradeName, divisionName, postcode }: JobBannerProps)
   const [aiAnalysis, setAiAnalysis] = useState<string | undefined>(undefined);
   const [savedPostcode, setSavedPostcode] = useState<string | undefined>(undefined);
   const [savedDivision, setSavedDivision] = useState<string | undefined>(undefined);
+  const [intent, setIntent] = useState<"problem" | "project" | undefined>(undefined);
+  const [projectSteps, setProjectSteps] = useState<any[] | undefined>(undefined);
+  const [confidenceScore, setConfidenceScore] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const data = getSearchData();
@@ -29,6 +32,9 @@ export function JobBanner({ tradeName, divisionName, postcode }: JobBannerProps)
       setAiAnalysis(data.aiAnalysis || undefined);
       setSavedPostcode(data.postcode || undefined);
       setSavedDivision(data.division || undefined);
+      setIntent(data.intent || undefined);
+      setProjectSteps(data.projectSteps || undefined);
+      setConfidenceScore(data.confidenceScore || undefined);
     }
   }, [tradeName]);
 
@@ -113,6 +119,9 @@ export function JobBanner({ tradeName, divisionName, postcode }: JobBannerProps)
         aiAnalysis={hasValidSearchData ? aiAnalysis : undefined}
         postcode={savedPostcode}
         division={savedDivision}
+        intent={hasValidSearchData ? intent : undefined}
+        projectSteps={hasValidSearchData ? projectSteps : undefined}
+        confidenceScore={hasValidSearchData ? confidenceScore : undefined}
       />
     </div>
   );

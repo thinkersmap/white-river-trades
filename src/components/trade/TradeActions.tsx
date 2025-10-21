@@ -17,17 +17,24 @@ export function TradeActions({ tradeName, constituencyName, postcode }: TradeAct
   const [showDialog, setShowDialog] = useState(false);
   const [savedPostcode, setSavedPostcode] = useState<string | undefined>(undefined);
   const [savedDivision, setSavedDivision] = useState<string | undefined>(undefined);
+  const [intent, setIntent] = useState<"problem" | "project" | undefined>(undefined);
+  const [projectSteps, setProjectSteps] = useState<any[] | undefined>(undefined);
+  const [confidenceScore, setConfidenceScore] = useState<number | undefined>(undefined);
   
   // Get search data from localStorage and check for mismatch
   const searchData = getSearchData();
   const hasValidSearchData = searchData && searchData.selectedTrade === tradeName;
 
-  // Clear search data if there's a mismatch
+  // Clear search data if there's a mismatch and set project data
   React.useEffect(() => {
     console.log('TradeActions useEffect:', { searchData, tradeName, hasValidSearchData });
     if (searchData && searchData.selectedTrade && searchData.selectedTrade !== tradeName) {
       console.log('Trade mismatch detected, clearing data:', { saved: searchData.selectedTrade, current: tradeName });
       clearSearchData();
+    } else if (hasValidSearchData) {
+      setIntent(searchData?.intent || undefined);
+      setProjectSteps(searchData?.projectSteps || undefined);
+      setConfidenceScore(searchData?.confidenceScore || undefined);
     }
   }, [tradeName, searchData, hasValidSearchData]);
 
@@ -95,6 +102,9 @@ export function TradeActions({ tradeName, constituencyName, postcode }: TradeAct
         aiAnalysis={hasValidSearchData ? searchData?.aiAnalysis : undefined}
         postcode={savedPostcode}
         division={savedDivision}
+        intent={hasValidSearchData ? intent : undefined}
+        projectSteps={hasValidSearchData ? projectSteps : undefined}
+        confidenceScore={hasValidSearchData ? confidenceScore : undefined}
       />
     </>
   );

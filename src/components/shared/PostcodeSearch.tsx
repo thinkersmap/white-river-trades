@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getConstituencyFromPostcode } from "@/lib/postcodes";
 import { saveSearchData } from "@/lib/searchData";
-import { trades } from "@/data/trades";
+import { trades, homeServices } from "@/data/trades";
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
 import { fbqTrack } from "@/lib/fbpixel";
 
 interface PostcodeSearchProps {
@@ -27,7 +30,7 @@ export function PostcodeSearch({ tradeSlug }: PostcodeSearchProps) {
       const constituency = await getConstituencyFromPostcode(trimmed);
       
       // Get trade name from slug
-      const trade = trades.find(t => t.slug === tradeSlug);
+      const trade = allWorkCategories.find(t => t.slug === tradeSlug);
       const tradeName = trade?.name || tradeSlug;
       
       // Track ConnectedToDivision event

@@ -6,6 +6,21 @@ export interface SearchData {
   postcode?: string;
   division?: string;
   timestamp: number;
+  // Project-specific data
+  intent?: "problem" | "project";
+  projectSteps?: Array<{
+    stepName: string;
+    stepDescription: string;
+    recommendedTrades: string[];
+    estimatedPrice: {
+      low: number;
+      high: number;
+      currency: string;
+      notes: string;
+    };
+  }>;
+  confidenceScore?: number;
+  overview?: string;
 }
 
 const SEARCH_DATA_KEY = 'white-river-search-data';

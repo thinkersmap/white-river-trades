@@ -1,42 +1,82 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { trades } from "@/data/trades";
+import { trades, homeServices } from "@/data/trades";
 import { NextResponse } from "next/server";
+import { SearchResult } from "@/types/search";
+import { supabase } from "@/lib/supabaseClient";
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-// Types for the response
-export type TradeMatch = {
-  tradeName: string;
-  matchScore: number; // 0-100
-  matchReason: string;
-};
+// Function to log search data to database
+async function logSearch(query: string, response: SearchResult, request: Request) {
+  try {
+    if (!supabase) {
+      console.warn('Supabase client not available, skipping search log');
+      return;
+    }
 
-export type SearchResponse = {
-  overview: string;
-  recommendedTrade: string;
-  recommendationReason: string;
-  matches: TradeMatch[];
-};
+    // Extract user information from request
+    const userIP = request.headers.get('x-forwarded-for') || 
+                   request.headers.get('x-real-ip') || 
+                   'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    // Prepare search log data
+    const searchLogData = {
+      query,
+      intent: response.intent,
+      intent_reason: response.intentReason,
+      overview: response.overview,
+      recommended_trade: response.recommendedTrade || null,
+      recommendation_reason: response.recommendationReason || null,
+      confidence_score: response.confidenceScore || null,
+      user_ip: userIP,
+      user_agent: userAgent,
+      response_data: response
+    };
+
+    // Insert into search_logs table
+    const { error } = await supabase
+      .from('search_logs')
+      .insert([searchLogData]);
+
+    if (error) {
+      console.error('Failed to log search:', error);
+    } else {
+      console.log('Search logged successfully');
+    }
+  } catch (error) {
+    console.error('Error logging search:', error);
+  }
+}
 
 export async function POST(request: Request) {
   try {
     const { query } = await request.json();
 
     // Prepare trades data for Gemini (simplified version)
-    const tradesData = trades.map(trade => ({
+    const tradesData = allWorkCategories.map(trade => ({
       name: trade.name,
       description: trade.description,
-      subcategories: trade.subcategories.map(sub => ({
-        name: sub.name,
-        description: sub.description
-      }))
+      commonJobs: trade.commonJobs
     }));
 
     // Create the prompt for Gemini
-    const prompt = `You are a trade matching expert for a UK home services platform.
+    // Create the prompt for Gemini
+const prompt = `You are a trade matching and intent detection expert for a UK home services platform.
 
-Your job is to analyze a homeowner's request and determine the most relevant trades from our database, based on the nature of the work, the likely cause of the issue, and typical UK trade responsibilities.
+Your job is to:
+- Understand the intent behind a homeowner's request.
+- Classify whether the request is a **Problem** (something is broken, not working, or needs fixing)
+  or a **Project** (something planned, new, or being improved).
+- Identify all relevant trades or, if it's a project, generate a clear step-by-step workflow with estimated pricing.
+
+Intent definitions:
+- "problem": Reactive or repair-based work (e.g. something leaking, broken, faulty, damaged, blocked, or not working).
+- "project": Planned improvements, installations, renovations, or upgrades (e.g. install, build, replace, fit, design, add, renovate).
 
 Query:
 "${query}"
@@ -47,42 +87,86 @@ ${JSON.stringify(tradesData, null, 2)}
 ---
 
 Your goals:
-1. Understand the intent behind the user's request (for example, repair, installation, renovation, or inspection).
-2. Identify the most suitable trade or trades from the provided data.
-3. Provide a short, clear analysis that explains the issue or intent.
-4. Recommend up to 4 trades maximum, ordered by relevance.
-5. Assign realistic match scores between 0 and 100.
-6. For each trade, estimate an average price range in GBP based on UK market data for that type of work.
-   - Use broad, honest ranges (for example, 80–200 for small jobs, 300–800 for major repairs).
-   - Express as numeric values: "low" and "high".
-   - Always include "currency": "GBP".
-   - Add a short "notes" field explaining what the estimate covers (for example, call-out, parts, labour).
-7. If no exact match exists, choose the closest relevant trade and briefly explain why.
+1. Detect whether this query represents a **problem** or a **project** and output it as "intent".
+2. Provide a short explanation for this classification as "intentReason".
+
+3. If intent = "problem":
+   - Recommend the **single most relevant trade** and up to 4 total matches (ordered by relevance).
+   - Include:
+     - "recommendedTrade" and "recommendationReason"
+     - "estimatedPrice" for the top trade
+     - "matches" array for all relevant trades
+   - Each match must include:
+     - "tradeName"
+     - "matchScore" (0–100)
+     - "matchReason"
+     - "estimatedPrice" (with "low", "high", "currency", and "notes" fields)
+
+4. If intent = "project":
+   - Do **not** include "recommendedTrade" or "matchScore".
+   - Instead, include:
+     - "confidenceScore" (0–100) for how confidently this matches a known project type.
+     - "projectSteps" array describing the phases of work.
+   - Each step must include:
+     - "stepName": name of the phase (e.g. "Electrical Rough-In")
+     - "stepDescription": what happens at this stage
+     - "recommendedTrades": array of relevant trade names from the provided data
+     - "estimatedPrice": {
+         "low": number,
+         "high": number,
+         "currency": "GBP",
+         "notes": "short text describing what the cost covers"
+       }
+   - The total across steps should roughly align with realistic UK pricing for that project type.
+
+5. Always include:
+   - "overview": short summary of what the work likely involves and the trades suitable.
+   - Valid JSON output (no markdown, no commentary).
 
 ---
 
-Output format (strict JSON, no markdown, no extra text):
+Output format (strict JSON, no markdown, no text outside the JSON):
 
 {
-  "overview": "2 to 3 sentence summary explaining what the problem likely involves and what kind of trades are suitable.",
-  "recommendedTrade": "Name of the single most relevant trade",
-  "recommendationReason": "Why this trade best fits the job (1 to 2 sentences)",
+  "intent": "problem" | "project",
+  "intentReason": "short explanation",
+  "overview": "2–3 sentence summary",
+
+  // Only for problems:
+  "recommendedTrade": "string (omit for projects)",
+  "recommendationReason": "string (omit for projects)",
   "estimatedPrice": {
     "low": number,
     "high": number,
     "currency": "GBP",
-    "notes": "short sentence describing what the estimate includes"
+    "notes": "short description"
   },
   "matches": [
     {
-      "tradeName": "Trade name from tradesData",
-      "matchScore": number between 0 and 100,
-      "matchReason": "1 sentence explaining why this trade is suitable",
+      "tradeName": "string",
+      "matchScore": number,
+      "matchReason": "string",
       "estimatedPrice": {
         "low": number,
         "high": number,
         "currency": "GBP",
-        "notes": "short description"
+        "notes": "string"
+      }
+    }
+  ],
+
+  // Only for projects:
+  "confidenceScore": number,
+  "projectSteps": [
+    {
+      "stepName": "string",
+      "stepDescription": "string",
+      "recommendedTrades": ["string", "string"],
+      "estimatedPrice": {
+        "low": number,
+        "high": number,
+        "currency": "GBP",
+        "notes": "string"
       }
     }
   ]
@@ -91,12 +175,13 @@ Output format (strict JSON, no markdown, no extra text):
 ---
 
 Important rules:
-- Use plain English in all text fields.
-- Avoid vague statements (for example, "this trade may help"); be specific about what they can do.
-- Always include an estimatedPrice for both the top-level recommendation and each match.
-- Never add commentary or markdown formatting.
-- If the problem is unclear, recommend the most versatile trade (like "Handyman Services") and explain why.
-- Make sure your JSON is valid and can be parsed directly.`;
+- Always include "intent" and "intentReason".
+- Only include "recommendedTrade", "recommendationReason", and "matchScore" if intent = "problem".
+- Only include "confidenceScore" and "projectSteps" if intent = "project".
+- Use realistic UK cost ranges in GBP for all pricing.
+- Use plain English and ensure valid JSON output only (no markdown or extra text).
+- If the request is ambiguous, default to intent = "problem" and recommend "Handyman & General Maintenance".`;
+
 
     // Check for API key
     if (!process.env.GEMINI_API_KEY) {
@@ -156,7 +241,7 @@ Important rules:
       }
 
       // Parse the JSON response
-      let data: SearchResponse;
+      let data: SearchResult;
       try {
         data = JSON.parse(jsonText);
         
@@ -173,16 +258,27 @@ Important rules:
           throw new Error('Missing or invalid overview');
         }
 
-        if (!data.matches || !Array.isArray(data.matches) || data.matches.length === 0) {
-          throw new Error('No matching trades found');
+        if (!data.intent || !data.intentReason) {
+          throw new Error('Missing intent classification');
         }
 
-        // Validate each match
-        data.matches.forEach((match, index) => {
-          if (!match.tradeName || !match.matchScore || !match.matchReason) {
-            throw new Error(`Invalid match data at index ${index}`);
+        // Validate based on intent type
+        if (data.intent === 'problem') {
+          if (!data.matches || !Array.isArray(data.matches) || data.matches.length === 0) {
+            throw new Error('No matching trades found for problem');
           }
-        });
+
+          // Validate each match
+          data.matches.forEach((match, index) => {
+            if (!match.tradeName || !match.matchScore || !match.matchReason) {
+              throw new Error(`Invalid match data at index ${index}`);
+            }
+          });
+        } else if (data.intent === 'project') {
+          if (!data.projectSteps || !Array.isArray(data.projectSteps) || data.projectSteps.length === 0) {
+            throw new Error('No project steps found for project');
+          }
+        }
 
       } catch (error) {
               console.error('Failed to parse or validate Gemini response:', error);
@@ -198,6 +294,11 @@ Important rules:
                 { status: 500 }
               );
       }
+
+      // Log the search to database (non-blocking)
+      logSearch(query, data, request).catch(err => 
+        console.error('Failed to log search:', err)
+      );
 
       return NextResponse.json(data);
     } catch (error) {
