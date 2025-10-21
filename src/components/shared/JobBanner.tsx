@@ -5,6 +5,7 @@ import { ArrowRightIcon, CheckIcon, ShieldCheckIcon, HeartIcon } from "@heroicon
 import { JobDescriptionDialog } from "@/components/shared/JobDescriptionDialog";
 import { getSearchData, clearSearchData } from "@/lib/searchData";
 import { fbqTrack } from "@/lib/fbpixel";
+import { ProjectStep } from "@/types/search";
 
 interface JobBannerProps {
   tradeName: string;
@@ -20,7 +21,7 @@ export function JobBanner({ tradeName, divisionName, postcode }: JobBannerProps)
   const [savedPostcode, setSavedPostcode] = useState<string | undefined>(undefined);
   const [savedDivision, setSavedDivision] = useState<string | undefined>(undefined);
   const [intent, setIntent] = useState<"problem" | "project" | undefined>(undefined);
-  const [projectSteps, setProjectSteps] = useState<any[] | undefined>(undefined);
+  const [projectSteps, setProjectSteps] = useState<ProjectStep[] | undefined>(undefined);
   const [confidenceScore, setConfidenceScore] = useState<number | undefined>(undefined);
 
   useEffect(() => {

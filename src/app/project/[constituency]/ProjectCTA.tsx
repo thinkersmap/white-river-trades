@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { getSearchData, SearchData } from "@/lib/searchData";
 import { fbqTrack } from "@/lib/fbpixel";
 import { JobDescriptionDialog } from "@/components/shared/JobDescriptionDialog";
-import { ProjectStep } from "@/types/search";
 
 interface ProjectCTAProps {
   constituencyData: {
@@ -14,8 +12,6 @@ interface ProjectCTAProps {
 }
 
 export function ProjectCTA({ constituencyData }: ProjectCTAProps) {
-  const [searchData, setSearchData] = useState<SearchData | null>(null);
-  const [projectSteps, setProjectSteps] = useState<ProjectStep[]>([]);
   const [showDialog, setShowDialog] = useState(false);
 
   const handleStartProject = () => {
@@ -57,13 +53,8 @@ export function ProjectCTA({ constituencyData }: ProjectCTAProps) {
         isOpen={showDialog}
         onClose={() => setShowDialog(false)}
         tradeName="Project Management"
-        problemDescription={searchData?.problemDescription}
-        aiAnalysis={searchData?.aiAnalysis}
-        postcode={searchData?.postcode}
         division={constituencyData.name}
         intent="project"
-        projectSteps={searchData?.projectSteps}
-        confidenceScore={searchData?.confidenceScore}
       />
     </>
   );

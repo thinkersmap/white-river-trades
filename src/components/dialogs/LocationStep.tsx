@@ -65,21 +65,19 @@ export function LocationStep({ selectedTrade, tradeIcon: Icon, problemDescriptio
       
       // Save search data with postcode and division information
       // Always save postcode and division, even if no problem description
-      const searchDataToSave: any = {
+      const searchDataToSave = {
         problemDescription: problemDescription || '',
         aiAnalysis: aiAnalysis || '',
         selectedTrade: selectedTrade,
         postcode: postcode,
         division: constituency.name,
         intent: existingSearchData?.intent,
-        overview: existingSearchData?.overview
+        overview: existingSearchData?.overview,
+        ...(existingSearchData?.intent === 'project' && {
+          projectSteps: existingSearchData.projectSteps,
+          confidenceScore: existingSearchData.confidenceScore
+        })
       };
-
-      // Preserve project-specific data if it exists
-      if (existingSearchData?.intent === 'project') {
-        searchDataToSave.projectSteps = existingSearchData.projectSteps;
-        searchDataToSave.confidenceScore = existingSearchData.confidenceScore;
-      }
 
       saveSearchData(searchDataToSave);
       

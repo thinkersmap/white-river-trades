@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { JobDescriptionDialog } from "@/components/shared/JobDescriptionDialog";
 import { getSearchData, clearSearchData } from "@/lib/searchData";
 import { fbqTrack } from "@/lib/fbpixel";
+import { ProjectStep } from "@/types/search";
 
 interface TradeActionsProps {
   tradeSlug: string;
@@ -18,7 +19,7 @@ export function TradeActions({ tradeName, constituencyName, postcode }: TradeAct
   const [savedPostcode, setSavedPostcode] = useState<string | undefined>(undefined);
   const [savedDivision, setSavedDivision] = useState<string | undefined>(undefined);
   const [intent, setIntent] = useState<"problem" | "project" | undefined>(undefined);
-  const [projectSteps, setProjectSteps] = useState<any[] | undefined>(undefined);
+  const [projectSteps, setProjectSteps] = useState<ProjectStep[] | undefined>(undefined);
   const [confidenceScore, setConfidenceScore] = useState<number | undefined>(undefined);
   
   // Get search data from localStorage and check for mismatch
