@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/home/Navigation";
 import { Hero } from "@/components/home/Hero";
 import { SearchDialog } from "@/components/dialogs/SearchDialog";
 import { TradesDialog } from "@/components/dialogs/TradesDialog";
+import { WhyChooseUsDialog } from "@/components/dialogs/WhyChooseUsDialog";
+import { SearchResult } from "@/types/search";
 import { FinalCTA } from "@/components/shared/FinalCTA";
 import { saveSearchData, clearSearchData, getSearchData } from "@/lib/searchData";
 import { fbqTrack } from "@/lib/fbpixel";
@@ -42,31 +43,17 @@ export default function Home() {
   const [showTrades, setShowTrades] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<{
-    overview: string;
-    recommendedTrade: string;
-    recommendationReason: string;
-    estimatedPrice: {
-      low: number;
-      high: number;
-      currency: string;
-      notes: string;
-    };
-    matches: Array<{
-      tradeName: string;
-      matchScore: number;
-      matchReason: string;
-      estimatedPrice: {
-        low: number;
-        high: number;
-        currency: string;
-        notes: string;
-      };
-    }>;
-  } | null>(null);
+  const [searchResults, setSearchResults] = useState<SearchResult | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [messageIndex, setMessageIndex] = useState(0);
+  const [whyChooseUsDialog, setWhyChooseUsDialog] = useState<{
+    isOpen: boolean;
+    cardType: 'verified' | 'handle' | 'communication' | null;
+  }>({
+    isOpen: false,
+    cardType: null
+  });
 
 
   const loadingMessages = [
@@ -141,21 +128,29 @@ export default function Home() {
       console.log('Saving new search data:', {
         problemDescription: searchQuery,
         aiAnalysis: data.overview,
-        selectedTrade: data.recommendedTrade
+        selectedTrade: data.recommendedTrade || 'General Trade'
       });
       
       // Track Facebook Search event (on successful results)
       fbqTrack('Search', {
         search_string: searchQuery,
-        content_category: data.recommendedTrade,
+        content_category: data.recommendedTrade || 'General Trade',
       });
 
       // Save search data for use in other pages
-      saveSearchData({
+      const searchDataToSave = {
         problemDescription: searchQuery,
         aiAnalysis: data.overview,
-        selectedTrade: data.recommendedTrade
-      });
+        selectedTrade: data.recommendedTrade || 'General Trade',
+        intent: data.intent,
+        overview: data.overview,
+        ...(data.intent === 'project' && {
+          projectSteps: data.projectSteps,
+          confidenceScore: data.confidenceScore
+        })
+      };
+
+      saveSearchData(searchDataToSave);
       
       console.log('Search data after saving:', getSearchData());
     } catch (error) {
@@ -189,6 +184,20 @@ export default function Home() {
     setStep(2);
     
     console.log('handleSelectTrade: No event fired here - events should be fired by individual components');
+  };
+
+  const handleWhyChooseUsClick = (cardType: 'verified' | 'handle' | 'communication') => {
+    setWhyChooseUsDialog({
+      isOpen: true,
+      cardType
+    });
+  };
+
+  const handleWhyChooseUsClose = () => {
+    setWhyChooseUsDialog({
+      isOpen: false,
+      cardType: null
+    });
   };
 
 
@@ -229,7 +238,7 @@ export default function Home() {
 
       {/* Why Homeowners Choose Us Section */}
       <section className="py-16 lg:py-24 relative">
-        <WhyChooseUsSection />
+        <WhyChooseUsSection onCardClick={handleWhyChooseUsClick} />
       </section>
 
       <FinalCTA 
@@ -243,21 +252,83 @@ export default function Home() {
         }}
       />
 
-      {/* Footer */}
-      <footer className="bg-slate-950 border-t border-white/10">
-        <div className="max-w-[120rem] mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-white/60 text-sm">
-              © 2025 White River Trades 
+      {/* Message from the Founders */}
+      <div className="w-full mt-16 sm:mt-20 lg:mt-24">
+        <div className="w-full px-4 sm:px-6 lg:px-12">
+          {/* Section Header */}
+          <div className="mb-8 sm:mb-12 lg:mb-16">
+            <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-900 text-white flex items-center justify-center text-xs sm:text-sm font-bold tracking-wide ring-2 ring-gray-500/20">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="h-px bg-gray-200 flex-1" />
+            </div>
+            <h3 className="text-2xl sm:text-3xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-3 sm:mb-4 lg:mb-6 max-w-5xl leading-tight">
+              Message from the founders
+            </h3>
+            <p className="text-base sm:text-lg lg:text-2xl text-gray-600 leading-relaxed max-w-4xl font-light">
+              Why we built White River Trades and what drives us every day
             </p>
-            <div className="flex items-center space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="text-white/60 hover:text-white text-sm transition-colors">Privacy</Link>
-              <Link href="/terms" className="text-white/60 hover:text-white text-sm transition-colors">Terms</Link>
-              <Link href="/contact" className="text-white/60 hover:text-white text-sm transition-colors">Contact</Link>
+          </div>
+          
+          {/* Founder Message Content */}
+          <div className="w-full">
+            <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-8 sm:p-12 lg:p-16 shadow-sm">
+              {/* Quote */}
+              <blockquote className="text-lg sm:text-xl lg:text-2xl text-gray-800 font-medium leading-relaxed mb-8 sm:mb-12 lg:mb-16 italic">
+                &ldquo;We believe every homeowner deserves access to trusted, verified tradespeople who can solve their problems quickly and affordably. That&apos;s why we built White River Trades.&rdquo;
+              </blockquote>
+              
+              {/* Mission & Promise */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 mb-8 sm:mb-12 lg:mb-16">
+                <div>
+                  <h4 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Our Mission</h4>
+                  <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                    To connect homeowners with the right tradespeople for their specific needs, using technology to make the process transparent, efficient, and trustworthy.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Our Promise</h4>
+                  <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+                    Every tradesperson on our platform is verified, insured, and committed to delivering quality work at fair prices. Your home deserves nothing less.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Founders */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-4 ring-4 ring-gray-100 shadow-lg">
+                    <img 
+                      src="/images/hasith.jpg" 
+                      alt="Hasith" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h5 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">Hasith</h5>
+                  <p className="text-sm sm:text-base text-gray-600">Co-Founder</p>
+                </div>
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-4 ring-4 ring-gray-100 shadow-lg">
+                    <img 
+                      src="/images/stephen.jpeg" 
+                      alt="Stephen" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h5 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">Stephen</h5>
+                  <p className="text-sm sm:text-base text-gray-600">Co-Founder</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </footer>
+      </div>
+
+      {/* Additional spacing below founders section */}
+      <div className="mt-16 sm:mt-20 lg:mt-24"></div>
 
       <SearchDialog
         isOpen={isOpen}
@@ -290,6 +361,12 @@ export default function Home() {
           setIsOpen(true);
         }}
         onSelectTrade={handleSelectTrade}
+      />
+
+      <WhyChooseUsDialog
+        isOpen={whyChooseUsDialog.isOpen}
+        onClose={handleWhyChooseUsClose}
+        cardType={whyChooseUsDialog.cardType}
       />
     </div>
   );
@@ -554,7 +631,7 @@ function LearnMoreAccordion({ stepNumber }: { stepNumber: string }) {
 function TimelineSteps() {
   const steps = [
     {
-      title: 'Describe your problem',
+      title: 'Describe your problem or project',
       subtitle: 'Tell us what you need done and our AI will analyze your request to suggest the best trades for the job.',
       stepNumber: '01',
       accent: 'blue',
@@ -1250,33 +1327,7 @@ function QuoteSkeletonAnimation() {
 }
 
 // Why Choose Us Section - Subheading flow with novel visuals
-function WhyChooseUsSection() {
-  const stories = [
-    {
-      title: 'You\'re not alone in feeling overwhelmed',
-      subtitle: 'Every homeowner has been there',
-      description: 'That sinking feeling when something breaks. The panic of not knowing who to call. The dread of being ripped off or getting shoddy work.',
-      accent: 'red'
-    },
-    {
-      title: 'There\'s a better way',
-      subtitle: 'Meet Sarah from Kingston',
-      description: 'Sarah had the same fears. Then she discovered White River Trades. Within 24 hours, she had three detailed quotes from qualified local tradespeople.',
-      accent: 'blue'
-    },
-    {
-      title: 'You\'re in complete control',
-      subtitle: 'No pressure, no surprises',
-      description: 'Compare detailed quotes side by side. Ask questions directly to tradespeople. Negotiate terms. You decide when you\'re ready.',
-      accent: 'green'
-    },
-    {
-      title: 'Quality you can count on',
-      subtitle: 'Every job backed by our guarantee',
-      description: 'All tradespeople are vetted and qualified. Every job comes with our workmanship guarantee. If something isn\'t right, we make it right.',
-      accent: 'purple'
-    }
-  ];
+function WhyChooseUsSection({ onCardClick }: { onCardClick: (cardType: 'verified' | 'handle' | 'communication') => void }) {
 
   return (
     <div className="w-full">
@@ -1335,16 +1386,24 @@ function WhyChooseUsSection() {
                   </svg>
                 )
               }
-            ].map((card, idx) => (
-            <motion.div
-                key={card.title}
-                initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ margin: '-10% 0px -10% 0px', once: true }}
-                transition={{ duration: 0.6, ease: 'easeOut', delay: idx * 0.15 }}
-                className="group"
-              >
-                <div className="relative rounded-xl sm:rounded-2xl border border-white/20 bg-black shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+            ].map((card, idx) => {
+              const cardType = card.title === 'Verified Local Professionals' ? 'verified' :
+                              card.title === 'We Handle Everything' ? 'handle' : 'communication';
+              
+              return (
+              <motion.div
+                  key={card.title}
+                  initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ margin: '-10% 0px -10% 0px', once: true }}
+                  transition={{ duration: 0.6, ease: 'easeOut', delay: idx * 0.15 }}
+                  className="group"
+                >
+                  <button
+                    onClick={() => onCardClick(cardType)}
+                    className="w-full text-left"
+                  >
+                    <div className="relative rounded-xl sm:rounded-2xl border border-white/20 bg-black shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden cursor-pointer">
                   {/* Complex free-form gradient background */}
                   <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
                   
@@ -1408,9 +1467,11 @@ function WhyChooseUsSection() {
                       Learn more →
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+                    </div>
+                  </button>
+                </motion.div>
+              );
+            })}
         </div>
         </div>
 

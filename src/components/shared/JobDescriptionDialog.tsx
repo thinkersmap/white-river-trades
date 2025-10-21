@@ -5,6 +5,7 @@ import { Dialog } from '@headlessui/react';
 import { DialogHeader } from './DialogHeader';
 import { constituenciesMeta } from '@/data/constituencies-meta';
 import { fbqTrack } from "@/lib/fbpixel";
+import { ProjectStep } from '@/types/search';
 
 interface JobDescriptionDialogProps {
   isOpen: boolean;
@@ -14,6 +15,10 @@ interface JobDescriptionDialogProps {
   aiAnalysis?: string;
   postcode?: string;
   division?: string;
+  // New props for project support
+  intent?: "problem" | "project";
+  projectSteps?: ProjectStep[];
+  confidenceScore?: number;
 }
 
 export function JobDescriptionDialog({ 
@@ -23,7 +28,10 @@ export function JobDescriptionDialog({
   problemDescription,
   aiAnalysis,
   postcode,
-  division
+  division,
+  intent = "problem",
+  projectSteps,
+  confidenceScore
 }: JobDescriptionDialogProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -285,7 +293,9 @@ export function JobDescriptionDialog({
         contactInfo: formData.contactInfo,
         additionalInfo,
         urgency: formData.urgency,
-        timeline: formData.timeline
+        timeline: formData.timeline,
+        intent: intent || 'problem',
+        aiAnalysis: aiAnalysis || ''
       };
 
       // Submit to Airtable
@@ -345,10 +355,16 @@ export function JobDescriptionDialog({
               </svg>
             </div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Finding {tradeName.toLowerCase()} professionals
+              {intent === 'project' 
+                ? 'Starting your project' 
+                : `Finding ${tradeName.toLowerCase()} professionals`
+              }
             </h1>
             <p className="text-gray-600">
-              We&apos;re contacting qualified companies in {formData.division || division}
+              {intent === 'project' 
+                ? `We're setting up your project phases in ${formData.division || division}`
+                : `We're contacting qualified companies in ${formData.division || division}`
+              }
             </p>
           </div>
 
@@ -361,8 +377,18 @@ export function JobDescriptionDialog({
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-1">We&apos;ll call you within 24 hours</h3>
-                <p className="text-sm text-gray-600">Keep your phone nearby - we&apos;ll confirm your job details</p>
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  {intent === 'project' 
+                    ? 'We\'ll call you within 24 hours' 
+                    : 'We\'ll call you within 24 hours'
+                  }
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {intent === 'project' 
+                    ? 'Keep your phone nearby - we\'ll confirm your project details and timeline'
+                    : 'Keep your phone nearby - we\'ll confirm your job details'
+                  }
+                </p>
               </div>
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
@@ -374,12 +400,18 @@ export function JobDescriptionDialog({
 
           {/* Simple Job Summary */}
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Your Job</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">
+              {intent === 'project' ? 'Your Project' : 'Your Job'}
+            </h3>
             <div className="space-y-3">
               {/* Service - stacked on mobile, inline on sm+ */}
               <div className="sm:flex sm:items-center sm:justify-between">
-                <span className="text-gray-700">Service</span>
-                <div className="mt-1 sm:mt-0 font-medium text-gray-900">{tradeName}</div>
+                <span className="text-gray-700">
+                  {intent === 'project' ? 'Project Type' : 'Service'}
+                </span>
+                <div className="mt-1 sm:mt-0 font-medium text-gray-900">
+                  {intent === 'project' ? 'Multi-phase Project' : tradeName}
+                </div>
               </div>
               {/* Location - stacked on mobile, inline on sm+ */}
               <div className="sm:flex sm:items-center sm:justify-between">
@@ -392,6 +424,30 @@ export function JobDescriptionDialog({
                   <p className="text-sm text-gray-900 mt-1">
                     &ldquo;{problemDescription || problemInput}&rdquo;
                   </p>
+                </div>
+              )}
+
+              {/* Project Steps - only show for project intent */}
+              {intent === 'project' && projectSteps && projectSteps.length > 0 && (
+                <div className="pt-3 border-t border-gray-100">
+                  <span className="text-gray-700 text-sm">Project Phases</span>
+                  <div className="mt-2 space-y-2">
+                    {projectSteps.slice(0, 3).map((step, index) => (
+                      <div key={index} className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">
+                          {index + 1}. {step.stepName}
+                        </span>
+                        <span className="text-gray-900 font-medium">
+                          £{step.estimatedPrice.low.toLocaleString()}-£{step.estimatedPrice.high.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                    {projectSteps.length > 3 && (
+                      <div className="text-sm text-gray-500">
+                        +{projectSteps.length - 3} more phases
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
               
@@ -427,8 +483,15 @@ export function JobDescriptionDialog({
                   <span className="text-xs font-medium text-gray-600">2</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Companies send quotes</p>
-                  <p className="text-xs text-gray-600">You&apos;ll receive 2-3 detailed quotes</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {intent === 'project' ? 'Project planning begins' : 'Companies send quotes'}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    {intent === 'project' 
+                      ? 'We\'ll create a detailed timeline for each phase'
+                      : 'You\'ll receive 2-3 detailed quotes'
+                    }
+                  </p>
                 </div>
               </div>
               
@@ -437,8 +500,15 @@ export function JobDescriptionDialog({
                   <span className="text-xs font-medium text-gray-600">3</span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Choose and book</p>
-                  <p className="text-xs text-gray-600">Compare quotes and book your preferred company</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {intent === 'project' ? 'Phase-by-phase execution' : 'Choose and book'}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    {intent === 'project' 
+                      ? 'Each phase will be handled by the right specialists'
+                      : 'Compare quotes and book your preferred company'
+                    }
+                  </p>
                 </div>
               </div>
             </div>
@@ -477,10 +547,13 @@ export function JobDescriptionDialog({
             <div className="max-w-2xl mx-auto">
               <div className="text-center mb-8">
                 <h2 className="text-2xl sm:text-3xl font-medium text-gray-900 tracking-[-0.01em] mb-3">
-                  Job Summary
+                  {intent === 'project' ? 'Project Summary' : 'Job Summary'}
                 </h2>
                 <p className="text-base text-gray-700">
-                  Here&apos;s what we understand about your project
+                  {intent === 'project' 
+                    ? 'Here\'s what we understand about your project' 
+                    : 'Here\'s what we understand about your project'
+                  }
                 </p>
               </div>
 
@@ -496,7 +569,9 @@ export function JobDescriptionDialog({
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-gray-900">Your Problem</h4>
+                          <h4 className="font-semibold text-gray-900">
+                            {intent === 'project' ? 'Your Project' : 'Your Problem'}
+                          </h4>
                           {editingField !== 'problem' && (
                             <button
                               onClick={() => startEditing('problem', problemDescription || problemInput)}
@@ -522,7 +597,7 @@ export function JobDescriptionDialog({
                                   ? 'border-red-300 focus:ring-red-500' 
                                   : 'border-gray-300 focus:ring-blue-500'
                               }`}
-                              placeholder="Describe your problem in detail..."
+                              placeholder={intent === 'project' ? 'Describe your project in detail...' : 'Describe your problem in detail...'}
                             />
                             <div className="flex space-x-2">
                               <button
@@ -555,8 +630,15 @@ export function JobDescriptionDialog({
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 mb-2">Your Problem</h4>
-                        <p className="text-gray-600 text-sm mb-3">Describe what&apos;s wrong or what you need done</p>
+                        <h4 className="font-semibold text-gray-900 mb-2">
+                          {intent === 'project' ? 'Your Project' : 'Your Problem'}
+                        </h4>
+                        <p className="text-gray-600 text-sm mb-3">
+                          {intent === 'project' 
+                            ? 'Describe your project or what you need done'
+                            : 'Describe what\'s wrong or what you need done'
+                          }
+                        </p>
                         {fieldErrors.problem && (
                           <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-md">
                             <p className="text-sm text-red-600">{fieldErrors.problem}</p>
@@ -568,7 +650,7 @@ export function JobDescriptionDialog({
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
                               className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900 placeholder:text-gray-500"
-                              placeholder="Describe your problem in detail..."
+                              placeholder={intent === 'project' ? 'Describe your project in detail...' : 'Describe your problem in detail...'}
                             />
                             <div className="flex space-x-2">
                               <button
@@ -590,7 +672,7 @@ export function JobDescriptionDialog({
                             onClick={() => startEditing('problem', '')}
                             className="text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-2 rounded hover:bg-blue-50 transition-colors"
                           >
-                            + Add problem description
+                            {intent === 'project' ? '+ Add project description' : '+ Add problem description'}
                           </button>
                         )}
                       </div>
@@ -857,13 +939,56 @@ export function JobDescriptionDialog({
                   </div>
                 )}
 
+                {/* Project Steps - only show for project intent */}
+                {intent === 'project' && projectSteps && projectSteps.length > 0 && (
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-blue-200">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <h4 className="font-semibold text-gray-900">Project Workflow</h4>
+                      {confidenceScore && (
+                        <div className="ml-auto text-sm text-gray-600">
+                          {confidenceScore}% confidence
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-4">
+                      {projectSteps.map((step, index) => (
+                        <div key={index} className="bg-white rounded-lg p-4 border border-blue-100">
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                              {index + 1}
+                            </div>
+                            <div className="flex-1">
+                              <h5 className="font-medium text-gray-900 mb-1">{step.stepName}</h5>
+                              <p className="text-sm text-gray-600 mb-2">{step.stepDescription}</p>
+                              <div className="flex items-center justify-between">
+                                <div className="text-sm text-gray-500">
+                                  {step.recommendedTrades.join(', ')}
+                                </div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  £{step.estimatedPrice.low.toLocaleString()} - £{step.estimatedPrice.high.toLocaleString()}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
               </div>
 
               <div className="mt-8 bg-blue-50 rounded-lg p-6 border border-blue-100">
                 <div className="text-center">
-                  <h4 className="font-semibold text-gray-900 mb-2">Ready to get quotes?</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">
+                    {intent === 'project' ? 'Ready to start your project?' : 'Ready to get quotes?'}
+                  </h4>
                   <p className="text-sm text-gray-600">
-                    We&apos;ll connect you with verified {tradeName.toLowerCase()} professionals in your area
+                    {intent === 'project' 
+                      ? 'We\'ll connect you with verified professionals for each phase of your project'
+                      : `We'll connect you with verified ${tradeName.toLowerCase()} professionals in your area`
+                    }
                   </p>
                 </div>
               </div>

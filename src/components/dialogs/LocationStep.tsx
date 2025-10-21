@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getConstituencyFromPostcode } from '@/lib/postcodes';
-import { trades } from '@/data/trades';
-import { saveSearchData, clearSearchData } from '@/lib/searchData';
+import { trades, homeServices } from '@/data/trades';
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
+import { saveSearchData, clearSearchData, getSearchData } from '@/lib/searchData';
 import { fbqTrack } from '@/lib/fbpixel';
 
 interface LocationStepProps {
@@ -10,9 +13,10 @@ interface LocationStepProps {
   tradeIcon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   problemDescription?: string;
   aiAnalysis?: string;
+  intent?: "problem" | "project";
 }
 
-export function LocationStep({ selectedTrade, tradeIcon: Icon, problemDescription, aiAnalysis }: LocationStepProps) {
+export function LocationStep({ selectedTrade, tradeIcon: Icon, problemDescription, aiAnalysis, intent }: LocationStepProps) {
   const router = useRouter();
   const [postcode, setPostcode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -56,24 +60,42 @@ export function LocationStep({ selectedTrade, tradeIcon: Icon, problemDescriptio
         trade: selectedTrade,
       });
       
+      // Get existing search data to preserve project information
+      const existingSearchData = getSearchData();
+      
       // Save search data with postcode and division information
       // Always save postcode and division, even if no problem description
-      saveSearchData({
+      const searchDataToSave = {
         problemDescription: problemDescription || '',
         aiAnalysis: aiAnalysis || '',
         selectedTrade: selectedTrade,
         postcode: postcode,
-        division: constituency.name
-      });
+        division: constituency.name,
+        intent: existingSearchData?.intent,
+        overview: existingSearchData?.overview,
+        ...(existingSearchData?.intent === 'project' && {
+          projectSteps: existingSearchData.projectSteps,
+          confidenceScore: existingSearchData.confidenceScore
+        })
+      };
+
+      saveSearchData(searchDataToSave);
       
-      // Look up the trade by its display name and use its canonical slug
-      const tradeSlug = trades.find(t => t.name === selectedTrade)?.slug
-        || selectedTrade.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      
-      // Redirect to the trade/constituency page
-      const target = `/${tradeSlug}/${constituency.slug}`;
-      console.log("[LocationStep] navigating to", target);
-      router.push(target);
+      // Check if this is a project workflow
+      if (intent === 'project') {
+        // For projects, redirect to the project page
+        const target = `/project/${constituency.slug}`;
+        console.log("[LocationStep] navigating to project page", target);
+        router.push(target);
+      } else {
+        // For problems, redirect to the trade/constituency page
+        const tradeSlug = allWorkCategories.find(t => t.name === selectedTrade)?.slug
+          || selectedTrade.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        
+        const target = `/${tradeSlug}/${constituency.slug}`;
+        console.log("[LocationStep] navigating to trade page", target);
+        router.push(target);
+      }
     } catch (error) {
       console.error("[LocationStep] error", error);
       setError(error instanceof Error ? error.message : 'Failed to find your constituency');
@@ -85,9 +107,15 @@ export function LocationStep({ selectedTrade, tradeIcon: Icon, problemDescriptio
     <div className="p-4 sm:p-6">
       <div className="max-w-2xl mx-auto space-y-8">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full">
-            <Icon className="w-4 h-4 text-gray-600" />
-            <span className="text-sm text-gray-900 font-medium">{selectedTrade}</span>
+          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
+            intent === 'project' 
+              ? 'bg-blue-50 text-blue-700 border border-blue-200' 
+              : 'bg-gray-50'
+          }`}>
+            <Icon className={`w-4 h-4 ${intent === 'project' ? 'text-blue-600' : 'text-gray-600'}`} />
+            <span className={`text-sm font-medium ${intent === 'project' ? 'text-blue-700' : 'text-gray-900'}`}>
+              {intent === 'project' ? 'Project' : selectedTrade}
+            </span>
           </div>
         </div>
 

@@ -2,31 +2,13 @@ import { Dialog } from '@headlessui/react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { DialogHeader } from '../shared/DialogHeader';
 import { LocationStep } from './LocationStep';
-import { trades } from '@/data/trades';
+import { trades, homeServices } from '@/data/trades';
 import { useState } from 'react';
 import { fbqTrack } from '@/lib/fbpixel';
-interface SearchResult {
-  overview: string;
-  recommendedTrade: string;
-  recommendationReason: string;
-  estimatedPrice: {
-    low: number;
-    high: number;
-    currency: string;
-    notes: string;
-  };
-  matches: Array<{
-    tradeName: string;
-    matchScore: number;
-    matchReason: string;
-    estimatedPrice: {
-      low: number;
-      high: number;
-      currency: string;
-      notes: string;
-    };
-  }>;
-}
+import { SearchResult } from '@/types/search';
+
+// Combine all work categories
+const allWorkCategories = [...trades, ...homeServices];
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -102,42 +84,31 @@ export function SearchDialog({
                   <p className="text-base text-gray-500">Browse our selection of trusted local trades and services.</p>
                 </div>
 
-                {Array.from(new Set(trades.map(t => t.category))).map(category => (
+                {Array.from(new Set(allWorkCategories.map(t => t.category))).map(category => (
                   <div key={category}>
                     <h3 className="text-sm font-medium text-gray-400 mb-4">{category}</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {trades
+                      {allWorkCategories
                         .filter(trade => trade.category === category)
                         .map((trade) => {
                           const Icon = trade.icon;
                           return (
                             <div 
                               key={trade.name}
-                              className={`
-                                bg-gray-50/60 border border-gray-200/60 rounded-md overflow-hidden transition-all
-                                ${!trade.available && 'opacity-60'}
-                              `}
+                              className="bg-gray-50/60 border border-gray-200/60 rounded-md overflow-hidden transition-all"
                             >
                               <button
                                 onClick={() => {
-                                  if (trade.available) {
-                                    // Track directTradeSelected event
-                                    fbqTrack('directTradeSelected', {
-                                      content_name: trade.name,
-                                      content_category: 'trade',
-                                    });
-                                    setSelectedTrade(trade.name);
-                                    setStep(2);
-                                    setView('location');
-                                  }
+                                  // Track directTradeSelected event
+                                  fbqTrack('directTradeSelected', {
+                                    content_name: trade.name,
+                                    content_category: 'trade',
+                                  });
+                                  setSelectedTrade(trade.name);
+                                  setStep(2);
+                                  setView('location');
                                 }}
-                                className={`
-                                  w-full p-3 sm:p-4 text-left transition-all
-                                  ${trade.available 
-                                    ? 'hover:bg-gray-100/50 active:bg-gray-100' 
-                                    : 'cursor-not-allowed'
-                                  }
-                                `}
+                                className="w-full p-3 sm:p-4 text-left transition-all hover:bg-gray-100/50 active:bg-gray-100"
                               >
                                 <div className="flex items-start gap-3">
                                   <div className="p-1.5 bg-gray-100 rounded-md shrink-0">
@@ -146,23 +117,20 @@ export function SearchDialog({
                                   <div className="min-w-0 space-y-1.5 sm:space-y-2">
                                     <div className="flex items-center gap-2">
                                       <span className="text-sm font-medium text-gray-900">{trade.name}</span>
-                                      {!trade.available && (
-                                        <span className="text-[10px] font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Coming Soon</span>
-                                      )}
                                     </div>
                                     <div className="text-xs text-gray-600 line-clamp-2">{trade.description}</div>
                                     <div className="flex gap-1.5 flex-wrap">
-                                      {trade.subcategories.slice(0, 2).map(sub => (
+                                      {trade.commonJobs.slice(0, 2).map((job, index) => (
                                         <span 
-                                          key={sub.slug}
+                                          key={index}
                                           className="inline-flex text-[10px] text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded"
                                         >
-                                          {sub.name}
+                                          {job}
                                         </span>
                                       ))}
-                                      {trade.subcategories.length > 2 && (
+                                      {trade.commonJobs.length > 2 && (
                                         <span className="inline-flex text-[10px] text-gray-400">
-                                          +{trade.subcategories.length - 2}
+                                          +{trade.commonJobs.length - 2}
                                         </span>
                                       )}
                                     </div>
@@ -179,9 +147,10 @@ export function SearchDialog({
             ) : view === 'location' ? (
               <LocationStep
                 selectedTrade={selectedTrade}
-                tradeIcon={trades.find(t => t.name === selectedTrade)?.icon || (() => null)}
+                tradeIcon={allWorkCategories.find(t => t.name === selectedTrade)?.icon || (() => null)}
                 problemDescription={searchQuery}
                 aiAnalysis={searchResults?.overview}
+                intent={searchResults?.intent}
               />
             ) : (
               <div className="p-4 sm:p-6">
@@ -286,10 +255,24 @@ export function SearchDialog({
                             {searchError}
                           </div>
                         </div>
-                      ) : searchResults?.matches ? (
+                      ) : searchResults ? (
                         <>
+                          {/* Intent Classification */}
+                          <div className="mb-6">
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                searchResults.intent === 'problem' 
+                                  ? 'bg-red-50 text-red-700 border border-red-200' 
+                                  : 'bg-blue-50 text-blue-700 border border-blue-200'
+                              }`}>
+                                {searchResults.intent === 'problem' ? 'Problem' : 'Project'}
+                              </div>
+                              <div className="text-sm text-gray-500">{searchResults.intentReason}</div>
+                            </div>
+                          </div>
+
                           {/* Analysis Overview */}
-                          <div>
+                          <div className="mb-8">
                             <div className="text-sm text-gray-400 font-medium mb-3">AI ANALYSIS</div>
                             <div className="bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] rounded-lg p-6">
                               <div className="text-base text-gray-600 leading-relaxed">
@@ -298,91 +281,201 @@ export function SearchDialog({
                             </div>
                           </div>
 
-                          {/* Matching Trades */}
-                          <div>
-                            <div className="text-sm text-gray-400 font-medium mb-4">RECOMMENDED TRADES</div>
-                            <div className="space-y-4">
-                              {searchResults.matches.map((match) => {
-                                const trade = trades.find(t => t.name === match.tradeName);
-                                if (!trade) return null;
-                                
-                                const Icon = trade.icon;
-                                return (
-                                  <div 
-                                    key={trade.name}
-                                    className="group border border-gray-200 rounded-xl overflow-hidden transition-all hover:border-gray-300 hover:shadow-sm"
-                                  >
-                                    <div className="flex flex-col">
-                                      {/* Header */}
-                                      <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100">
-                                        <div className="flex items-center gap-3">
-                                          <div className="p-2.5 bg-gray-50 rounded-lg shrink-0 group-hover:bg-white transition-colors">
-                                            <Icon className="w-5 h-5 text-gray-600" />
+                          {/* Problem Intent - Trade Matches */}
+                          {searchResults.intent === 'problem' && searchResults.matches && (
+                            <div>
+                              <div className="text-sm text-gray-400 font-medium mb-4">RECOMMENDED TRADES</div>
+                              <div className="space-y-4">
+                                {searchResults.matches.map((match) => {
+                                  const trade = allWorkCategories.find(t => t.name === match.tradeName);
+                                  if (!trade) return null;
+                                  
+                                  const Icon = trade.icon;
+                                  return (
+                                    <div 
+                                      key={trade.name}
+                                      className="group border border-gray-200 rounded-xl overflow-hidden transition-all hover:border-gray-300 hover:shadow-sm"
+                                    >
+                                      <div className="flex flex-col">
+                                        {/* Header */}
+                                        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-100">
+                                          <div className="flex items-center gap-3">
+                                            <div className="p-2.5 bg-gray-50 rounded-lg shrink-0 group-hover:bg-white transition-colors">
+                                              <Icon className="w-5 h-5 text-gray-600" />
+                                            </div>
+                                            <div className="text-lg font-medium text-gray-900">{trade.name}</div>
                                           </div>
-                                          <div className="text-lg font-medium text-gray-900">{trade.name}</div>
+                                          <div className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                                            match.matchScore >= 80 ? 'bg-green-50 text-green-700' :
+                                            match.matchScore >= 50 ? 'bg-yellow-50 text-yellow-700' :
+                                            'bg-gray-50 text-gray-500'
+                                          }`}>
+                                            {match.matchScore}% match
+                                          </div>
                                         </div>
-                                        <div className={`px-2.5 py-1 rounded-full text-sm font-medium ${
-                                          match.matchScore >= 80 ? 'bg-green-50 text-green-700' :
-                                          match.matchScore >= 50 ? 'bg-yellow-50 text-yellow-700' :
-                                          'bg-gray-50 text-gray-500'
-                                        }`}>
-                                          {match.matchScore}% match
+
+                                        {/* Content */}
+                                        <div className="p-4 sm:p-5 space-y-4">
+                                          {/* Description */}
+                                          <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
+
+                                          {/* Match Reason */}
+                                          <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
+
+                                          {/* Price Box */}
+                                          <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                            <div className="flex items-baseline gap-1.5">
+                                              <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.low.toLocaleString()}</div>
+                                              <div className="text-gray-400">-</div>
+                                              <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.high.toLocaleString()}</div>
+                                            </div>
+                                            <div className="text-sm text-gray-500">{match.estimatedPrice.notes}</div>
+                                          </div>
+
+                                          {/* Common Jobs */}
+                                          <div className="flex flex-wrap gap-2 pt-1">
+                                            {trade.commonJobs.slice(0, 3).map((job, index) => (
+                                              <span 
+                                                key={index}
+                                                className="inline-flex text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg group-hover:bg-gray-50 transition-colors"
+                                              >
+                                                {job}
+                                              </span>
+                                            ))}
+                                            {trade.commonJobs.length > 3 && (
+                                              <span className="inline-flex text-xs text-gray-400">
+                                                +{trade.commonJobs.length - 3} more
+                                              </span>
+                                            )}
+                                          </div>
+
+                                          {/* Select Button */}
+                                          <button 
+                                            onClick={() => {
+                                              // Track SuggestedTradeSelected event
+                                              fbqTrack('SuggestedTradeSelected', {
+                                                content_name: trade.name,
+                                                content_category: 'trade',
+                                              });
+                                              setSelectedTrade(trade.name);
+                                              setStep(2);
+                                              setView('location');
+                                            }}
+                                            className="w-full px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                                          >
+                                            Select {trade.name}
+                                          </button>
                                         </div>
                                       </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
 
-                                      {/* Content */}
-                                      <div className="p-4 sm:p-5 space-y-4">
-                                        {/* Description */}
-                                        <div className="text-base text-gray-600 leading-relaxed">{trade.description}</div>
+                          {/* Project Intent - Enhanced Project Steps */}
+                          {searchResults.intent === 'project' && searchResults.projectSteps && (
+                            <div className="space-y-8">
+                              {/* Project Header */}
+                              <div className="text-center space-y-4">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full border border-blue-200">
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                  <span className="text-sm font-semibold text-blue-700">PROJECT WORKFLOW</span>
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900">Your Project Journey</h2>
+                                <p className="text-gray-600 max-w-2xl mx-auto">
+                                  Here&apos;s how your project will unfold, step by step. Each phase has specific trades and estimated costs.
+                                </p>
+                                {searchResults.confidenceScore && (
+                                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span className="text-sm font-medium text-gray-700">
+                                      {searchResults.confidenceScore}% confidence match
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
 
-                                        {/* Match Reason */}
-                                        <div className="text-sm text-gray-600 leading-relaxed bg-gradient-to-r from-purple-500/[0.1] to-blue-500/[0.1] p-3 rounded-lg">{match.matchReason}</div>
-
-                                        {/* Price Box */}
-                                        <div className="bg-gray-50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                                          <div className="flex items-baseline gap-1.5">
-                                            <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.low.toLocaleString()}</div>
-                                            <div className="text-gray-400">-</div>
-                                            <div className="text-2xl font-medium text-gray-900">£{match.estimatedPrice.high.toLocaleString()}</div>
+                              {/* Mobile-Optimized Step Timeline */}
+                              <div className="space-y-4">
+                                {searchResults.projectSteps?.map((step, index) => (
+                                  <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                                    {/* Step Header */}
+                                    <div className="p-4 sm:p-6">
+                                      <div className="flex items-start gap-4">
+                                        {/* Step Number */}
+                                        <div className="flex-shrink-0">
+                                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-lg flex items-center justify-center text-sm sm:text-base font-bold">
+                                            {index + 1}
                                           </div>
-                                          <div className="text-sm text-gray-500">{match.estimatedPrice.notes}</div>
                                         </div>
-
-                                        {/* Subcategories */}
-                                        <div className="flex flex-wrap gap-2 pt-1">
-                                          {trade.subcategories.map(sub => (
-                                            <span 
-                                              key={sub.slug}
-                                              className="inline-flex text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg group-hover:bg-gray-50 transition-colors"
-                                            >
-                                              {sub.name}
-                                            </span>
-                                          ))}
+                                        
+                                        {/* Step Content */}
+                                        <div className="flex-1 min-w-0">
+                                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">{step.stepName}</h3>
+                                          <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-4">{step.stepDescription}</p>
+                                          
+                                          {/* Required Trades - Mobile Optimized */}
+                                          <div className="space-y-3">
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-1 h-3 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
+                                              <span className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wide">Required Trades</span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                              {step.recommendedTrades.map((tradeName, tradeIndex) => {
+                                                const trade = allWorkCategories.find(t => t.name === tradeName);
+                                                if (!trade) return null;
+                                                const Icon = trade.icon;
+                                                return (
+                                                  <div 
+                                                    key={tradeIndex}
+                                                    className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200"
+                                                  >
+                                                    <Icon className="w-4 h-4 text-blue-600" />
+                                                    <span className="text-sm font-medium text-gray-800">{tradeName}</span>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          </div>
                                         </div>
+                                      </div>
+                                    </div>
 
-                                        {/* Select Button */}
-                                        <button 
-                                          onClick={() => {
-                                            // Track SuggestedTradeSelected event
-                                            fbqTrack('SuggestedTradeSelected', {
-                                              content_name: trade.name,
-                                              content_category: 'trade',
-                                            });
-                                            setSelectedTrade(trade.name);
-                                            setStep(2);
-                                            setView('location');
-                                          }}
-                                          className="w-full px-4 py-3 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
-                                        >
-                                          Select {trade.name}
-                                        </button>
+                                    {/* Price Estimate - Mobile Optimized */}
+                                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100">
+                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                        <div className="space-y-1">
+                                          <div className="text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide">Estimated Cost</div>
+                                          <div className="flex items-baseline gap-2">
+                                            <div className="text-xl sm:text-2xl font-bold text-gray-900">£{step.estimatedPrice.low.toLocaleString()}</div>
+                                            <div className="text-gray-400">-</div>
+                                            <div className="text-xl sm:text-2xl font-bold text-gray-900">£{step.estimatedPrice.high.toLocaleString()}</div>
+                                          </div>
+                                          <div className="text-xs sm:text-sm text-gray-500">{step.estimatedPrice.notes}</div>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
-                                );
-                              })}
+                                ))}
+                              </div>
+
+                              {/* Project Summary - Mobile Optimized */}
+                              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 sm:p-6 lg:p-8 border border-blue-200">
+                                <div className="text-center space-y-3 sm:space-y-4">
+                                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Ready to Start Your Project?</h3>
+                                  <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
+                                    Each phase will be handled by the right professionals. We&apos;ll connect you with trusted tradespeople for each step.
+                                  </p>
+                                  <div className="flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-500">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span>Total phases: {searchResults.projectSteps.length}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </>
                       ) : null}
                     </div>
@@ -414,6 +507,31 @@ export function SearchDialog({
               </div>
             )}
           </div>
+
+          {/* Footer with Continue button for projects */}
+          {searchResults && searchResults.intent === 'project' && view === 'search' && (
+            <div className="border-t border-gray-200 bg-gray-50 px-4 sm:px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Ready to start your project? We&apos;ll help you find the right trades for each step.
+                </div>
+                <button
+                  onClick={() => {
+                    // Track project continue event
+                    fbqTrack('ProjectContinue', {
+                      content_name: 'project_workflow',
+                      content_category: 'project',
+                    });
+                    setStep(2);
+                    setView('location');
+                  }}
+                  className="px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Continue with Project
+                </button>
+              </div>
+            </div>
+          )}
         </Dialog.Panel>
       </div>
     </Dialog>
