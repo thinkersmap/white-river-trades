@@ -263,7 +263,7 @@ export default function RoofInspectionPage() {
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">Real Tragedy: Bradford Roof Collapse</h2>
                 <p className="text-gray-700 mb-4 text-base sm:text-lg leading-relaxed">
                   In August 2020, a 47-year-old man was killed when a chimney collapsed through his roof in Bradford. 
-                  His partner suffered injuries as debris fell into their bedroom. Neighbors heard a "loud bang" at 4:30 AM.
+                  His partner suffered injuries as debris fell into their bedroom. Neighbors heard a &quot;loud bang&quot; at 4:30 AM.
                 </p>
                 <p className="text-gray-600 mb-6 text-sm sm:text-base">
                   This tragic incident highlights how quickly roof failures can become life-threatening. What started as a structural issue escalated into a fatal accident in moments.
