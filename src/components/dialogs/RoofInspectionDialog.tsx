@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog } from '@headlessui/react';
 import { DialogHeader } from '../shared/DialogHeader';
 import { fbqTrack } from "@/lib/fbpixel";
-import { ExclamationTriangleIcon, CheckCircleIcon, ClockIcon, CurrencyPoundIcon, ArrowRightIcon, HomeIcon, EyeIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
+import { ExclamationTriangleIcon, CheckCircleIcon, ClockIcon, HomeIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
 
 interface RoofInspectionDialogProps {
   isOpen: boolean;
@@ -435,7 +435,7 @@ export function RoofInspectionDialog({
                       <h4 className="font-semibold text-gray-900 mb-2">How urgent is this?</h4>
                       <select
                         value={formData.urgency}
-                        onChange={(e) => setFormData(prev => ({ ...prev, urgency: e.target.value as any }))}
+                        onChange={(e) => setFormData(prev => ({ ...prev, urgency: e.target.value as "immediate" | "urgent" | "soon" }))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900"
                       >
                         <option value="soon">Soon - Within a few weeks</option>
