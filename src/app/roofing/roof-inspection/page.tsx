@@ -1,9 +1,15 @@
+"use client";
+
 import { Navigation } from "@/components/home/Navigation";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
-import { ExclamationTriangleIcon, CheckCircleIcon, ClockIcon, CurrencyPoundIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import { ExclamationTriangleIcon, CheckCircleIcon, ClockIcon, CurrencyPoundIcon, ArrowRightIcon, HomeIcon, EyeIcon, WrenchScrewdriverIcon } from "@heroicons/react/24/outline";
 import { ImageWithFallback } from "@/components/shared/ImageWithFallback";
+import { RoofInspectionDialog } from "@/components/dialogs/RoofInspectionDialog";
+import { useState } from "react";
 
 export default function RoofInspectionPage() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
   const breadcrumbItems = [
     { label: "Roofing", href: "/roofing" },
     { label: "Roof Inspection" }
@@ -190,13 +196,13 @@ export default function RoofInspectionPage() {
   const getUrgencyIcon = (urgency: string) => {
     switch (urgency) {
       case 'immediate':
-        return '🚨';
+        return <ExclamationTriangleIcon className="w-6 h-6" />;
       case 'urgent':
-        return '⚠️';
+        return <ExclamationTriangleIcon className="w-6 h-6" />;
       case 'soon':
-        return '⏰';
+        return <ClockIcon className="w-6 h-6" />;
       default:
-        return 'ℹ️';
+        return <HomeIcon className="w-6 h-6" />;
     }
   };
 
@@ -222,11 +228,20 @@ export default function RoofInspectionPage() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <button className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-red-600 text-white text-base sm:text-lg font-medium rounded-full hover:bg-red-700 active:bg-red-800 transition-colors duration-200 shadow-lg hover:shadow-xl touch-manipulation">
+                <button 
+                  onClick={() => setIsDialogOpen(true)}
+                  className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-red-600 text-white text-base sm:text-lg font-medium rounded-full hover:bg-red-700 active:bg-red-800 transition-colors duration-200 shadow-lg hover:shadow-xl touch-manipulation"
+                >
                   Get Emergency Inspection
                   <ArrowRightIcon className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
-                <button className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-white text-gray-900 text-base sm:text-lg font-medium rounded-full border border-gray-300 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-200 touch-manipulation">
+                <button 
+                  onClick={() => {
+                    const warningSection = document.getElementById('warning-signs');
+                    warningSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-white text-gray-900 text-base sm:text-lg font-medium rounded-full border border-gray-300 hover:bg-gray-50 active:bg-gray-100 transition-colors duration-200 touch-manipulation"
+                >
                   Learn Warning Signs
                 </button>
               </div>
@@ -254,7 +269,7 @@ export default function RoofInspectionPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-sm border border-red-100">
             <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6">
-              <div className="flex-shrink-0 mx-auto sm:mx-0">
+              <div className="flex-shrink-0 mx-auto sm:mx-0 mr-0 sm:mr-4">
                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-xl sm:rounded-2xl flex items-center justify-center">
                   <ExclamationTriangleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
                 </div>
@@ -284,7 +299,7 @@ export default function RoofInspectionPage() {
       </div>
 
       {/* Warning Signs Section */}
-      <div className="py-16 sm:py-20 lg:py-24 bg-white">
+      <div id="warning-signs" className="py-16 sm:py-20 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-3 sm:space-y-4 mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-gray-900 tracking-tight">
@@ -304,7 +319,7 @@ export default function RoofInspectionPage() {
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center space-x-2 sm:space-x-3">
                     <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center ${getUrgencyColor(sign.urgency).replace('text-', 'bg-').replace('bg-red-600', 'bg-red-100').replace('bg-orange-600', 'bg-orange-100').replace('bg-yellow-600', 'bg-yellow-100')}`}>
-                      <span className="text-lg sm:text-2xl">{getUrgencyIcon(sign.urgency)}</span>
+                      <div className="text-red-600">{getUrgencyIcon(sign.urgency)}</div>
                     </div>
                     <div className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium uppercase tracking-wide ${getUrgencyColor(sign.urgency)}`}>
                       {sign.urgency}
@@ -318,7 +333,7 @@ export default function RoofInspectionPage() {
                   
                   <div className="aspect-video bg-gray-50 rounded-lg sm:rounded-xl overflow-hidden relative">
                     <ImageWithFallback
-                      src={`/warning-sign-${index + 1}.png`}
+                      src={`/images/roof-inspection/warning-sign-${index + 1}.png`}
                       alt={sign.sign}
                       fill
                       className="object-cover"
@@ -333,59 +348,75 @@ export default function RoofInspectionPage() {
 
       {/* Emergency Section */}
       <div className="py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-red-600 to-red-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div className="space-y-6 sm:space-y-8 order-2 lg:order-1">
-              <div className="space-y-3 sm:space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-500 rounded-full flex items-center justify-center">
-                    <ExclamationTriangleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white tracking-tight">
-                    Emergency Situations
-                  </h2>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-8 sm:space-y-12">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex items-center justify-center space-x-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-500 rounded-full flex items-center justify-center">
+                  <ExclamationTriangleIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                 </div>
-                <p className="text-lg sm:text-xl text-red-100 leading-relaxed">
-                  If you notice any of these signs, evacuate the area immediately and call for emergency inspection.
-                </p>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                  Emergency Situations
+                </h2>
+              </div>
+              <p className="text-xl sm:text-2xl text-red-100 leading-relaxed max-w-4xl mx-auto">
+                If you notice any of these warning signs, take immediate action and contact a professional for urgent inspection.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+              <div className="bg-red-500/20 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 border border-red-400/30">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4 sm:mb-6 flex items-center space-x-2 sm:space-x-3">
+                  <WrenchScrewdriverIcon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                  <span>Recommended Actions</span>
+                </h3>
+                <ul className="space-y-3 sm:space-y-4">
+                  {[
+                    "Move away from the affected area for safety",
+                    "Turn off electricity to prevent fire risk", 
+                    "Move valuable items to a safe location",
+                    "Call emergency services if structural damage is visible",
+                    "Contact a professional roofer for urgent inspection"
+                  ].map((action, index) => (
+                    <li key={index} className="flex items-start space-x-3 sm:space-x-4">
+                      <div className="w-6 h-6 bg-red-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white font-bold text-sm">{index + 1}</span>
+                      </div>
+                      <span className="text-red-100 text-base sm:text-lg leading-relaxed">{action}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
               
-              <div className="space-y-4 sm:space-y-6">
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-semibold text-white mb-3 sm:mb-4">Immediate Actions:</h3>
+              <div className="bg-red-500/20 rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-8 border border-red-400/30">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4 sm:mb-6 flex items-center space-x-2 sm:space-x-3">
+                  <EyeIcon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                  <span>When to Call</span>
+                </h3>
+                <div className="space-y-3 sm:space-y-4">
+                  <p className="text-red-100 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6">
+                    Call immediately if you see any of these critical signs:
+                  </p>
                   <ul className="space-y-2 sm:space-y-3">
                     {[
-                      "Evacuate the affected area immediately",
-                      "Turn off electricity to prevent fire risk", 
-                      "Move valuable items to safety",
-                      "Call emergency services if structural damage is visible",
-                      "Contact a professional roofer immediately"
-                    ].map((action, index) => (
-                      <li key={index} className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-red-200 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-red-100 text-sm sm:text-base">{action}</span>
+                      "Visible roof sagging or bowing",
+                      "Large sections of missing tiles", 
+                      "Water pouring through ceilings",
+                      "Cracks in walls or ceilings",
+                      "Doors and windows sticking or jamming"
+                    ].map((sign, index) => (
+                      <li key={index} className="flex items-start space-x-2 sm:space-x-3">
+                        <ExclamationTriangleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-200 flex-shrink-0 mt-1" />
+                        <span className="text-red-100 text-sm sm:text-base">{sign}</span>
                       </li>
                     ))}
                   </ul>
+                  <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-red-600/30 rounded-lg sm:rounded-xl border border-red-400/50">
+                    <p className="text-white font-semibold text-base sm:text-lg">
+                      Early detection and action can prevent serious damage.
+                    </p>
+                  </div>
                 </div>
-                
-                <div className="bg-red-500/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-red-400/30">
-                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-3">When to Call:</h3>
-                  <p className="text-red-100 leading-relaxed text-sm sm:text-base">
-                    Call immediately if you see: visible roof sagging, large sections of missing tiles, water pouring through ceilings, or any signs of imminent structural failure. Don&apos;t wait—roof collapses can happen in minutes.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative order-1 lg:order-2">
-              <div className="aspect-[4/3] bg-red-500/10 rounded-2xl sm:rounded-3xl border border-red-400/20 overflow-hidden relative">
-                <ImageWithFallback
-                  src="/emergency-roof.png"
-                  alt="Emergency roof damage situation"
-                  fill
-                  className="object-cover"
-                />
               </div>
             </div>
           </div>
@@ -437,14 +468,6 @@ export default function RoofInspectionPage() {
                   </div>
                 </div>
                 
-                <div className="mt-4 sm:mt-6 aspect-video bg-gray-100 rounded-xl sm:rounded-2xl overflow-hidden relative">
-                  <ImageWithFallback
-                    src={`/inspection-step-${index + 1}.png`}
-                    alt={`${step.step} process`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
               </div>
             ))}
           </div>
@@ -453,76 +476,79 @@ export default function RoofInspectionPage() {
 
       {/* Pricing Section */}
       <div className="py-16 sm:py-20 lg:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-3 sm:space-y-4 mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-gray-900 tracking-tight">
-              Inspection Costs
+              Typical Inspection Costs
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-              Professional roof inspections typically cost between £150-£400 depending on scope and urgency.
+            <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto">
+              Professional roof inspection pricing varies by scope, urgency, and property size. Here&apos;s what you can typically expect to pay.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {pricingRanges.map((range, index) => (
-              <div key={index} className={`relative bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-sm border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 touch-manipulation ${
-                index === 1 ? 'border-indigo-200 ring-2 ring-indigo-100' : 'border-gray-100'
-              }`}>
-                {index === 1 && (
-                  <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-indigo-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium">
-                      Most Popular
-                    </div>
-                  </div>
-                )}
+              <div key={index} className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-lg">
                 
-                <div className="text-center space-y-4 sm:space-y-6">
+                <div className="text-center space-y-6">
                   <div>
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-2">{range.type}</h3>
-                    <div className="flex items-center justify-center space-x-2 mb-3 sm:mb-4">
-                      <CurrencyPoundIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
-                      <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-indigo-600">{range.price}</span>
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3">{range.type}</h3>
+                    <div className="flex items-center justify-center space-x-2 mb-4">
+                      <CurrencyPoundIcon className="w-8 h-8 text-indigo-600" />
+                      <span className="text-3xl sm:text-4xl font-bold text-indigo-600">{range.price}</span>
                     </div>
-                    <p className="text-gray-600 text-sm sm:text-base lg:text-lg">{range.description}</p>
+                    <p className="text-gray-600 text-base sm:text-lg">{range.description}</p>
                   </div>
                   
-                  <div className="space-y-3 sm:space-y-4">
-                    <h4 className="text-base sm:text-lg font-semibold text-gray-900">Includes:</h4>
-                    <ul className="space-y-2 sm:space-y-3">
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">What&apos;s typically included:</h4>
+                    <ul className="space-y-3 text-left">
                       {range.includes.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-start space-x-2 sm:space-x-3">
-                          <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <li key={itemIndex} className="flex items-start space-x-3">
+                          <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                           <span className="text-gray-700 text-sm sm:text-base">{item}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  
-                  <div className="aspect-video bg-gray-100 rounded-lg sm:rounded-xl overflow-hidden mb-4 sm:mb-6 relative">
-                    <ImageWithFallback
-                      src={`/pricing-tier-${index + 1}.png`}
-                      alt={`${range.type} service`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  
-                  <button className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl sm:rounded-2xl font-semibold text-base sm:text-lg transition-colors duration-200 touch-manipulation ${
-                    index === 1 
-                      ? 'bg-indigo-600 text-white hover:bg-indigo-700 active:bg-indigo-800' 
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300'
-                  }`}>
-                    Get This Inspection
-                  </button>
                 </div>
               </div>
             ))}
+          </div>
+          
+          <div className="mt-12 bg-gray-50 rounded-2xl sm:rounded-3xl p-6 sm:p-8">
+            <div className="text-center space-y-4">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-900">Important Notes</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Pricing Factors:</h4>
+                  <ul className="space-y-1 text-sm text-gray-600">
+                    <li>• Property size and complexity</li>
+                    <li>• Roof height and accessibility</li>
+                    <li>• Urgency of inspection</li>
+                    <li>• Geographic location</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">What Affects Cost:</h4>
+                  <ul className="space-y-1 text-sm text-gray-600">
+                    <li>• Emergency vs. scheduled inspection</li>
+                    <li>• Detailed reporting requirements</li>
+                    <li>• Additional services (drones, thermal imaging)</li>
+                    <li>• Travel distance for contractor</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mt-4">
+                *Actual costs may vary.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Benefits Section */}
-      <div className="py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-indigo-50 to-blue-50">
+      <div className="py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-green-50 to-emerald-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-3 sm:space-y-4 mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-gray-900 tracking-tight">
@@ -533,35 +559,26 @@ export default function RoofInspectionPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             {[
               "Prevent catastrophic roof failure before it happens",
               "Identify hidden water damage and structural issues", 
-              "Get accurate repair cost estimates from qualified professionals",
-              "Protect your family&apos;s safety and your home&apos;s value",
-              "Peace of mind with detailed inspection reports",
-              "Access to emergency repair services if needed",
-              "Insurance claim support and documentation",
-              "Professional recommendations for preventive maintenance"
+              "Protect your family's safety and your home's value",
+              "Get peace of mind with professional assessment",
+              "Save money by catching problems early",
+              "Ensure insurance compliance and coverage",
+              "Increase your property's market value",
+              "Get expert recommendations for maintenance"
             ].map((benefit, index) => (
               <div key={index} className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 touch-manipulation">
                 <div className="flex items-start space-x-3 sm:space-x-4">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
-                    <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                    <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                   </div>
                   <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{benefit}</p>
                 </div>
               </div>
             ))}
-          </div>
-          
-          <div className="mt-8 sm:mt-12 aspect-video bg-gray-100 rounded-2xl sm:rounded-3xl overflow-hidden relative">
-            <ImageWithFallback
-              src="/roof-inspection-benefits.png"
-              alt="Benefits of professional roof inspection"
-              fill
-              className="object-cover"
-            />
           </div>
         </div>
       </div>
@@ -603,11 +620,17 @@ export default function RoofInspectionPage() {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-              <button className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-white text-gray-900 text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 shadow-lg hover:shadow-xl touch-manipulation">
-                Find Roofing Professionals
+              <button 
+                onClick={() => setIsDialogOpen(true)}
+                className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-white text-gray-900 text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 shadow-lg hover:shadow-xl touch-manipulation"
+              >
+                Request Roof Inspection
                 <ArrowRightIcon className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-              <button className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-red-600 text-white text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl hover:bg-red-700 active:bg-red-800 transition-all duration-200 shadow-lg hover:shadow-xl touch-manipulation">
+              <button 
+                onClick={() => setIsDialogOpen(true)}
+                className="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-red-600 text-white text-base sm:text-lg font-semibold rounded-xl sm:rounded-2xl hover:bg-red-700 active:bg-red-800 transition-all duration-200 shadow-lg hover:shadow-xl touch-manipulation"
+              >
                 Get Emergency Help
                 <ExclamationTriangleIcon className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
               </button>
@@ -621,6 +644,13 @@ export default function RoofInspectionPage() {
           </div>
         </div>
       </div>
+      
+      {/* Roof Inspection Dialog */}
+      <RoofInspectionDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        urgency="urgent"
+      />
     </div>
   );
 }
